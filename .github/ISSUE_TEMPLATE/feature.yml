@@ -8,8 +8,8 @@ body:
         Thanks for the idea.
 
         Valve is **experimental 1.0.x** — API surface may move while that status remains.
-        Operands and a live docs site (`valve.relicloops.org`) are tracked separately
-        and are not required for the first public tag.
+        Operands are tracked separately and are not required for the first public tag.
+        Docs live at https://valve.relicloops.org.
         Please search [existing issues](https://github.com/relicloops/valve/issues?q=is%3Aissue)
         first.
 

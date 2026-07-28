@@ -4,9 +4,7 @@ Thanks for helping with Valve. This library is **experimental `1.0.x`**
 (Apache-2.0). The public API may change while that status remains — please call
 that out in issues and PRs when behaviour or headers move.
 
-Public docs will eventually live at `https://valve.relicloops.org`. Until that
-site is live, treat the README, `docs/`, and public headers as the source of
-truth.
+Public docs live at [valve.relicloops.org](https://valve.relicloops.org). The README, `docs/`, and the public headers in this repository remain the source of truth when they disagree with the site.
 
 By participating, you agree to the [Code of Conduct](CODE_OF_CONDUCT.md).
 

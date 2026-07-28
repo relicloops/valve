@@ -13,10 +13,9 @@ the community.
 | Security vulnerability | [SECURITY.md](SECURITY.md) — **private** advisory only |
 | Conduct | [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) |
 
-## Docs (interim)
+## Docs
 
-Until `https://valve.relicloops.org` is live, use:
-
+* [valve.relicloops.org](https://valve.relicloops.org) — quick start, concepts, status, downloads
 * [README](README.md)
 * [Reference](docs/reference/README.md)
 * [Examples](docs/example/README.md)

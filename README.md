@@ -15,6 +15,8 @@ A command line is where a program first meets its users. `valve` helps C program
 
 Declare accepted options and, when needed, verbs and sub-verbs. `vl_parse` validates `argc` / `argv`, converts values to their declared types, and can fill caller-owned config structs. Built-in help and version banners, terminal-aware color, structured parse errors, and target teardown keep the whole lifecycle in one small library with no third-party runtime dependencies.
 
+Documentation lives at [valve.relicloops.org](https://valve.relicloops.org), including a quick start, the parsing concepts, current status, and a verified source download.
+
 ## Status and limitations
 
 Valve `1.x` is experimental. Minor releases may change the public source or ABI contract, so consumers should pin an exact version tag. Valve will announce when the experimental status is lifted; from that release onward, breaking public API or ABI changes require a major-version bump, backward-compatible additions require a minor-version bump, and fixes require a patch-version bump. The final `BUILD` component identifies the published build.
