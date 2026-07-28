@@ -6,3 +6,12 @@ contact_links:
   - name: Contributing
     url: https://github.com/relicloops/valve/blob/main/CONTRIBUTING.md
     about: How to build with Meson and run Ceedling tests before opening an issue.
+  - name: Support
+    url: https://github.com/relicloops/valve/blob/main/SUPPORT.md
+    about: Where to ask for help and what is in scope.
+  - name: Code of Conduct
+    url: https://github.com/relicloops/valve/blob/main/CODE_OF_CONDUCT.md
+    about: Community standards for participation.
+  - name: Security policy
+    url: https://github.com/relicloops/valve/security/policy
+    about: Report vulnerabilities privately — do not file a public issue.

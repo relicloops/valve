@@ -5,13 +5,18 @@ Thanks for helping with Valve. This library is **experimental `1.0.x`**
 that out in issues and PRs when behaviour or headers move.
 
 Public docs will eventually live at `https://valve.relicloops.org`. Until that
-site is live, treat this README + headers as the source of truth. There is
+site is live, treat the README, `docs/`, and public headers as the source of
+truth.
+
+By participating, you agree to the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Quick links
 
 - Bug reports: use the [Bug report](https://github.com/relicloops/valve/issues/new?template=bug.yml) form
 - Feature ideas: use the [Feature request](https://github.com/relicloops/valve/issues/new?template=feature.yml) form
 - Security: see [SECURITY.md](SECURITY.md) (private advisory — not public issues)
+- Support: see [SUPPORT.md](SUPPORT.md)
+- Code of Conduct: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
 - Pull requests: follow [.github/PULL_REQUEST_TEMPLATE.md](.github/PULL_REQUEST_TEMPLATE.md)
 
 ## Prerequisites
