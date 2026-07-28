@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Valve generated help signatures, annotations, dot notation, grouping, and target resolution.">
+  <title>Valve road-map — generated help</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="shell site-header__inner">
+      <a class="brand" href="index.html" aria-label="Valve roadmap home">
+        <span class="brand__mark" aria-hidden="true">
+          <svg viewBox="0 0 48 48">
+            <circle cx="24" cy="24" r="12" fill="none" stroke="currentColor" stroke-width="3"/>
+            <circle cx="24" cy="24" r="4" fill="currentColor"/>
+            <path d="M24 3v12M24 33v12M3 24h12M33 24h12M9.2 9.2l8.5 8.5M30.3 30.3l8.5 8.5M38.8 9.2l-8.5 8.5M17.7 30.3l-8.5 8.5" stroke="currentColor" stroke-width="2"/>
+          </svg>
+        </span>
+        <span>
+          <span class="brand__name">valve</span>
+          <span class="brand__meta">parser road-map</span>
+        </span>
+      </a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">menu</button>
+      <nav class="site-nav" id="site-nav" aria-label="Roadmap">
+        <a href="index.html">overview</a>
+        <a href="parsing.html">parsing</a>
+        <a href="forms.html">forms</a>
+        <a href="constraints.html">constraints</a>
+        <a href="help.html">help</a>
+        <a href="roadmap.html">next work</a>
+        <a href="public.html">public</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="shell hero hero--compact">
+      <div>
+        <p class="eyebrow">04 · presentation contract</p>
+        <h1>The schema writes the <em>help.</em></h1>
+        <p class="lede">
+          Valve infers accepted syntax from option type, value kind, target, and
+          assignment mode. The caller may add usage guidance, but does not need to
+          restate the signature, required state, requirements, reverse references, or
+          conflicts.
+        </p>
+      </div>
+      <div class="card">
+        <span class="card__index">rendering invariant</span>
+        <pre>signature
+  + annotations
+  + optional usage
+  + optional description</pre>
+        <p class="card__meta">one shared option renderer</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Inference</p>
+            <h2><code>.usage</code> supplements; it does not override.</h2>
+          </div>
+          <p>
+            The visible <code>&lt;type&gt;</code> comes from the option's value model.
+            Dot-notation options derive it from their target. Boolean flags render bare.
+          </p>
+        </div>
+
+        <div class="grid grid--2">
+          <div class="card reveal">
+            <span class="card__index">schema</span>
+            <pre>{
+  .name = "limit",
+  .type = VL_OPT_TYPE_LONG,
+  .value = VL_OPTION_VALUE_INT,
+  .usage = "Maximum rows returned.",
+}</pre>
+          </div>
+          <div class="card reveal">
+            <span class="card__index">generated output</span>
+            <pre>--limit=&lt;int&gt;  [requires: --list]
+    Maximum rows returned.</pre>
+          </div>
+        </div>
+
+        <div class="callout callout--good">
+          <span class="callout__key">complete</span>
+          <p>
+            Callers may omit <code>.usage</code> entirely. Valve still prints a correct
+            option signature and every declarative relationship annotation.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Signature flow</p>
+            <h2>Four schema decisions become one line.</h2>
+          </div>
+          <p>
+            Type controls the accepted spelling, value controls the label, assignment
+            controls the separator, and relationship tables contribute annotations.
+          </p>
+        </div>
+
+        <div class="diagram reveal">
+          <svg viewBox="0 0 1020 440" role="img" aria-labelledby="signature-title signature-desc">
+            <title id="signature-title">Valve option help inference flow</title>
+            <desc id="signature-desc">Option type, assignment mode, value kind or target, and relationship edges combine into a generated option help line.</desc>
+            <defs>
+              <marker id="signature-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0 0L8 4L0 8Z" fill="#ffb000"/>
+              </marker>
+            </defs>
+            <path class="wire" marker-end="url(#signature-arrow)" d="M220 80C410 80 380 190 475 190"/>
+            <path class="wire" marker-end="url(#signature-arrow)" d="M220 180H475"/>
+            <path class="wire" marker-end="url(#signature-arrow)" d="M220 280C410 280 380 210 475 210"/>
+            <path class="wire" marker-end="url(#signature-arrow)" d="M745 200H840"/>
+
+            <rect class="node" x="30" y="35" width="190" height="90" rx="12"/>
+            <text class="label" x="125" y="72" text-anchor="middle">option type</text>
+            <text class="label label--small" x="125" y="98" text-anchor="middle">long · short · toggle</text>
+
+            <rect class="node" x="30" y="135" width="190" height="90" rx="12"/>
+            <text class="label" x="125" y="172" text-anchor="middle">assignment</text>
+            <text class="label label--small" x="125" y="198" text-anchor="middle">= or space</text>
+
+            <rect class="node" x="30" y="235" width="190" height="90" rx="12"/>
+            <text class="label" x="125" y="272" text-anchor="middle">value / target</text>
+            <text class="label label--small" x="125" y="298" text-anchor="middle">int · string · bool · ...</text>
+
+            <rect class="node node--active" x="475" y="145" width="270" height="110" rx="12"/>
+            <text class="label" x="610" y="188" text-anchor="middle">--limit=&lt;int&gt;</text>
+            <text class="label label--small" x="610" y="215" text-anchor="middle">inferred syntax</text>
+
+            <rect class="node" x="840" y="145" width="150" height="110" rx="12"/>
+            <text class="label" x="915" y="181" text-anchor="middle">annotations</text>
+            <text class="label label--small" x="915" y="207" text-anchor="middle">required</text>
+            <text class="label label--small" x="915" y="225" text-anchor="middle">requires · conflicts</text>
+
+            <path class="wire wire--muted" marker-end="url(#signature-arrow)" d="M610 255v90"/>
+            <rect class="node" x="475" y="345" width="270" height="70" rx="12"/>
+            <text class="label" x="610" y="375" text-anchor="middle">usage + description</text>
+            <text class="label label--small" x="610" y="397" text-anchor="middle">optional supporting lines</text>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Automatic annotations</p>
+            <h2>Both sides of every relationship are visible.</h2>
+          </div>
+          <p>
+            Requirement direction is preserved at runtime, but reverse help remains
+            useful. Stable schema order and label deduplication keep the output
+            deterministic.
+          </p>
+        </div>
+
+        <div class="grid grid--2">
+          <div class="card reveal">
+            <span class="card__index">forward view</span>
+            <pre>--publish
+  [requires: --id, --list]</pre>
+          </div>
+          <div class="card reveal">
+            <span class="card__index">reverse view</span>
+            <pre>--id=&lt;string&gt;
+  [required by: --enable-reload, --publish]</pre>
+          </div>
+          <div class="card reveal">
+            <span class="card__index">combined order</span>
+            <pre>[required; requires: ...;
+ required by: ...; conflicts: ...]</pre>
+          </div>
+          <div class="card reveal">
+            <span class="card__index">label fidelity</span>
+            <pre>--long
+-s
+--enable-toggle | --disable-toggle</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Dot notation</p>
+            <h2>Dotted option names are complete.</h2>
+          </div>
+          <p>
+            A dotted name is an exact option key and a grouping signal. It can populate
+            a nested caller target, infer its displayed type, and drive both overview
+            grouping and targeted group cards.
+          </p>
+        </div>
+
+        <div class="diagram reveal">
+          <svg viewBox="0 0 1010 360" role="img" aria-labelledby="dot-title dot-desc">
+            <title id="dot-title">Valve dot-notation flow</title>
+            <desc id="dot-desc">The dotted proxy.lane option is matched exactly, grouped under proxy in help, typed from its string target, and populates a nested field.</desc>
+            <defs>
+              <marker id="dot-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0 0L8 4L0 8Z" fill="#ffb000"/>
+              </marker>
+            </defs>
+            <path class="wire" marker-end="url(#dot-arrow)" d="M230 180H315"/>
+            <path class="wire" marker-end="url(#dot-arrow)" d="M555 180H640"/>
+            <path class="wire wire--muted" marker-end="url(#dot-arrow)" d="M435 125V70H800"/>
+            <path class="wire wire--muted" marker-end="url(#dot-arrow)" d="M435 235v55h365"/>
+
+            <rect class="node node--active" x="25" y="125" width="205" height="110" rx="12"/>
+            <text class="label" x="127" y="168" text-anchor="middle">--proxy.lane=fast</text>
+            <text class="label label--small" x="127" y="194" text-anchor="middle">exact dotted token</text>
+
+            <rect class="node" x="315" y="125" width="240" height="110" rx="12"/>
+            <text class="label" x="435" y="168" text-anchor="middle">DOT_NOTATION</text>
+            <text class="label label--small" x="435" y="194" text-anchor="middle">target = VL_TARGET_STRING</text>
+
+            <rect class="node node--active" x="640" y="125" width="335" height="110" rx="12"/>
+            <text class="label" x="807" y="168" text-anchor="middle">config.proxy.lane = "fast"</text>
+            <text class="label label--small" x="807" y="194" text-anchor="middle">typed target population</text>
+
+            <rect class="node" x="700" y="25" width="210" height="70" rx="12"/>
+            <text class="label" x="805" y="55" text-anchor="middle">group: proxy</text>
+            <text class="label label--small" x="805" y="77" text-anchor="middle">overview + targeted help</text>
+
+            <rect class="node" x="700" y="270" width="210" height="70" rx="12"/>
+            <text class="label" x="805" y="300" text-anchor="middle">&lt;string&gt;</text>
+            <text class="label label--small" x="805" y="322" text-anchor="middle">inferred from target</text>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Target resolution</p>
+            <h2>Help can focus without changing parse state.</h2>
+          </div>
+          <p>
+            Reserved help supports joined or separate targets according to assignment
+            mode. Exact option names win before structural verb paths and group prefixes.
+          </p>
+        </div>
+
+        <div class="flow">
+          <div class="flow__step reveal">
+            <span class="flow__number">01</span>
+            <strong>Read target</strong>
+            <p><code>--help=target</code> or <code>--help target</code>, with active-scope single-token resolution when no explicit target token follows.</p>
+          </div>
+          <div class="flow__step reveal">
+            <span class="flow__number">02</span>
+            <strong>Exact option</strong>
+            <p>Dotted names such as <code>proxy.lane</code> match literally first.</p>
+          </div>
+          <div class="flow__step reveal">
+            <span class="flow__number">03</span>
+            <strong>Command path</strong>
+            <p>Resolve verb, verb.subverb, verb.option, or verb.subverb.option.</p>
+          </div>
+          <div class="flow__step reveal">
+            <span class="flow__number">04</span>
+            <strong>Group prefix</strong>
+            <p>A prefix such as <code>proxy</code> selects all visible <code>proxy.*</code> entries.</p>
+          </div>
+          <div class="flow__step reveal">
+            <span class="flow__number">05</span>
+            <strong>Render card</strong>
+            <p>Use the shared renderer, including inferred syntax and relationships.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="shell pager">
+      <a href="constraints.html">
+        <small>previous</small>
+        <strong>← Constraint graph</strong>
+      </a>
+      <a href="roadmap.html">
+        <small>next chapter</small>
+        <strong>Implementation road-map →</strong>
+      </a>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell site-footer__inner">
+      <span>Valve road-map · generated help</span>
+      <span>schema is the source of truth</span>
+    </div>
+  </footer>
+  <script src="site.js"></script>
+</body>
+</html>

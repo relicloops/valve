@@ -1,0 +1,6 @@
+option(
+  'tests',
+  type: 'feature',
+  value: 'disabled',
+  description: 'Prepare the Ceedling/gcovr test toolchain and register meson test coverage',
+)

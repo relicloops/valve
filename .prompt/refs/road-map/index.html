@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Valve command-line parser architecture, capability status, and implementation roadmap.">
+  <title>Valve road-map — system overview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="shell site-header__inner">
+      <a class="brand" href="index.html" aria-label="Valve roadmap home">
+        <span class="brand__mark" aria-hidden="true">
+          <svg viewBox="0 0 48 48">
+            <circle cx="24" cy="24" r="12" fill="none" stroke="currentColor" stroke-width="3"/>
+            <circle cx="24" cy="24" r="4" fill="currentColor"/>
+            <path d="M24 3v12M24 33v12M3 24h12M33 24h12M9.2 9.2l8.5 8.5M30.3 30.3l8.5 8.5M38.8 9.2l-8.5 8.5M17.7 30.3l-8.5 8.5" stroke="currentColor" stroke-width="2"/>
+          </svg>
+        </span>
+        <span>
+          <span class="brand__name">valve</span>
+          <span class="brand__meta">parser road-map</span>
+        </span>
+      </a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">menu</button>
+      <nav class="site-nav" id="site-nav" aria-label="Roadmap">
+        <a href="index.html">overview</a>
+        <a href="parsing.html">parsing</a>
+        <a href="forms.html">forms</a>
+        <a href="constraints.html">constraints</a>
+        <a href="help.html">help</a>
+        <a href="roadmap.html">next work</a>
+        <a href="public.html">public</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="shell hero">
+      <div>
+        <p class="eyebrow">Linux + macOS · system libraries only · 2026-07-28</p>
+        <h1>Control the <em>argument stream.</em></h1>
+        <p class="lede">
+          Valve turns a declarative command schema into typed results, deterministic
+          diagnostics, and generated help. This road-map records what is complete,
+          how the parser moves data, and where the remaining design pressure lives.
+        </p>
+        <div class="hero__actions">
+          <a class="button button--primary" href="roadmap.html">open implementation road-map</a>
+          <a class="button" href="public.html">go public checklist</a>
+        </div>
+      </div>
+
+      <div class="signal-panel" aria-label="Valve signal diagram">
+        <svg class="signal-panel__diagram" viewBox="0 0 480 400" role="img" aria-labelledby="signal-title signal-desc">
+          <title id="signal-title">Valve schema to result signal</title>
+          <desc id="signal-desc">A schema enters the Valve core, passes through validation and parsing, and exits as results, errors, and help.</desc>
+          <defs>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="4" result="blur"/>
+              <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+          <g fill="none" stroke="#ffb000">
+            <circle cx="240" cy="190" r="82" opacity=".18"/>
+            <circle cx="240" cy="190" r="48" opacity=".35"/>
+            <path d="M35 190h128M317 190h128" opacity=".65" filter="url(#glow)"/>
+            <path d="M240 72v54M240 254v61" opacity=".35"/>
+          </g>
+          <g font-family="Space Mono, monospace" text-anchor="middle">
+            <text x="88" y="174" fill="#a58f63" font-size="11">DECLARATIVE</text>
+            <text x="88" y="194" fill="#ffe1a0" font-size="16">schema</text>
+            <text x="240" y="178" fill="#a58f63" font-size="11">VALIDATE · COPY</text>
+            <text x="240" y="201" fill="#ffb000" font-size="20">VALVE</text>
+            <text x="392" y="174" fill="#a58f63" font-size="11">QUERYABLE</text>
+            <text x="392" y="194" fill="#ffe1a0" font-size="16">results</text>
+            <text x="240" y="52" fill="#a58f63" font-size="10">GENERATED HELP</text>
+            <text x="240" y="340" fill="#a58f63" font-size="10">TYPED ERRORS</text>
+          </g>
+          <g fill="#ffb000" filter="url(#glow)">
+            <circle cx="163" cy="190" r="3"/>
+            <circle cx="317" cy="190" r="3"/>
+            <circle cx="240" cy="126" r="3"/>
+            <circle cx="240" cy="254" r="3"/>
+          </g>
+        </svg>
+        <div class="signal-panel__label">
+          <span>schema in</span>
+          <span>signal stable</span>
+          <span>state out</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="grid grid--4">
+          <div class="metric reveal">
+            <span class="metric__value">3</span>
+            <span class="metric__label">orthogonal schema axes</span>
+          </div>
+          <div class="metric reveal">
+            <span class="metric__value">1 + 1</span>
+            <span class="metric__label">command depth today</span>
+          </div>
+          <div class="metric reveal">
+            <span class="metric__value">3</span>
+            <span class="metric__label">constraint relationships</span>
+          </div>
+          <div class="metric reveal">
+            <span class="metric__value">5</span>
+            <span class="metric__label">ranked missing capabilities</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Architecture</p>
+            <h2>One schema, three runtime surfaces.</h2>
+          </div>
+          <p>
+            Valve owns the transition from caller memory to a copied runtime schema.
+            Parsing, diagnostics, and help all consume that normalized model, so
+            consumers do not duplicate option relationships or syntax descriptions.
+          </p>
+        </div>
+
+        <div class="diagram reveal">
+          <svg viewBox="0 0 1000 330" role="img" aria-labelledby="architecture-title architecture-desc">
+            <title id="architecture-title">Valve library architecture</title>
+            <desc id="architecture-desc">Caller schema validation and copying feed parsing, generated help, and constraint checks before results and errors are exposed.</desc>
+            <defs>
+              <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0 0L8 4L0 8Z" fill="#ffb000"/>
+              </marker>
+            </defs>
+            <path class="wire" marker-end="url(#arrow)" d="M180 165H270"/>
+            <path class="wire" marker-end="url(#arrow)" d="M430 165H500"/>
+            <path class="wire" marker-end="url(#arrow)" d="M660 165H735"/>
+            <path class="wire wire--muted" marker-end="url(#arrow)" d="M350 115V65H735"/>
+            <path class="wire wire--muted" marker-end="url(#arrow)" d="M580 215v60h155"/>
+
+            <rect class="node node--active" x="20" y="110" width="160" height="110" rx="12"/>
+            <text class="label" x="100" y="153" text-anchor="middle">caller schema</text>
+            <text class="label label--small" x="100" y="178" text-anchor="middle">options · verbs · metadata</text>
+
+            <rect class="node" x="270" y="110" width="160" height="110" rx="12"/>
+            <text class="label" x="350" y="153" text-anchor="middle">vl_create</text>
+            <text class="label label--small" x="350" y="178" text-anchor="middle">validate · copy · map</text>
+
+            <rect class="node node--active" x="500" y="110" width="160" height="110" rx="12"/>
+            <text class="label" x="580" y="153" text-anchor="middle">vl_parse</text>
+            <text class="label label--small" x="580" y="178" text-anchor="middle">match · type · constrain</text>
+
+            <rect class="node" x="735" y="25" width="225" height="75" rx="12"/>
+            <text class="label" x="847" y="57" text-anchor="middle">generated help</text>
+            <text class="label label--small" x="847" y="78" text-anchor="middle">signatures · groups · relations</text>
+
+            <rect class="node" x="735" y="127" width="225" height="75" rx="12"/>
+            <text class="label" x="847" y="159" text-anchor="middle">typed results</text>
+            <text class="label label--small" x="847" y="180" text-anchor="middle">query · populate targets</text>
+
+            <rect class="node node--missing" x="735" y="230" width="225" height="75" rx="12"/>
+            <text class="label" x="847" y="262" text-anchor="middle">structured errors</text>
+            <text class="label label--small" x="847" y="283" text-anchor="middle">argv index · key · code · message</text>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">System map</p>
+            <h2>Read the library by responsibility.</h2>
+          </div>
+          <p>
+            Each page isolates one contract while preserving the links between them.
+            Start with parsing for runtime flow or jump directly to the ordered work.
+          </p>
+        </div>
+
+        <div class="grid grid--3">
+          <a class="card card--link reveal" href="parsing.html">
+            <span class="card__index">01 / runtime</span>
+            <h3>Parsing pipeline</h3>
+            <p>Command selection, reserved tokens, option matching, value routing, and result production.</p>
+            <span class="card__meta">trace argv → state</span>
+          </a>
+          <a class="card card--link reveal" href="forms.html">
+            <span class="card__index">02 / syntax</span>
+            <h3>Option forms</h3>
+            <p>POSIX vocabulary, attachment modes, supported spellings, ambiguity, and relative implementation cost.</p>
+            <span class="card__meta">compare the grammar</span>
+          </a>
+          <a class="card card--link reveal" href="constraints.html">
+            <span class="card__index">03 / relationships</span>
+            <h3>Constraint graph</h3>
+            <p>Unconditional requirements, directed requirements, undirected conflicts, scopes, and copied ownership.</p>
+            <span class="card__meta">inspect schema semantics</span>
+          </a>
+          <a class="card card--link reveal" href="help.html">
+            <span class="card__index">04 / presentation</span>
+            <h3>Generated help</h3>
+            <p>Inferred type signatures, optional usage guidance, dotted groups, targeted cards, and cross-references.</p>
+            <span class="card__meta">see automatic output</span>
+          </a>
+          <a class="card card--link reveal" href="roadmap.html">
+            <span class="card__index">05 / delivery</span>
+            <h3>Implementation road-map</h3>
+            <p>Operands first by expense, followed by cluster parsing, joined forms, combined assignment, and depth policy.</p>
+            <span class="card__meta">order the missing work</span>
+          </a>
+          <a class="card card--link reveal" href="public.html">
+            <span class="card__index">06 / release</span>
+            <h3>Go public</h3>
+            <p>Experimental 1.0.x checklist at <strong>66/76 (86%)</strong>. Lines <strong>100.0%</strong> — 3068 exec / 26 excl / 3094 total; Functions <strong>100.0%</strong> — 204/204; Branches <strong>100.0%</strong> — 1764/1764 (99.9% ambition met). Multi-OS CI green; GitHub public; clean history base. In-tree library is <code>1.0.0-000</code> but the annotated tag is not cut. Docs site not a blocker. Next: first commit/push, then <code>v1.0.0-000</code>.</p>
+            <span class="card__meta">open the release plan</span>
+          </a>
+          <div class="card reveal">
+            <span class="card__index">source / audit</span>
+            <h3>Canonical terminology</h3>
+            <p>This microsite expands the dated source audit rather than replacing it.</p>
+            <a class="card__meta" href="../source/task/posix-cli-terminology.md">open source markdown</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Current signal</p>
+            <h2>The core is stable. The edges are explicit.</h2>
+          </div>
+          <p>
+            The parser already covers typed long and short forms, boolean extensions,
+            dotted names, one nested command level, generated help, and declarative
+            constraints. Remaining work is mostly grammar expansion and operand state.
+          </p>
+        </div>
+
+        <div class="grid grid--3">
+          <div class="card reveal">
+            <span class="status status--complete">complete</span>
+            <h3>Schema-driven core</h3>
+            <p>Validation, copied ownership, typed values, caller targets, repeat arrays, KV values, and diagnostics.</p>
+          </div>
+          <div class="card reveal">
+            <span class="status status--custom">Valve extension</span>
+            <h3>Rich help surface</h3>
+            <p>Targeted help, dotted groups, inferred signatures, toggles, and relationship annotations.</p>
+          </div>
+          <div class="card reveal">
+            <span class="status status--missing">next pressure</span>
+            <h3>Operands and <code>--</code></h3>
+            <p>The behavior flag exists, but storage and accessors do not. The current end marker silently ignores its tail.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="shell pager">
+      <a href="public.html">
+        <small>jump to</small>
+        <strong>Go public checklist</strong>
+      </a>
+      <a href="parsing.html">
+        <small>next chapter</small>
+        <strong>Parsing pipeline →</strong>
+      </a>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell site-footer__inner">
+      <span>Valve road-map · generated from the POSIX CLI terminology audit</span>
+      <span>signal theme · static HTML</span>
+    </div>
+  </footer>
+  <script src="site.js"></script>
+</body>
+</html>

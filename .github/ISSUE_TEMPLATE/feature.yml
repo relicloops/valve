@@ -1,0 +1,82 @@
+name: Feature request
+description: Propose an additive change for experimental Valve 1.0.x.
+title: "[feature] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the idea.
+
+        Valve is **experimental 1.0.x** — API surface may move while that status remains.
+        Operands and a live docs site (`valve.relicloops.org`) are tracked separately
+        and are not required for the first public tag.
+        Please search [existing issues](https://github.com/relicloops/valve/issues?q=is%3Aissue)
+        first.
+
+  - type: dropdown
+    id: feature-area
+    attributes:
+      label: Feature area
+      options:
+        - Parsing / argv
+        - Options / forms / assignment
+        - Schema / value types / targets
+        - Verbs / sub-verbs
+        - Requirements / conflicts
+        - Help / reserved tokens
+        - Color / terminal capabilities
+        - Errors / targets teardown
+        - Values (KV, arrays, duration, path)
+        - Build (Meson) / tests (Ceedling)
+        - Docs / packaging
+        - New area (describe below)
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      description: What are you trying to do that Valve does not support cleanly today?
+      placeholder: "When I ..., Valve doesn't ... so I end up ..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: Schema sketch, C snippet, or behaviour description are all welcome.
+      render: c
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Workarounds you already tried, or APIs you would rather not add.
+
+  - type: dropdown
+    id: milestone
+    attributes:
+      label: Target track
+      description: Valve is pre-1.0; minor versions may still break.
+      options:
+        - Additive in 1.0.x (preferred)
+        - Fine if it waits for a later 0.x
+        - Willing to discuss a breaking change
+        - No preference
+    validations:
+      required: true
+
+  - type: dropdown
+    id: pr
+    attributes:
+      label: Would you submit a pull request?
+      options:
+        - "Yes"
+        - Maybe with guidance
+        - "No — reporting only"
+    validations:
+      required: true

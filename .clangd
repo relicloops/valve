@@ -1,0 +1,33 @@
+# clangd config for Valve (Cursor / Zed / any clangd-based editor).
+#
+# -xc forces the C frontend: clangd otherwise parses standalone headers as
+# Objective-C++, which rejects -std=c23.
+CompileFlags:
+  Add:
+    - -xc
+    - -std=c23
+    # Portable fallback paths; generated databases remain authoritative.
+    - -Iinclude
+    - -Isrc/core
+    - -Wall
+    - -Wextra
+
+# Meson owns compile commands for library sources.
+---
+If:
+  PathExclude:
+    - 'test/.*'
+    - '\.cache/ceedling/.*'
+CompileFlags:
+  CompilationDatabase: build
+
+# Ceedling owns compile commands, Unity paths, and test definitions for tests
+# and its generated runners. Configure `build` with `-Dtests=enabled`, then run
+# `meson test -C build --print-errorlogs` once in a fresh checkout.
+---
+If:
+  PathMatch:
+    - 'test/.*'
+    - '\.cache/ceedling/.*'
+CompileFlags:
+  CompilationDatabase: .cache/ceedling/artifacts

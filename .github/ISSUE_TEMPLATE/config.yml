@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: README
+    url: https://github.com/relicloops/valve#readme
+    about: Usage examples, API notes, and build/test commands for experimental 1.0.x.
+  - name: Contributing
+    url: https://github.com/relicloops/valve/blob/main/CONTRIBUTING.md
+    about: How to build with Meson and run Ceedling tests before opening an issue.

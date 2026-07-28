@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Detailed flow charts for the Valve command-line parser lifecycle and runtime.">
+  <title>Valve road-map — parsing pipeline</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="shell site-header__inner">
+      <a class="brand" href="index.html" aria-label="Valve roadmap home">
+        <span class="brand__mark" aria-hidden="true">
+          <svg viewBox="0 0 48 48">
+            <circle cx="24" cy="24" r="12" fill="none" stroke="currentColor" stroke-width="3"/>
+            <circle cx="24" cy="24" r="4" fill="currentColor"/>
+            <path d="M24 3v12M24 33v12M3 24h12M33 24h12M9.2 9.2l8.5 8.5M30.3 30.3l8.5 8.5M38.8 9.2l-8.5 8.5M17.7 30.3l-8.5 8.5" stroke="currentColor" stroke-width="2"/>
+          </svg>
+        </span>
+        <span>
+          <span class="brand__name">valve</span>
+          <span class="brand__meta">parser road-map</span>
+        </span>
+      </a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">menu</button>
+      <nav class="site-nav" id="site-nav" aria-label="Roadmap">
+        <a href="index.html">overview</a>
+        <a href="parsing.html">parsing</a>
+        <a href="forms.html">forms</a>
+        <a href="constraints.html">constraints</a>
+        <a href="help.html">help</a>
+        <a href="roadmap.html">next work</a>
+        <a href="public.html">public</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="shell hero hero--compact">
+      <div>
+        <p class="eyebrow">01 · runtime pipeline</p>
+        <h1>From <em>argv</em> to typed state.</h1>
+        <p class="lede">
+          Valve separates schema construction from repeated parsing. Creation validates
+          and copies caller declarations. Parsing selects command scope, intercepts
+          reserved behavior, assigns typed values, and checks relationships.
+        </p>
+      </div>
+      <div class="card">
+        <span class="card__index">runtime invariant</span>
+        <h3>Caller pointers do not drive parsing.</h3>
+        <p>
+          After <code>vl_create()</code>, options, verbs, strings, conflicts, and
+          requirements live in Valve-owned storage. Runtime checks use copied option
+          identity and parsed-result presence.
+        </p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Lifecycle</p>
+            <h2>Five stages, one ownership boundary.</h2>
+          </div>
+          <p>
+            The same <code>valve_t</code> can parse more than once. Each parse clears
+            prior results and errors while retaining the copied schema.
+          </p>
+        </div>
+
+        <div class="flow">
+          <div class="flow__step reveal">
+            <span class="flow__number">01</span>
+            <strong>Declare</strong>
+            <p>The caller describes metadata, globals, verbs, options, targets, and relationships.</p>
+          </div>
+          <div class="flow__step reveal">
+            <span class="flow__number">02</span>
+            <strong>Create</strong>
+            <p><code>vl_create()</code> validates the schema, copies it, and maps relation edges.</p>
+          </div>
+          <div class="flow__step reveal">
+            <span class="flow__number">03</span>
+            <strong>Parse</strong>
+            <p><code>vl_parse()</code> resolves scope and converts accepted tokens into typed values.</p>
+          </div>
+          <div class="flow__step reveal">
+            <span class="flow__number">04</span>
+            <strong>Query</strong>
+            <p>Consumers inspect results, errors, active command names, or populated targets.</p>
+          </div>
+          <div class="flow__step reveal">
+            <span class="flow__number">05</span>
+            <strong>Destroy</strong>
+            <p><code>vl_destroy()</code> clears relation edges before copied options and verbs.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Decision flow</p>
+            <h2>How one token moves through the parser.</h2>
+          </div>
+          <p>
+            Command tokens are consumed first. Every later token passes reserved-token
+            interception before long, short, or positional classification.
+          </p>
+        </div>
+
+        <div class="diagram reveal">
+          <svg viewBox="0 0 1060 640" role="img" aria-labelledby="parse-title parse-desc">
+            <title id="parse-title">Valve token parsing flow chart</title>
+            <desc id="parse-desc">Flow chart from argv reset through command selection, reserved token handling, option parsing, constraints, results, and errors.</desc>
+            <defs>
+              <marker id="parse-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0 0L8 4L0 8Z" fill="#ffb000"/>
+              </marker>
+            </defs>
+            <path class="wire" marker-end="url(#parse-arrow)" d="M165 90H255"/>
+            <path class="wire" marker-end="url(#parse-arrow)" d="M425 90H515"/>
+            <path class="wire" marker-end="url(#parse-arrow)" d="M685 90H775"/>
+            <path class="wire" marker-end="url(#parse-arrow)" d="M860 130v70"/>
+            <path class="wire" marker-end="url(#parse-arrow)" d="M775 250H685"/>
+            <path class="wire" marker-end="url(#parse-arrow)" d="M515 250H425"/>
+            <path class="wire" marker-end="url(#parse-arrow)" d="M255 250H165"/>
+            <path class="wire" marker-end="url(#parse-arrow)" d="M80 290v105"/>
+            <path class="wire" marker-end="url(#parse-arrow)" d="M165 440H255"/>
+            <path class="wire" marker-end="url(#parse-arrow)" d="M425 440H515"/>
+            <path class="wire" marker-end="url(#parse-arrow)" d="M685 440H775"/>
+            <path class="wire" marker-end="url(#parse-arrow)" d="M860 480v70H605"/>
+            <path class="wire wire--muted" marker-end="url(#parse-arrow)" d="M600 130v70"/>
+            <path class="wire wire--muted" marker-end="url(#parse-arrow)" d="M600 290v105"/>
+
+            <rect class="node" x="20" y="50" width="145" height="80" rx="10"/>
+            <text class="label" x="92" y="82" text-anchor="middle">reset parse state</text>
+            <text class="label label--small" x="92" y="105" text-anchor="middle">results · errors · scope</text>
+
+            <rect class="node" x="255" y="50" width="170" height="80" rx="10"/>
+            <text class="label" x="340" y="82" text-anchor="middle">select verb</text>
+            <text class="label label--small" x="340" y="105" text-anchor="middle">argv[1], when configured</text>
+
+            <rect class="node" x="515" y="50" width="170" height="80" rx="10"/>
+            <text class="label" x="600" y="82" text-anchor="middle">select sub-verb</text>
+            <text class="label label--small" x="600" y="105" text-anchor="middle">argv[2], one level</text>
+
+            <rect class="node node--active" x="775" y="50" width="170" height="80" rx="10"/>
+            <text class="label" x="860" y="82" text-anchor="middle">read next token</text>
+            <text class="label label--small" x="860" y="105" text-anchor="middle">start at active scope tail</text>
+
+            <rect class="node" x="775" y="200" width="170" height="90" rx="10"/>
+            <text class="label" x="860" y="235" text-anchor="middle">reserved?</text>
+            <text class="label label--small" x="860" y="258" text-anchor="middle">help · version · valve</text>
+
+            <rect class="node" x="515" y="200" width="170" height="90" rx="10"/>
+            <text class="label" x="600" y="235" text-anchor="middle">long option?</text>
+            <text class="label label--small" x="600" y="258" text-anchor="middle">--name or --name=value</text>
+
+            <rect class="node" x="255" y="200" width="170" height="90" rx="10"/>
+            <text class="label" x="340" y="235" text-anchor="middle">short option?</text>
+            <text class="label label--small" x="340" y="258" text-anchor="middle">-n or -n=value</text>
+
+            <rect class="node node--missing" x="20" y="200" width="145" height="90" rx="10"/>
+            <text class="label" x="92" y="235" text-anchor="middle">positional?</text>
+            <text class="label label--small" x="92" y="258" text-anchor="middle">currently rejected</text>
+
+            <rect class="node" x="20" y="395" width="145" height="90" rx="10"/>
+            <text class="label" x="92" y="430" text-anchor="middle">match option</text>
+            <text class="label label--small" x="92" y="453" text-anchor="middle">sub → parent → global</text>
+
+            <rect class="node node--active" x="255" y="395" width="170" height="90" rx="10"/>
+            <text class="label" x="340" y="430" text-anchor="middle">assign value</text>
+            <text class="label label--small" x="340" y="453" text-anchor="middle">scalar · KV · array</text>
+
+            <rect class="node" x="515" y="395" width="170" height="90" rx="10"/>
+            <text class="label" x="600" y="430" text-anchor="middle">more tokens?</text>
+            <text class="label label--small" x="600" y="453" text-anchor="middle">loop or post-parse checks</text>
+
+            <rect class="node" x="775" y="395" width="170" height="90" rx="10"/>
+            <text class="label" x="860" y="426" text-anchor="middle">constraints</text>
+            <text class="label label--small" x="860" y="449" text-anchor="middle">required → requires</text>
+            <text class="label label--small" x="860" y="466" text-anchor="middle">→ conflicts</text>
+
+            <rect class="node node--active" x="515" y="550" width="170" height="65" rx="10"/>
+            <text class="label" x="600" y="580" text-anchor="middle">results or errors</text>
+            <text class="label label--small" x="600" y="600" text-anchor="middle">return 0 or -1</text>
+
+            <text class="label label--small" x="723" y="235">no</text>
+            <text class="label label--small" x="470" y="235">no</text>
+            <text class="label label--small" x="210" y="235">no</text>
+            <text class="label label--small" x="615" y="168">missing/error</text>
+            <text class="label label--small" x="690" y="425">done</text>
+          </svg>
+        </div>
+
+        <div class="callout callout--danger">
+          <span class="callout__key">known gap</span>
+          <p>
+            The current <code>--</code> branch stops the loop and silently ignores all
+            remaining tokens. Correct behavior requires either collecting the tail as
+            operands or rejecting it when operand support is disabled.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Command scope</p>
+            <h2>Unlimited siblings, fixed depth.</h2>
+          </div>
+          <p>
+            Counts use <code>size_t</code> or null-terminated tables, so sibling
+            quantity is memory-bound. Runtime state stores only one active verb and
+            one active sub-verb.
+          </p>
+        </div>
+
+        <div class="diagram reveal">
+          <svg viewBox="0 0 980 360" role="img" aria-labelledby="command-title command-desc">
+            <title id="command-title">Valve command-depth model</title>
+            <desc id="command-desc">A program has any number of verbs, and each verb has any number of sibling sub-verbs, but deeper levels cannot be selected.</desc>
+            <defs>
+              <marker id="command-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0 0L8 4L0 8Z" fill="#ffb000"/>
+              </marker>
+            </defs>
+            <path class="wire" d="M170 180H250M410 180H490M650 180H730" marker-end="url(#command-arrow)"/>
+            <rect class="node node--active" x="20" y="125" width="150" height="110" rx="12"/>
+            <text class="label" x="95" y="168" text-anchor="middle">program</text>
+            <text class="label label--small" x="95" y="193" text-anchor="middle">global options</text>
+            <text class="label label--small" x="95" y="211" text-anchor="middle">argv[0]</text>
+
+            <rect class="node node--active" x="250" y="125" width="160" height="110" rx="12"/>
+            <text class="label" x="330" y="168" text-anchor="middle">verb</text>
+            <text class="label label--small" x="330" y="193" text-anchor="middle">any sibling count</text>
+            <text class="label label--small" x="330" y="211" text-anchor="middle">argv[1]</text>
+
+            <rect class="node node--active" x="490" y="125" width="160" height="110" rx="12"/>
+            <text class="label" x="570" y="168" text-anchor="middle">sub-verb</text>
+            <text class="label label--small" x="570" y="193" text-anchor="middle">any sibling count</text>
+            <text class="label label--small" x="570" y="211" text-anchor="middle">argv[2]</text>
+
+            <rect class="node node--missing" x="730" y="125" width="210" height="110" rx="12"/>
+            <text class="label" x="835" y="168" text-anchor="middle">deeper verb</text>
+            <text class="label label--small" x="835" y="193" text-anchor="middle">schema currently accepts</text>
+            <text class="label label--small" x="835" y="211" text-anchor="middle">parser cannot select</text>
+
+            <text class="label label--small" x="570" y="78" text-anchor="middle">supported active path: program → verb → sub-verb</text>
+            <text class="label label--small" x="835" y="286" text-anchor="middle">decision: reject deeper schema or implement recursive path state</text>
+          </svg>
+        </div>
+
+        <div class="grid grid--2">
+          <div class="card reveal">
+            <span class="status status--complete">runtime complete</span>
+            <h3>Lookup precedence</h3>
+            <p>Active sub-verb options win, followed by owning verb options, then global options.</p>
+          </div>
+          <div class="card reveal">
+            <span class="status status--partial">schema mismatch</span>
+            <h3>Recursive declarations</h3>
+            <p>Validation and copying recurse deeper even though parsing and help stop at one sub-verb level.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Value routing</p>
+            <h2>Syntax, value kind, and target are separate.</h2>
+          </div>
+          <p>
+            Option type chooses accepted spelling. Value kind chooses conversion.
+            Target chooses where a converted value is copied. Dot notation uses its
+            target to infer the scalar kind.
+          </p>
+        </div>
+
+        <div class="grid grid--3">
+          <div class="card reveal">
+            <span class="card__index">axis 01</span>
+            <h3>Option type</h3>
+            <pre>VL_OPT_TYPE_LONG
+VL_OPT_TYPE_SHORT
+VL_OPT_TYPE_TOGGLE</pre>
+          </div>
+          <div class="card reveal">
+            <span class="card__index">axis 02</span>
+            <h3>Value kind</h3>
+            <pre>STRING · INT · DOUBLE
+NUMBER · KV · ARRAY
+BOOL · DOT_NOTATION
+TIME</pre>
+          </div>
+          <div class="card reveal">
+            <span class="card__index">axis 03</span>
+            <h3>Target</h3>
+            <pre>STRING · INT · INT64
+DOUBLE · BOOL · VALUE
+TOGGLE · NONE</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="shell pager">
+      <a href="index.html">
+        <small>previous</small>
+        <strong>← System overview</strong>
+      </a>
+      <a href="forms.html">
+        <small>next chapter</small>
+        <strong>Option forms →</strong>
+      </a>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell site-footer__inner">
+      <span>Valve road-map · parsing pipeline</span>
+        <span>source audited 2026-07-27</span>
+    </div>
+  </footer>
+  <script src="site.js"></script>
+</body>
+</html>

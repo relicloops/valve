@@ -1,0 +1,223 @@
+# =============================================================================
+# git-cliff configuration
+#
+# Generates CHANGELOG.md from Conventional Commits in the git history.
+# Regenerate manually with:
+#
+#     git-cliff --output CHANGELOG.md
+#
+# The output tracks the Keep a Changelog 1.1.0 structure
+# (https://keepachangelog.com/en/1.1.0/) for its canonical group order:
+# Added, Changed, Deprecated, Removed, Fixed, Security. Extra groups
+# (Performance, Refactored, Documentation, Tests, Style, Build, CI,
+# Reverted, Initial) ride below the canonical block.
+#
+# Design choices documented in this file, in order of appearance:
+#
+#   [changelog]
+#     - `header`       -- short preamble naming the conventions in use
+#     - `body`         -- Tera template rendered once per release block
+#     - `trim`         -- strip leading/trailing whitespace on each rendered
+#                         line
+#     - `postprocessors` -- strip ordering hints injected by commit_parsers
+#
+#   [git]
+#     - `conventional_commits` + `filter_unconventional` + `filter_commits`
+#       keep non-conventional, unmatched, or free-form subjects out of the
+#       changelog entirely
+#     - `protect_breaking_commits` -- breaking commits are never dropped even
+#       if their type is skipped
+#     - `commit_parsers` (ordered) -- type -> group mapping with
+#       section-order hints encoded as `<!-- NN -->Group`
+#     - `commit_preprocessors` -- normalise subject/body before parsing
+#     - `tag_pattern`, `sort_commits` -- release detection and in-group order
+# =============================================================================
+
+[changelog]
+
+# ---------------------------------------------------------------------------
+# Header
+# ---------------------------------------------------------------------------
+# Rendered once at the top of CHANGELOG.md. Keep short: the point is to name
+# the conventions so a reader understands the structure, not to advertise.
+# ---------------------------------------------------------------------------
+header = """
+# Changelog
+
+All notable changes to this project are documented in this file.
+
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project uses [Conventional Commits](https://www.conventionalcommits.org/).
+
+"""
+
+# ---------------------------------------------------------------------------
+# Body template (Tera syntax)
+# ---------------------------------------------------------------------------
+# Rendered once per release block (a tag in the git history). The unreleased
+# block is emitted whenever there are commits newer than the latest tag.
+#
+# Per-group section headers carry an ordering hint like `<!-- 00 -->Added`.
+# `group_by` in Tera sorts alphabetically by the group string, which is why
+# the `<!-- NN -->` prefixes control order: `<!-- 00 -->` sorts before
+# `<!-- 01 -->`, irrespective of the trailing group name. The prefixes are
+# stripped from the final output by `postprocessors` below, so the rendered
+# changelog reads as `### Added`, `### Changed`, etc.
+#
+# Per-commit bullet format:
+#     - **scope**: Commit subject (upper-cased first letter) [**BREAKING**]
+#
+# The scope marker is conditional so scope-less commits do not emit an empty
+# `**: ` prefix. The `\` line continuation at the end of the subject line
+# keeps the optional `[**BREAKING**]` flag on the same bullet.
+# ---------------------------------------------------------------------------
+body = """
+{% if version -%}
+    ## [{{ version | trim_start_matches(pat="v") }}] - {{ timestamp | date(format="%Y-%m-%d") }}
+{% else -%}
+    ## [unreleased]
+{% endif -%}
+
+{% for group, commits in commits | group_by(attribute="group") %}
+    ### {{ group | trim | upper_first }}
+    {% for commit in commits %}
+        - {% if commit.scope %}**{{ commit.scope }}**: {% endif -%}
+          {{ commit.message | upper_first | trim }}\
+          {% if commit.breaking %} [**BREAKING**]{% endif %}
+    {%- endfor %}
+{% endfor %}
+"""
+
+footer = ""
+
+# Strip leading/trailing whitespace on every rendered line. Prevents the
+# template's indentation from leaking into CHANGELOG.md.
+trim = true
+
+# ---------------------------------------------------------------------------
+# Postprocessors
+# ---------------------------------------------------------------------------
+# Run on the fully rendered changelog text, right before it hits disk. Used
+# here to strip the `<!-- NN -->` ordering hints from group headers so the
+# output never shows `### <!-- 00 -->Added` to the reader.
+# ---------------------------------------------------------------------------
+postprocessors = [
+    { pattern = '<!-- \d+ -->', replace = "" },
+]
+
+
+[git]
+
+# ---------------------------------------------------------------------------
+# Baseline parsing behaviour
+# ---------------------------------------------------------------------------
+# Require Conventional Commits. Anything unmatched is filtered out rather
+# than dumped into the changelog raw. This is strict on purpose: the
+# changelog is a user-facing artefact -- a single stray free-form subject
+# can make it look sloppy.
+# ---------------------------------------------------------------------------
+conventional_commits  = true
+filter_unconventional = true
+filter_commits        = true
+split_commits         = false
+
+# ---------------------------------------------------------------------------
+# Breaking-change protection
+# ---------------------------------------------------------------------------
+# Breaking commits are detected via either:
+#
+#   * a `!` before the colon in the subject   (e.g. `feat(api)!: drop v1 flag`)
+#   * a `BREAKING CHANGE:` footer in the body
+#
+# With `protect_breaking_commits = true`, any such commit bypasses the skip
+# rules below. This matters because a `chore(deps)!:` commit that drops a
+# runtime dependency MUST reach the changelog even though plain
+# `chore(deps)` might not.
+# ---------------------------------------------------------------------------
+protect_breaking_commits = true
+
+# ---------------------------------------------------------------------------
+# Commit parsers (ORDER MATTERS: first match wins)
+# ---------------------------------------------------------------------------
+# Section ordering is encoded in the `<!-- NN -->` comment prefix on the
+# group name. Lower numbers render earlier. Numbering scheme:
+#
+#   00-05   Keep a Changelog canonical sections (Added, Changed,
+#           Deprecated, Removed, Fixed, Security)
+#   06      Dependencies -- surfaced carve-out for chore(deps) since the
+#           rest of chore(...) is skipped below
+#   10-18   Extra sections (Performance, Refactored, Documentation, Tests,
+#           Style, Build, CI, Reverted, Initial)
+#
+# The `^change`, `^deprecate`, and `^remove` parsers are present as HOOKS
+# for future Keep a Changelog-aligned commit types; they do not fire today
+# because the project uses `refactor:` for internal restructuring and does
+# not currently emit `change:`/`deprecate:`/`remove:` prefixes. Leaving the
+# hooks in keeps the config honest about what would land where if anyone
+# did start using them.
+# ---------------------------------------------------------------------------
+commit_parsers = [
+    # --- Keep a Changelog canonical block ---------------------------------
+    { message = "^feat",              group = "<!-- 00 -->Added" },
+    { message = "^change",            group = "<!-- 01 -->Changed" },
+    { message = "^deprecate",         group = "<!-- 02 -->Deprecated" },
+    { message = "^remove",            group = "<!-- 03 -->Removed" },
+    { message = "^fix",               group = "<!-- 04 -->Fixed" },
+    { message = "^security",          group = "<!-- 05 -->Security" },
+
+    # --- Dependencies -----------------------------------------------------
+    # Surface `chore(deps):` (dependency bumps) despite the `^chore` skip
+    # below. This parser must appear BEFORE the `^chore` skip so that the
+    # specific pattern wins.
+    { message = "^chore\\(deps\\)",  group = "<!-- 06 -->Dependencies" },
+
+    # --- Extra sections --------------------------------------------------
+    { message = "^perf",              group = "<!-- 10 -->Performance" },
+    { message = "^refactor",          group = "<!-- 11 -->Refactored" },
+    { message = "^docs",              group = "<!-- 12 -->Documentation" },
+    { message = "^test",              group = "<!-- 13 -->Tests" },
+    { message = "^style",             group = "<!-- 14 -->Style" },
+    { message = "^build",             group = "<!-- 15 -->Build" },
+    { message = "^ci",                group = "<!-- 16 -->CI" },
+    { message = "^revert",            group = "<!-- 17 -->Reverted" },
+    { message = "^initial",           group = "<!-- 18 -->Initial" },
+
+    # --- Skipped ---------------------------------------------------------
+    # Routine housekeeping (file moves, internal cleanups) is kept out of
+    # the user-facing changelog. The `^chore(deps)` carve-out above is the
+    # one exception. Breaking chores still reach the changelog via
+    # `protect_breaking_commits = true`.
+    { message = "^chore",             skip  = true },
+    { message = "^Merge",             skip  = true },
+]
+
+# ---------------------------------------------------------------------------
+# Commit-body preprocessors
+# ---------------------------------------------------------------------------
+# Applied to each commit's subject + body BEFORE the parsers run. Used here
+# to normalise stray formatting and strip accidental trailers.
+# ---------------------------------------------------------------------------
+commit_preprocessors = [
+    # Strip any `Co-Authored-By:` lines that leak through.
+    { pattern = '(?m)^Co-Authored-By:.*$', replace = "" },
+
+    # Collapse trailing whitespace on any line so the rendered bullet never
+    # carries tab- or space-polluted endings.
+    { pattern = '(?m)[ \t]+$', replace = "" },
+]
+
+# ---------------------------------------------------------------------------
+# Tag matching (release detection)
+# ---------------------------------------------------------------------------
+# One form only: vMAJOR.MINOR.PATCH-BUILD (e.g. v1.0.0-000). BUILD is
+# required — bare v1.0.0 is not a release tag.
+# ---------------------------------------------------------------------------
+tag_pattern = "^v\\d+\\.\\d+\\.\\d+-\\d+$"
+
+# ---------------------------------------------------------------------------
+# In-release commit ordering
+# ---------------------------------------------------------------------------
+# `newest` = most recent commit first within each section. Reads like a
+# diff-log. The canonical Keep a Changelog format is silent on within-group
+# order, so this is a defensible project choice.
+# ---------------------------------------------------------------------------
+sort_commits = "newest"

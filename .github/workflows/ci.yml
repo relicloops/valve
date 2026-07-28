@@ -1,0 +1,115 @@
+name: CI
+
+# Runs on version tags only: vMAJOR.MINOR.PATCH-BUILD (e.g. v1.0.0-000).
+# Glob: v[0-9]+.[0-9]+.[0-9]+-[0-9]+ — bare v1.0.0 is not a release tag.
+# Also: manual workflow_dispatch. Not on ordinary branch pushes or PRs.
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+-[0-9]+'
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CEEDLING_VERSION: "1.1.1"
+  GCOVR_VERSION: "8.6"
+
+# Runner policy (public OSS):
+# - Ubuntu and macOS are required gates. Each job runs the same Meson test target,
+#   which delegates to Ceedling and produces a gcovr HTML report.
+# - Ubuntu provides plentiful concurrency, fast queues, and free unlimited
+#   standard runners on public repos (see GitHub Actions billing docs).
+# - macOS minutes are also free on public standard runners, but Free/Pro/Team plans
+#   share a low concurrent-macOS cap (5). Prefer one macos-latest job over a dual-OS
+#   matrix so release/manual runs do not burn multiple macOS slots. macos-latest is
+#   arm64 Apple Silicon and tracks the current GA image (macos-26 as of mid-2026);
+#   macos-14 is deprecated.
+
+jobs:
+  ubuntu:
+    name: Ubuntu (${{ matrix.compiler }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler:
+          - gcc-14
+          - clang-18
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential "${{ matrix.compiler }}" ninja-build pipx pkg-config
+          pipx install 'meson>=1.4,<2'
+          pipx install "gcovr==${GCOVR_VERSION}"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: false
+
+      - name: Install Ceedling
+        run: gem install ceedling -v "${CEEDLING_VERSION}"
+
+      - name: Meson setup
+        run: CC=${{ matrix.compiler }} meson setup build -Dtests=enabled
+
+      - name: Meson compile
+        run: meson compile -C build
+
+      - name: Meson test
+        run: meson test -C build --print-errorlogs
+
+      - name: Upload coverage HTML
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-ubuntu-${{ matrix.compiler }}
+          path: .cache/ceedling/artifacts/gcov/gcovr/
+          if-no-files-found: error
+
+  macos:
+    name: macOS (Meson + Ceedling)
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install toolchain
+        run: |
+          brew install ninja pipx pkg-config
+          pipx install 'meson>=1.4,<2'
+          pipx install "gcovr==${GCOVR_VERSION}"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: false
+
+      - name: Install Ceedling
+        run: gem install ceedling -v "${CEEDLING_VERSION}"
+
+      - name: Meson setup
+        run: CC=clang meson setup build -Dtests=enabled
+
+      - name: Meson compile
+        run: meson compile -C build
+
+      - name: Meson test
+        run: meson test -C build --print-errorlogs
+
+      - name: Upload coverage HTML
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-macos-clang
+          path: .cache/ceedling/artifacts/gcov/gcovr/
+          if-no-files-found: error

@@ -1,0 +1,83 @@
+---
+:project:
+  :name: valve
+  :which_ceedling: gem
+  :ceedling_version: 1.1.1
+  :use_mocks: false
+  :use_test_preprocessor: :none
+  :use_backtrace: :simple
+  :build_root: .cache/ceedling
+  :test_file_prefix: test_
+  :default_tasks:
+    - test:all
+  :test_threads: 4
+  :compile_threads: 4
+
+:test_build:
+  :use_assembly: false
+
+:plugins:
+  :load_paths: []
+  :enabled:
+    - compile_commands_json_db
+    - report_tests_pretty_stdout
+
+:paths:
+  :test:
+    - +:test/**
+    - -:test/support
+  :source:
+    - src/core/unit
+    - src/core/unit/argv
+    - src/core/unit/option
+    - src/core/unit/conflict
+    - src/core/unit/requirement
+    - src/core/unit/result
+    - src/core/unit/schema
+    - src/core/unit/value
+    - src/core/unit/verb
+    - test/support
+  :include:
+    - include
+    - src/core
+    - test/support
+  :support: []
+  :libraries: []
+
+:files:
+  :test: []
+  :source: []
+  :support:
+    - +:test/support/fault_alloc.c
+
+:defines:
+  :test: []
+  :release: []
+
+:flags:
+  :test:
+    :compile:
+      "*":
+        - -std=c23
+        - -Wall
+        - -Wextra
+        - -Wpedantic
+        # glibc: expose setenv/unsetenv under strict -std=c* (Linux CI).
+        - -D_DEFAULT_SOURCE
+        - -Dmalloc=vl_test_malloc
+        - -Dcalloc=vl_test_calloc
+        - -Drealloc=vl_test_realloc
+        - -Dstrdup=vl_test_strdup
+        - -Dstrndup=vl_test_strndup
+        - -DVALVE_VERSION=\"1.0.0-000\"
+    :link:
+      # openpty (color TTY probes) lives in libutil on Linux and macOS.
+      - -lutil
+
+# Toolchain (:tools, compiler, gcov, gcovr) is prepared by Meson into
+# build/ceedling-toolchain.yml. Prefer `meson test` or `build/valve-ceedling`
+# so the correct OS/architecture/compiler selection is always applied.
+
+:unity:
+  :defines:
+    - UNITY_EXCLUDE_FLOAT

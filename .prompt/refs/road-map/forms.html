@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Valve option syntax, POSIX terminology, implementation status, ambiguity, and cost ranking.">
+  <title>Valve road-map — option forms</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="shell site-header__inner">
+      <a class="brand" href="index.html" aria-label="Valve roadmap home">
+        <span class="brand__mark" aria-hidden="true">
+          <svg viewBox="0 0 48 48">
+            <circle cx="24" cy="24" r="12" fill="none" stroke="currentColor" stroke-width="3"/>
+            <circle cx="24" cy="24" r="4" fill="currentColor"/>
+            <path d="M24 3v12M24 33v12M3 24h12M33 24h12M9.2 9.2l8.5 8.5M30.3 30.3l8.5 8.5M38.8 9.2l-8.5 8.5M17.7 30.3l-8.5 8.5" stroke="currentColor" stroke-width="2"/>
+          </svg>
+        </span>
+        <span>
+          <span class="brand__name">valve</span>
+          <span class="brand__meta">parser road-map</span>
+        </span>
+      </a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">menu</button>
+      <nav class="site-nav" id="site-nav" aria-label="Roadmap">
+        <a href="index.html">overview</a>
+        <a href="parsing.html">parsing</a>
+        <a href="forms.html">forms</a>
+        <a href="constraints.html">constraints</a>
+        <a href="help.html">help</a>
+        <a href="roadmap.html">next work</a>
+        <a href="public.html">public</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="shell hero hero--compact">
+      <div>
+        <p class="eyebrow">02 · grammar and vocabulary</p>
+        <h1>Name every <em>attachment.</em></h1>
+        <p class="lede">
+          Valve models assignment style globally and option spelling per schema entry.
+          The existing grammar is deterministic. Each missing form adds a different
+          ambiguity surface, so cost is ranked against the parser as it exists today.
+        </p>
+      </div>
+      <div class="card">
+        <span class="card__index">design equation</span>
+        <pre>assignment style
+  × option type
+  × value kind
+  = accepted token</pre>
+        <p class="card__meta">orthogonal concerns · no redundant form bits</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">POSIX core</p>
+            <h2>The vocabulary Valve builds on.</h2>
+          </div>
+          <p>
+            POSIX names options, option-arguments, and operands. Long options,
+            enable/disable toggles, and targeted help are extensions layered on that
+            base.
+          </p>
+        </div>
+
+        <dl class="term-list">
+          <div class="term reveal">
+            <dt>option</dt>
+            <dd>A named flag that changes utility behavior, such as <code>-f</code> or <code>--force</code>.</dd>
+          </div>
+          <div class="term reveal">
+            <dt>option-argument</dt>
+            <dd>The value associated with an option, such as <code>fast</code> in <code>--lane=fast</code>.</dd>
+          </div>
+          <div class="term reveal">
+            <dt>operand</dt>
+            <dd>A positional argument whose meaning comes from its location rather than a flag name.</dd>
+          </div>
+          <div class="term reveal">
+            <dt>end-of-options marker</dt>
+            <dd>The special token <code>--</code>; everything after it must be treated as operand data.</dd>
+          </div>
+          <div class="term reveal">
+            <dt>inline / attached</dt>
+            <dd>The value shares one argv element with its option, normally separated by <code>=</code>.</dd>
+          </div>
+          <div class="term reveal">
+            <dt>separate / detached</dt>
+            <dd>The value occupies the next argv element after its option name.</dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Operands</p>
+            <h2>Position supplies the meaning.</h2>
+          </div>
+          <p>
+            Options are named; operands are positional. A parser should preserve
+            operand insertion order and leave the consumer responsible for mapping
+            each index to application behavior.
+          </p>
+        </div>
+
+        <div class="grid grid--2">
+          <div class="card reveal">
+            <span class="card__index">standard utility</span>
+            <pre>cp  -r  src/  dest/
+│   │   │     └─ operand[1]
+│   │   └─────── operand[0]
+│   └─────────── option
+└─────────────── utility</pre>
+          </div>
+          <div class="card reveal">
+            <span class="card__index">future Valve boundary</span>
+            <pre>operand[0] = "filename.log"
+operand[1] = "7890"
+
+consumer:
+  0 → --log-path
+  1 → --listening-port</pre>
+          </div>
+        </div>
+
+        <div class="callout callout--danger">
+          <span class="callout__key">today</span>
+          <p>
+            Valve rejects ordinary positional tokens. The declared
+            <code>VL_BEHAVIOR_ACCEPT_OPERANDS</code> flag is not wired, its documented
+            public accessors do not exist, and <code>--</code> currently discards the
+            remaining tail instead of collecting it.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Syntax matrix</p>
+            <h2>What the parser accepts today.</h2>
+          </div>
+          <p>
+            Inline and separate forms are both implemented, but the executable selects
+            exactly one assignment mode. Bare booleans remain valid in either mode.
+          </p>
+        </div>
+
+        <div class="table-wrap reveal">
+          <table>
+            <thead>
+              <tr>
+                <th>Form</th>
+                <th>Example</th>
+                <th>Status</th>
+                <th>Current behavior or missing rule</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Long inline</td>
+                <td><code>--flag=value</code></td>
+                <td><span class="status status--complete">complete</span></td>
+                <td>Accepted in <code>VL_ASSIGN_INLINE</code>.</td>
+              </tr>
+              <tr>
+                <td>Long separate</td>
+                <td><code>--flag value</code></td>
+                <td><span class="status status--complete">complete</span></td>
+                <td>Accepted in <code>VL_ASSIGN_SEPARATE</code>.</td>
+              </tr>
+              <tr>
+                <td>Short inline</td>
+                <td><code>-f=value</code></td>
+                <td><span class="status status--complete">complete</span></td>
+                <td>Accepted in <code>VL_ASSIGN_INLINE</code>.</td>
+              </tr>
+              <tr>
+                <td>Short separate</td>
+                <td><code>-f value</code></td>
+                <td><span class="status status--complete">complete</span></td>
+                <td>Accepted in <code>VL_ASSIGN_SEPARATE</code>.</td>
+              </tr>
+              <tr>
+                <td>Both attachment modes</td>
+                <td><code>--flag=value</code> and <code>--flag value</code></td>
+                <td><span class="status status--missing">missing</span></td>
+                <td>Add an assignment policy accepting both existing branches.</td>
+              </tr>
+              <tr>
+                <td>Long joined</td>
+                <td><code>--flagvalue</code></td>
+                <td><span class="status status--missing">missing</span></td>
+                <td>Define name-prefix matching and ambiguity precedence.</td>
+              </tr>
+              <tr>
+                <td>Short joined</td>
+                <td><code>-fvalue</code></td>
+                <td><span class="status status--missing">missing</span></td>
+                <td>Split after the short name and coordinate with clusters.</td>
+              </tr>
+              <tr>
+                <td>Short stacking</td>
+                <td><code>-abc</code></td>
+                <td><span class="status status--missing">missing</span></td>
+                <td>Expand members and reserve a value-taking final member.</td>
+              </tr>
+              <tr>
+                <td>Enable / disable</td>
+                <td><code>--enable-X</code></td>
+                <td><span class="status status--custom">extension</span></td>
+                <td>Complete: both prefixes map to one toggle option.</td>
+              </tr>
+              <tr>
+                <td>Dotted name</td>
+                <td><code>--proxy.lane=fast</code></td>
+                <td><span class="status status--custom">extension</span></td>
+                <td>Complete: exact match, typed target, grouped and targeted help.</td>
+              </tr>
+              <tr>
+                <td>Operand</td>
+                <td><code>file.txt</code></td>
+                <td><span class="status status--missing">missing</span></td>
+                <td>Behavior bit is declared; storage, accessors, lifecycle, and parsing are absent.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Implementation expense</p>
+            <h2>Operands are the largest missing parser surface.</h2>
+          </div>
+          <p>
+            This is relative engineering cost, not delivery priority. Percent rails
+            communicate ordering only; they are not estimates of elapsed time.
+          </p>
+        </div>
+
+        <div class="card reveal">
+          <div class="expense">
+            <strong>1 · Operands + <code>--</code></strong>
+            <span class="expense__rail"><span class="expense__fill" style="--expense:100%"></span></span>
+            <span class="expense__value">very high</span>
+          </div>
+          <div class="expense">
+            <strong>2 · Short stacking</strong>
+            <span class="expense__rail"><span class="expense__fill" style="--expense:82%"></span></span>
+            <span class="expense__value">high</span>
+          </div>
+          <div class="expense">
+            <strong>3 · Long joined</strong>
+            <span class="expense__rail"><span class="expense__fill" style="--expense:68%"></span></span>
+            <span class="expense__value">high</span>
+          </div>
+          <div class="expense">
+            <strong>4 · Short joined</strong>
+            <span class="expense__rail"><span class="expense__fill" style="--expense:45%"></span></span>
+            <span class="expense__value">medium</span>
+          </div>
+          <div class="expense">
+            <strong>5 · Both assignment modes</strong>
+            <span class="expense__rail"><span class="expense__fill" style="--expense:23%"></span></span>
+            <span class="expense__value">low</span>
+          </div>
+        </div>
+
+        <div class="grid grid--2">
+          <div class="card reveal">
+            <span class="card__index">why operands rank first</span>
+            <h3>They add a new result family.</h3>
+            <ul class="checklist">
+              <li>Public <code>vl_operand_count()</code> and <code>vl_operand_at()</code></li>
+              <li>Owned storage, clearing, repeated-parse behavior, and destruction</li>
+              <li>Trailing and post-<code>--</code> collection rules</li>
+              <li>Disambiguation from separate option values</li>
+              <li>Disabled-mode errors and generated help notation</li>
+            </ul>
+          </div>
+          <div class="card reveal">
+            <span class="card__index">strict attachment answer</span>
+            <h3>Long joined is the costliest attachment form.</h3>
+            <p>
+              Operands and clusters are not option-argument attachments. Among the
+              missing attachment forms, <code>--flagvalue</code> is most expensive
+              because arbitrary long names create prefix ambiguity.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Ambiguity</p>
+            <h2>Joined long values need a policy before code.</h2>
+          </div>
+          <p>
+            A parser cannot know where an arbitrary long name ends without consulting
+            the schema. Multiple valid prefixes can still describe different parses.
+          </p>
+        </div>
+
+        <div class="diagram reveal">
+          <svg viewBox="0 0 980 370" role="img" aria-labelledby="ambiguity-title ambiguity-desc">
+            <title id="ambiguity-title">Long joined option ambiguity</title>
+            <desc id="ambiguity-desc">The token --output can exactly match an output option or be split as out plus put, depending on schema policy.</desc>
+            <defs>
+              <marker id="ambiguity-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0 0L8 4L0 8Z" fill="#ffb000"/>
+              </marker>
+            </defs>
+            <rect class="node node--active" x="30" y="130" width="230" height="100" rx="12"/>
+            <text class="label" x="145" y="172" text-anchor="middle">--output</text>
+            <text class="label label--small" x="145" y="198" text-anchor="middle">one argv token</text>
+
+            <path class="wire" marker-end="url(#ambiguity-arrow)" d="M260 160H400"/>
+            <path class="wire" marker-end="url(#ambiguity-arrow)" d="M260 202H400"/>
+
+            <rect class="node" x="400" y="65" width="250" height="100" rx="12"/>
+            <text class="label" x="525" y="105" text-anchor="middle">exact option: output</text>
+            <text class="label label--small" x="525" y="132" text-anchor="middle">bare or missing value?</text>
+
+            <rect class="node node--missing" x="400" y="205" width="250" height="100" rx="12"/>
+            <text class="label" x="525" y="245" text-anchor="middle">joined option: out</text>
+            <text class="label label--small" x="525" y="272" text-anchor="middle">value = "put"</text>
+
+            <path class="wire wire--muted" marker-end="url(#ambiguity-arrow)" d="M650 115H760"/>
+            <path class="wire wire--muted" marker-end="url(#ambiguity-arrow)" d="M650 255H760"/>
+
+            <rect class="node" x="760" y="130" width="190" height="100" rx="12"/>
+            <text class="label" x="855" y="166" text-anchor="middle">required policy</text>
+            <text class="label label--small" x="855" y="190" text-anchor="middle">exact wins?</text>
+            <text class="label label--small" x="855" y="208" text-anchor="middle">longest prefix?</text>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">API terminology</p>
+            <h2>The simplified model is already in place.</h2>
+          </div>
+          <p>
+            Historical form-specific constants were replaced by one global assignment
+            enum and combinable option-type bits. KV behavior is routed by value kind.
+          </p>
+        </div>
+
+        <div class="grid grid--2">
+          <div class="card reveal">
+            <span class="status status--complete">current</span>
+            <pre>typedef enum vl_assign {
+  VL_ASSIGN_INLINE = 0,
+  VL_ASSIGN_SEPARATE,
+} vl_assign_t;</pre>
+          </div>
+          <div class="card reveal">
+            <span class="status status--complete">current</span>
+            <pre>VL_OPT_TYPE_LONG
+VL_OPT_TYPE_SHORT
+VL_OPT_TYPE_TOGGLE</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">References</p>
+            <h2>The standards behind the vocabulary.</h2>
+          </div>
+          <p>
+            Valve uses POSIX terminology while deliberately supporting GNU-style long
+            options and project-specific extensions.
+          </p>
+        </div>
+
+        <div class="grid grid--3">
+          <a class="card card--link reveal" href="https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html">
+            <span class="card__index">POSIX</span>
+            <h3>Chapter 12</h3>
+            <p>Utility conventions, option-arguments, operands, and the end-of-options marker.</p>
+          </a>
+          <a class="card card--link reveal" href="https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html">
+            <span class="card__index">GNU libc</span>
+            <h3>Argument syntax</h3>
+            <p>Conventional short and long option spelling beyond the POSIX core.</p>
+          </a>
+          <a class="card card--link reveal" href="https://ftp.gnu.org/old-gnu/Manuals/glibc-2.2.5/html_node/Getopt-Long-Options.html">
+            <span class="card__index">GNU libc</span>
+            <h3>Long options</h3>
+            <p>Historical <code>getopt_long</code> terminology and behavior.</p>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <div class="shell pager">
+      <a href="parsing.html">
+        <small>previous</small>
+        <strong>← Parsing pipeline</strong>
+      </a>
+      <a href="constraints.html">
+        <small>next chapter</small>
+        <strong>Constraint graph →</strong>
+      </a>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell site-footer__inner">
+      <span>Valve road-map · option forms</span>
+      <span>expense order is architecture-relative</span>
+    </div>
+  </footer>
+  <script src="site.js"></script>
+</body>
+</html>

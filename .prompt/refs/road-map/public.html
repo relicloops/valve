@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Valve checkbox roadmap to an early experimental 1.0.x public release.">
+  <title>Valve road-map — go public</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="shell site-header__inner">
+      <a class="brand" href="index.html" aria-label="Valve roadmap home">
+        <span class="brand__mark" aria-hidden="true">
+          <svg viewBox="0 0 48 48">
+            <circle cx="24" cy="24" r="12" fill="none" stroke="currentColor" stroke-width="3"/>
+            <circle cx="24" cy="24" r="4" fill="currentColor"/>
+            <path d="M24 3v12M24 33v12M3 24h12M33 24h12M9.2 9.2l8.5 8.5M30.3 30.3l8.5 8.5M38.8 9.2l-8.5 8.5M17.7 30.3l-8.5 8.5" stroke="currentColor" stroke-width="2"/>
+          </svg>
+        </span>
+        <span>
+          <span class="brand__name">valve</span>
+          <span class="brand__meta">parser road-map</span>
+        </span>
+      </a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">menu</button>
+      <nav class="site-nav" id="site-nav" aria-label="Roadmap">
+        <a href="index.html">overview</a>
+        <a href="parsing.html">parsing</a>
+        <a href="forms.html">forms</a>
+        <a href="constraints.html">constraints</a>
+        <a href="help.html">help</a>
+        <a href="roadmap.html">next work</a>
+        <a href="public.html">public</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="shell hero hero--compact">
+      <div>
+        <p class="eyebrow">06 · public release</p>
+        <h1>Ship an <em>experimental 1.0.x.</em></h1>
+        <p class="lede">
+          Experimental <code>1.0.x</code> under Apache-2.0 is the public bar.
+          Product, packaging, multi-OS CI, coverage, and in-repo docs are ready.
+          The GitHub repo is <strong>public</strong> again (empty history after
+          delete/recreate). Live <code>valve.relicloops.org</code> is <strong>not</strong>
+          a blocker. Remaining ceremony: first commit on the clean tree, then annotated
+          <code>v1.0.0-000</code> + Release notes.
+          Lines <strong>100.0%</strong> on <code>src/core</code> (3068 exec / 26 excl / 3094 total via Ceedling gcov); Functions <strong>100.0%</strong> — 204/204; Branches <strong>100.0%</strong> — 1764/1764; 99.9% ambition met.
+        </p>
+      </div>
+      <div class="card">
+        <span class="card__index">canonical checklist</span>
+        <h3>Rendered status view</h3>
+        <p>
+          This page is updated from live repository state during roadmap sync.
+          Use it as the current release-status dashboard.
+        </p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="card reveal">
+          <span class="card__index">codebase snapshot · 2026-07-28</span>
+          <h3>Version <code>1.0.0-000</code> · experimental <code>1.0.x</code></h3>
+          <p>
+            Installable <code>libvalve</code> / <code>valve.pc</code> / <code>valve_dep</code>.
+            Headers under <code>include/valve/</code>. Ceedling tests in <code>test/</code> (30 files).
+            Docs: README + <code>docs/example/</code> + <code>docs/reference/</code>.
+            Durations, requires, conflicts, and color probes are shipped. Operands remain unimplemented.
+            CI is Meson-first: configure writes the Ceedling toolchain; <code>meson test</code> runs
+            <code>gcov:all</code> + gcovr on Ubuntu (gcc-14, clang-18) and macOS.
+            In-tree library version is <code>1.0.0-000</code> (meson / tests / badge) — that is
+            <strong>not</strong> a published git tag until <code>v1.0.0-000</code> is cut.
+            Multi-OS CI was proven green on probe tag <code>v0.999.999-999</code> before the
+            history reset. GitHub <code>relicloops/valve</code> is <strong>public</strong> with
+            description and topics; local git is re-inited with <code>origin</code> and
+            <strong>no commits yet</strong>. Branch protection waits for the first push to
+            <code>main</code>.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Readiness</p>
+            <h2>Public checklist and coverage.</h2>
+          </div>
+          <p>
+            Two honest meters for experimental public: required release steps, and
+            Ceedling gcov line coverage (soft 90% and 99.9% ambition both met).
+          </p>
+        </div>
+
+        <div class="readiness">
+          <div class="readiness__card reveal">
+            <span class="card__index">public checklist</span>
+            <h3>66 / 76 = 86%</h3>
+            <p class="readiness__note">
+              Required checklist items across Phases 0–8 (global out-of-scope list excluded).
+              Product, CI, public repo, and clean history base are ready. Remaining:
+              first commit/push, branch protection, annotated <code>v1.0.0-000</code>,
+              notify/follow-ups (docs site items stay optional follow-ups).
+            </p>
+            <div class="readiness__rail" aria-hidden="true">
+              <span class="readiness__fill" style="--readiness: 86%"></span>
+            </div>
+            <div class="readiness__marks">
+              <span>0%</span>
+              <span class="done">86% now</span>
+              <span>100%</span>
+            </div>
+          </div>
+          <div class="readiness__card reveal">
+            <span class="card__index">line coverage · src/core</span>
+            <h3>100% · 99.9% ✓</h3>
+            <p class="readiness__note">
+              Measured Ceedling gcov: Lines <strong>100.0%</strong> — 3068 exec / 26 excl / 3094 total;
+              Functions <strong>100.0%</strong> — 204/204; Branches <strong>100.0%</strong> — 1764/1764.
+              Baseline was 64.8%; soft 90% and 99.9% ambition both met.
+              377/377 Unity tests; CMock off.
+            </p>
+            <div class="readiness__rail" aria-hidden="true">
+              <span class="readiness__fill readiness__fill--good" style="--readiness: 100%"></span>
+            </div>
+            <div class="readiness__marks">
+              <span>64.8% baseline</span>
+              <span class="done">90% soft ✓</span>
+              <span class="done">99.9% ✓</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Phase 0</p>
+            <h2>Decide the public bar.</h2>
+          </div>
+          <p>
+            Name the release honestly, freeze what ships in the first tag, and
+            freeze what waits.
+          </p>
+        </div>
+
+        <div class="card reveal">
+          <ul class="checklist">
+            <li class="is-done">Label the release explicitly: <strong>experimental 1.0.x</strong>, not stable</li>
+            <li class="is-done">Write one sentence for README: what Valve is / is not (parse + schema + color + errors/targets; not dispatch, not logging)</li>
+            <li class="is-done">Freeze “in” for first public tag: handoff APIs + Ceedling green + LICENSE + honest README</li>
+            <li class="is-done">Freeze “out” for first public tag: operands, docs home is <code>valve.relicloops.org</code>, full community templates, wrapdb, 99.9% coverage</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Phase 1</p>
+            <h2>Stabilize / clean the repo.</h2>
+          </div>
+          <p>
+            Inventory intentional drops, land product work in clean commits, then
+            prove the standalone build and test gates.
+          </p>
+        </div>
+
+        <div class="grid grid--3">
+          <div class="card reveal">
+            <span class="card__index">1.1 · inventory</span>
+            <h3>Intentional drops</h3>
+            <ul class="checklist">
+              <li class="is-done">Diff deletions and choose keep vs drop: drop leftover docs stack under <code>docs/</code>, <code>justfile</code> / <code>just-scripts/</code>, <code>.prompt/skills/</code>, <code>.clang-format</code> / <code>.clang-tidy</code></li>
+              <li class="is-done">Keep or relocate <code>.prompt/refs/road-map/*.html</code> vs delete as private scratch</li>
+              <li class="is-done">Confirm <code>.handoff</code> stays <strong>untracked</strong>; do not publish it</li>
+              <li class="is-done">Ensure <code>.gitignore</code> covers <code>.cache/</code>, <code>build/</code>, Ceedling artifacts, coverage HTML</li>
+              <li class="is-done">SECURITY.md: Valve-only reporting/scope (no sibling product names)</li>
+              <li class="is-done">Strip remaining sibling product / other-repo references from docs, comments, headers, and roadmap wording</li>
+            </ul>
+          </div>
+          <div class="card reveal">
+            <span class="card__index">1.2 · commits</span>
+            <h3>Land product work</h3>
+            <ul class="checklist">
+              <li class="is-done">Commit handoff units: errors foreach/print, targets_clear, color/<code>vl_create</code> wiring</li>
+              <li class="is-done">Commit Ceedling migration: <code>project.yml</code>, <code>test/**</code>, Meson test removal, unique unit basenames</li>
+              <li class="is-done">Commit example-program updates after they match public helpers</li>
+              <li class="is-done">Commit intentional tooling/docs removals as a dedicated chore commit</li>
+              <li class="is-done">History reset: remote deleted/recreated public; local <code>git init</code> ready for the first public baseline commit</li>
+            </ul>
+          </div>
+          <div class="card reveal">
+            <span class="card__index">1.3 · gates</span>
+            <h3>Sanity gates</h3>
+            <ul class="checklist">
+              <li class="is-done"><code>meson setup</code> / <code>meson compile</code> succeeds standalone</li>
+              <li class="is-done"><code>ceedling test:all</code> green</li>
+              <li class="is-done">Demo binary smoke: help/version/parse</li>
+              <li class="is-done">Spot-check one Meson subproject consumer</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Phase 2</p>
+            <h2>Docs &amp; legal.</h2>
+          </div>
+          <p>
+            License first, then a blocking README rewrite. Community docs and
+            versioning policy ride alongside. The public docs site is a
+            follow-up at <code>valve.relicloops.org</code>.
+          </p>
+        </div>
+
+        <div class="grid grid--2">
+          <div class="card reveal">
+            <span class="card__index">2.1 · license</span>
+            <ul class="checklist">
+              <li class="is-done">Add root <strong>LICENSE</strong> (Apache-2.0) matching meson</li>
+              <li class="is-done">Confirm copyright / org name on GitHub</li>
+            </ul>
+          </div>
+          <div class="card reveal">
+            <span class="card__index">2.3 · community</span>
+            <ul class="checklist">
+              <li class="is-done">CONTRIBUTING.md (Ceedling, Meson)</li>
+              <li class="is-done">SECURITY.md (report path; supported = latest 1.0.x)</li>
+            </ul>
+          </div>
+          <div class="card reveal">
+            <span class="card__index">2.2 · README rewrite (blocking)</span>
+            <ul class="checklist">
+              <li class="is-done">Replace stale <code>VL_FORM_*</code> examples with <code>VL_OPT_TYPE_*</code></li>
+              <li class="is-done">Document <code>vl_assign_t</code> (not old assignment_form names)</li>
+              <li class="is-done">Verb / sub-verb wording; remove stale command notes</li>
+              <li class="is-done">Document <code>vl_errors_*</code>, <code>vl_targets_clear</code> (clear ≠ destroy)</li>
+              <li class="is-done">Document <code>.color</code> on <code>vl_executable_t</code> + env precedence</li>
+              <li class="is-done">Document <code>vl_value_clear</code> / <code>vl_targets_clear</code> — no <code>vl_value_destroy</code></li>
+              <li class="is-done">Build / Test / Install / Consume-as-subproject sections</li>
+              <li class="is-done">Status: <strong>Experimental — API may change while that status remains</strong></li>
+              <li class="is-done">Finish README ↔ <code>docs/reference/</code> split</li>
+            </ul>
+          </div>
+          <div class="card reveal">
+            <span class="card__index">2.4 · versioning</span>
+            <p>
+              One form only: <strong>MAJOR.MINOR.PATCH-BUILD</strong>
+              (tags: <strong>vMAJOR.MINOR.PATCH-BUILD</strong>).
+              Example: <code>1.0.0-000</code> / <code>v1.0.0-000</code>.
+              Bare <code>v1.0.0</code> is not used. Same string in
+              <code>meson.build</code>, <code>project.yml</code>, README badge,
+              and git tags (<code>v[0-9]+.[0-9]+.[0-9]+-[0-9]+</code>).
+            </p>
+            <ul class="checklist">
+              <li class="is-done">Document MAJOR.MINOR.PATCH-BUILD</li>
+              <li class="is-done">While experimental: MINOR may break</li>
+              <li class="is-done">Single tag/version form: <code>v1.0.0-000</code> (not bare <code>v1.0.0</code>)</li>
+              <li class="is-done"><code>cliff.toml</code> present for Keep a Changelog generation</li>
+            </ul>
+          </div>
+          <div class="card reveal">
+            <span class="card__index">2.5 · public docs site (follow-up)</span>
+            <h3><code>valve.relicloops.org</code></h3>
+            <p>
+              Public docs live at <code>https://valve.relicloops.org</code>
+              (tracked separately). In-repo interim docs: README + <code>docs/example/</code> + <code>docs/reference/</code> (WIP). Not a blocker for experimental <code>1.0</code>.
+            </p>
+            <ul class="checklist">
+              <li>Add <code>valve.relicloops.org</code> site (hostname-named dir + <code>manifest.tsx</code>)</li>
+              <li>Build on the shared components library</li>
+              <li>Containerize and host (OCI), fronted by cloudflared</li>
+              <li>Point README / release notes at <code>https://valve.relicloops.org</code> when live</li>
+              <li class="is-done">Experimental 1.0 may ship without the live site; README/examples/reference are the interim docs</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Phase 3</p>
+            <h2>API honesty.</h2>
+          </div>
+          <p>
+            Document what exists. Do not pretend operands or stable status are ready.
+          </p>
+        </div>
+
+        <div class="card reveal">
+          <ul class="checklist">
+            <li class="is-done">Keep operands marked not implemented; Limitations section in public docs</li>
+            <li class="is-done">Do not document operand APIs until they exist</li>
+            <li class="is-done">Audit public headers for contracts / footguns (<code>vl_metadata_t</code> dual fields remain, direct fields preferred)</li>
+            <li class="is-done">Document dual metadata fields preference</li>
+            <li class="is-done">Stability section for experimental 1.x</li>
+            <li class="is-done">Semver policy snippet for lifting experimental status</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="grid grid--3">
+          <div class="card reveal">
+            <span class="card__index">phase 4 · tests / CI</span>
+            <ul class="checklist">
+              <li class="is-done">Document Ceedling toolchain (Meson generates <code>build/ceedling-toolchain.yml</code> + <code>build/valve-ceedling</code>)</li>
+              <li class="is-done">Handoff APIs covered by tests</li>
+              <li class="is-done">CI workflow: tag + <code>workflow_dispatch</code>; Ubuntu gcc-14/clang-18 + macOS; <code>meson test</code> → gcovr HTML</li>
+              <li class="is-done">Coverage gate: soft 90% and 99.9% met (64.8% → Lines <strong>100.0%</strong> — 3068 exec / 26 excl / 3094 total; Functions <strong>100.0%</strong> — 204/204; Branches <strong>100.0%</strong> — 1764/1764)</li>
+              <li class="is-done">Full multi-OS CI green on probe tag <code>v0.999.999-999</code> (Ubuntu gcc-14 + clang-18 + macOS)</li>
+              <li>Required checks / branch protection on <code>main</code> (after first push)</li>
+            </ul>
+          </div>
+          <div class="card reveal">
+            <span class="card__index">phase 5 · packaging</span>
+            <ul class="checklist">
+              <li class="is-done">install: true + install_headers for valve/*.h</li>
+              <li class="is-done">Verify pkg-config</li>
+              <li class="is-done">Document subproject wrap + dependency usage</li>
+              <li class="is-done">Smoke-test clean prefix install</li>
+              <li class="is-done">Defer WrapDB/Homebrew</li>
+            </ul>
+          </div>
+          <div class="card reveal">
+            <span class="card__index">phase 6 · example polish</span>
+            <ul class="checklist">
+              <li class="is-done">Example programs match README style</li>
+              <li class="is-done">Use <code>vl_errors_print</code> + <code>vl_targets_clear</code></li>
+              <li class="is-done">Example metadata uses demo <code>program_version = "0.1.0"</code> (app identity, not Valve library version)</li>
+              <li class="is-done">Smoke paths for help/version/happy/error</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="grid grid--2">
+          <div class="card reveal">
+            <span class="card__index">phase 7 · community (optional)</span>
+            <h3>Health for experimental</h3>
+            <ul class="checklist">
+              <li class="is-done">Minimal bug issue template</li>
+              <li class="is-done">Repo description + topics on public <code>relicloops/valve</code></li>
+              <li>Branch protection + required CI (after first push to <code>main</code>)</li>
+            </ul>
+          </div>
+          <div class="card reveal">
+            <span class="card__index">phase 8 · release</span>
+            <h3>Tag checklist</h3>
+            <ul class="checklist">
+              <li class="is-done">History reset: empty public remote + fresh local git (baseline commit not written yet)</li>
+              <li class="is-done">Working tree ready for first public commit (no history; files present)</li>
+              <li class="is-done">Multi-OS CI green proven on pre-reset probe <code>v0.999.999-999</code> @ <code>0ce4ff8</code></li>
+              <li class="is-done">Library version <code>1.0.0-000</code> consistent in meson / <code>VALVE_VERSION</code> / README badge (in-tree only until tagged)</li>
+              <li class="is-done">Example <code>program_version</code> stays <code>0.1.0</code> — sample app banner, not libvalve</li>
+              <li class="is-done">CHANGELOG.md present (<code>cliff.toml</code> ready)</li>
+              <li class="is-done">Repository public with description/topics</li>
+              <li>First commit(s) + push to <code>origin/main</code></li>
+              <li>Annotated tag <code>v1.0.0-000</code> + GitHub Release (experimental warning)</li>
+              <li>Notify known consumers</li>
+              <li>Open follow-up issues (operands, <code>valve.relicloops.org</code> docs site)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Out of scope</p>
+            <h2>Explicitly not required for first public.</h2>
+          </div>
+          <p>
+            These remain valid follow-ups. They are not blockers for experimental
+            <code>1.0.x</code>.
+          </p>
+        </div>
+
+        <div class="card reveal">
+          <ul class="checklist">
+            <li>Stable status</li>
+            <li>Operands implementation</li>
+            <li class="is-done">99.9% line coverage (met at <strong>100%</strong> on <code>src/core</code>)</li>
+            <li>Live <code>valve.relicloops.org</code> docs site</li>
+            <li>Distro packages</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Release order</p>
+            <h2>What is left for the tag.</h2>
+          </div>
+          <p>
+            Product and gates are done. Ceremony is the remaining pressure.
+          </p>
+        </div>
+
+        <div class="timeline">
+          <article class="timeline__item reveal" data-expense="low">
+            <div class="timeline__top">
+              <div>
+                <span class="card__meta">done</span>
+                <h3>Product + docs + packaging</h3>
+              </div>
+              <span class="status status--complete">shipped</span>
+            </div>
+            <p>Library, LICENSE, README, CONTRIBUTING, SECURITY, install headers/<code>valve.pc</code>, examples, coverage ambition met.</p>
+          </article>
+          <article class="timeline__item reveal" data-expense="low">
+            <div class="timeline__top">
+              <div>
+                <span class="card__meta">done</span>
+                <h3>Multi-OS CI green</h3>
+              </div>
+              <span class="status status--complete">shipped</span>
+            </div>
+            <p>Probe tag green on Ubuntu gcc-14, Ubuntu clang-18, and macOS (Meson → Ceedling gcovr). Will re-fire on the real release tag.</p>
+          </article>
+          <article class="timeline__item reveal" data-expense="low">
+            <div class="timeline__top">
+              <div>
+                <span class="card__meta">done</span>
+                <h3>Public repo + clean history base</h3>
+              </div>
+              <span class="status status--complete">shipped</span>
+            </div>
+            <p>Remote recreated public with description/topics; local git re-inited with <code>origin</code>. No commits yet by design.</p>
+          </article>
+          <article class="timeline__item reveal" data-expense="low">
+            <div class="timeline__top">
+              <div>
+                <span class="card__meta">now</span>
+                <h3>First commit + experimental tag</h3>
+              </div>
+              <span class="status status--missing">release</span>
+            </div>
+            <p>On instruction: initial commit(s) → push → annotated <code>v1.0.0-000</code> + GitHub Release. Docs site is not a gate.</p>
+          </article>
+        </div>
+
+        <div class="callout callout--good">
+          <span class="callout__key">done when</span>
+          <p>
+            First public baseline is on <code>origin/main</code>, multi-OS CI is green on
+            the release tag, and annotated experimental <code>v1.0.0-000</code> release
+            notes name unfinished work (operands; live <code>valve.relicloops.org</code>
+            may still be pending).
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div class="shell pager">
+      <a href="roadmap.html">
+        <small>previous</small>
+        <strong>← Implementation priorities</strong>
+      </a>
+      <a href="index.html">
+        <small>return</small>
+        <strong>System overview →</strong>
+      </a>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell site-footer__inner">
+      <span>Valve road-map · go public</span>
+      <span>experimental 1.0.x · Apache-2.0</span>
+    </div>
+  </footer>
+  <script src="site.js"></script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+# Linux and macOS metadata
+.DS_Store
+._*
+.AppleDouble
+.LSOverride
+.directory
+.Trash-*
+.nfs*
+
+# Editors and temporary files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.log
+*.tmp
+
+# Meson and Ceedling
+/.cache/
+/build/
+/build-*/
+/compile_commands.json
+
+# Compiler and coverage output
+*.o
+*.a
+*.so
+*.dylib
+*.dSYM/
+*.gcda
+*.gcno
+*.gcov
+/coverage/
+/htmlcov/
+
+# Optional local tool environments
+/.bundle/
+/.venv/
+/venv/
+/vendor/bundle/
+__pycache__/
+*.py[cod]
+
+# Local references and secrets
+/.refs/
+.env
+.env.*
+!.env.example
+*.secret
+
+# Local agent coordination state
+.rules
+.rule
+.check
+.follow
+.done
+.handoff
+.prompt/settings.local.json
+.prompt/next.md

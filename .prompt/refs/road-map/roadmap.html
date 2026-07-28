@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Ordered Valve parser implementation roadmap, current capability matrix, and acceptance gates.">
+  <title>Valve road-map — implementation priorities</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="shell site-header__inner">
+      <a class="brand" href="index.html" aria-label="Valve roadmap home">
+        <span class="brand__mark" aria-hidden="true">
+          <svg viewBox="0 0 48 48">
+            <circle cx="24" cy="24" r="12" fill="none" stroke="currentColor" stroke-width="3"/>
+            <circle cx="24" cy="24" r="4" fill="currentColor"/>
+            <path d="M24 3v12M24 33v12M3 24h12M33 24h12M9.2 9.2l8.5 8.5M30.3 30.3l8.5 8.5M38.8 9.2l-8.5 8.5M17.7 30.3l-8.5 8.5" stroke="currentColor" stroke-width="2"/>
+          </svg>
+        </span>
+        <span>
+          <span class="brand__name">valve</span>
+          <span class="brand__meta">parser road-map</span>
+        </span>
+      </a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">menu</button>
+      <nav class="site-nav" id="site-nav" aria-label="Roadmap">
+        <a href="index.html">overview</a>
+        <a href="parsing.html">parsing</a>
+        <a href="forms.html">forms</a>
+        <a href="constraints.html">constraints</a>
+        <a href="help.html">help</a>
+        <a href="roadmap.html">next work</a>
+        <a href="public.html">public</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="shell hero hero--compact">
+      <div>
+        <p class="eyebrow">05 · implementation road-map</p>
+        <h1>Finish the parser by <em>pressure surface.</em></h1>
+        <p class="lede">
+          Expense and priority are recorded separately. Operands are the largest missing
+          capability and also repair incorrect <code>--</code> behavior. Smaller syntax
+          additions should follow explicit ambiguity policies instead of accidental
+          parser branches.
+        </p>
+      </div>
+      <div class="card">
+        <span class="card__index">road-map rule</span>
+        <h3>Decide the grammar before expanding it.</h3>
+        <p>
+          Each phase begins with a public contract, continues through owned runtime
+          state and generated help, and ends at errors and lifecycle verification.
+        </p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Status today</p>
+            <h2>A dated capability matrix.</h2>
+          </div>
+          <p>
+            This table separates complete core contracts, deliberate Valve extensions,
+            and missing parser surfaces. It reflects the implementation on 2026-07-27.
+          </p>
+        </div>
+
+        <div class="table-wrap reveal">
+          <table>
+            <thead>
+              <tr>
+                <th>Capability</th>
+                <th>Status today</th>
+                <th>Current contract</th>
+                <th>Missing implementation</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Long inline / separate</td>
+                <td><span class="status status--complete">mode complete</span></td>
+                <td>Both forms exist across global assignment configurations.</td>
+                <td>One executable cannot accept both at once.</td>
+              </tr>
+              <tr>
+                <td>Short inline / separate</td>
+                <td><span class="status status--complete">mode complete</span></td>
+                <td>Both forms exist across global assignment configurations.</td>
+                <td>One executable cannot accept both at once.</td>
+              </tr>
+              <tr>
+                <td>Long joined</td>
+                <td><span class="status status--missing">missing</span></td>
+                <td>The whole token is treated as one exact long name.</td>
+                <td>Prefix and ambiguity policy, parsing, errors, and help.</td>
+              </tr>
+              <tr>
+                <td>Short joined</td>
+                <td><span class="status status--missing">missing</span></td>
+                <td>Characters after a short option are rejected.</td>
+                <td>Joined value parsing and cluster coordination.</td>
+              </tr>
+              <tr>
+                <td>Short stacking</td>
+                <td><span class="status status--missing">missing</span></td>
+                <td><code>-abc</code> is not expanded.</td>
+                <td>Cluster lexer, per-member errors, duplicates, and final value rule.</td>
+              </tr>
+              <tr>
+                <td>Bare booleans</td>
+                <td><span class="status status--custom">complete extension</span></td>
+                <td>Bare means true; inline true and false literals are accepted.</td>
+                <td>General optional option-arguments remain unsupported.</td>
+              </tr>
+              <tr>
+                <td>Enable / disable</td>
+                <td><span class="status status--custom">complete extension</span></td>
+                <td>Both prefixes map to one toggle option.</td>
+                <td>None.</td>
+              </tr>
+              <tr>
+                <td>Dotted options</td>
+                <td><span class="status status--custom">complete extension</span></td>
+                <td>Exact matching, typed targets, target population, grouped and targeted help.</td>
+                <td>None.</td>
+              </tr>
+              <tr>
+                <td>Targeted help</td>
+                <td><span class="status status--custom">complete extension</span></td>
+                <td>Exact options, command paths, groups, and custom joined targets.</td>
+                <td>Only a future standardization policy, if desired.</td>
+              </tr>
+              <tr>
+                <td>Operands</td>
+                <td><span class="status status--missing">declared only</span></td>
+                <td>Ordinary positional tokens are rejected.</td>
+                <td>Storage, accessors, lifecycle, collection, help, and behavior wiring.</td>
+              </tr>
+              <tr>
+                <td><code>--</code> end marker</td>
+                <td><span class="status status--partial">incorrect partial</span></td>
+                <td>Parsing stops and ignores the remaining tail.</td>
+                <td>Collect operands or reject tail when operands are disabled.</td>
+              </tr>
+              <tr>
+                <td>Required options</td>
+                <td><span class="status status--complete">complete</span></td>
+                <td>Active-chain enforcement plus automatic help.</td>
+                <td>None.</td>
+              </tr>
+              <tr>
+                <td>Conflicts</td>
+                <td><span class="status status--complete">complete</span></td>
+                <td>Many-option, undirected, presence-based edges and help.</td>
+                <td>Full satisfiability analysis is intentionally absent.</td>
+              </tr>
+              <tr>
+                <td>Conditional requirements</td>
+                <td><span class="status status--complete">complete</span></td>
+                <td>Many-option directed edges with forward and reverse help.</td>
+                <td>Predicates and one-of requirements are outside the contract.</td>
+              </tr>
+              <tr>
+                <td>Inferred help</td>
+                <td><span class="status status--complete">complete</span></td>
+                <td>Syntax comes from type, value, target, and assignment.</td>
+                <td><code>.usage</code> remains optional supplementary guidance.</td>
+              </tr>
+              <tr>
+                <td>Verb / sub-verb</td>
+                <td><span class="status status--partial">fixed depth</span></td>
+                <td>Any sibling count; one verb plus one sub-verb can be active.</td>
+                <td>Reject deeper schemas or implement recursive path state and help.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Expense order</p>
+            <h2>Largest parser change to smallest.</h2>
+          </div>
+          <p>
+            This order measures architectural reach. It does not require delivery in
+            descending expense; low-cost policy additions may reasonably ship between
+            larger phases.
+          </p>
+        </div>
+
+        <div class="timeline">
+          <article class="timeline__item reveal" data-expense="very-high">
+            <div class="timeline__top">
+              <div>
+                <span class="card__meta">rank 01 · very high</span>
+                <h3>Operands and correct <code>--</code></h3>
+              </div>
+              <span class="status status--missing">missing</span>
+            </div>
+            <p>
+              New public query surface, owned result storage, repeated-parse lifecycle,
+              trailing positional collection, separate-value disambiguation, correct
+              end-marker semantics, errors, and help notation.
+            </p>
+          </article>
+
+          <article class="timeline__item reveal" data-expense="high">
+            <div class="timeline__top">
+              <div>
+                <span class="card__meta">rank 02 · high</span>
+                <h3>Short stacking</h3>
+              </div>
+              <span class="status status--missing">missing</span>
+            </div>
+            <p>
+              Add a per-character cluster parser, resolve every member in active scope,
+              attribute duplicates and errors to one argv index, and allow only a
+              value-taking final member.
+            </p>
+          </article>
+
+          <article class="timeline__item reveal" data-expense="high">
+            <div class="timeline__top">
+              <div>
+                <span class="card__meta">rank 03 · high</span>
+                <h3>Long joined values</h3>
+              </div>
+              <span class="status status--missing">missing</span>
+            </div>
+            <p>
+              Define exact-match precedence, longest-prefix behavior, schema ambiguity,
+              empty joined values, boolean handling, dotted names, diagnostics, and
+              generated syntax.
+            </p>
+          </article>
+
+          <article class="timeline__item reveal" data-expense="medium">
+            <div class="timeline__top">
+              <div>
+                <span class="card__meta">rank 04 · medium</span>
+                <h3>Short joined values</h3>
+              </div>
+              <span class="status status--missing">missing</span>
+            </div>
+            <p>
+              The one-character name makes splitting easy, but the contract must still
+              distinguish a joined value from a future short-option cluster.
+            </p>
+          </article>
+
+          <article class="timeline__item reveal" data-expense="low">
+            <div class="timeline__top">
+              <div>
+                <span class="card__meta">rank 05 · low</span>
+                <h3>Inline and separate together</h3>
+              </div>
+              <span class="status status--missing">missing</span>
+            </div>
+            <p>
+              Extend the assignment enum or policy, accept both existing parse branches,
+              validate the new mode, and display both accepted signatures in help.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Recommended delivery</p>
+            <h2>Correctness first, then grammar breadth.</h2>
+          </div>
+          <p>
+            Expense alone should not dictate sequence. The first phase repairs existing
+            incorrect behavior; later phases can be chosen according to consumer demand.
+          </p>
+        </div>
+
+        <div class="grid grid--3">
+          <div class="card reveal">
+            <span class="card__index">phase A · correctness</span>
+            <h3>Operands and <code>--</code></h3>
+            <p>Implement the declared behavior flag and eliminate silent argv-tail loss.</p>
+          </div>
+          <div class="card reveal">
+            <span class="card__index">phase B · low-risk reach</span>
+            <h3>Combined assignment</h3>
+            <p>Reuse proven inline and separate branches behind one explicit policy.</p>
+          </div>
+          <div class="card reveal">
+            <span class="card__index">phase C · short grammar</span>
+            <h3>Joined plus clusters</h3>
+            <p>Design short joined and stacking together so the token split is coherent.</p>
+          </div>
+          <div class="card reveal">
+            <span class="card__index">phase D · long grammar</span>
+            <h3>Long joined policy</h3>
+            <p>Ship only after ambiguity and exact-name precedence are part of the public contract.</p>
+          </div>
+          <div class="card reveal">
+            <span class="card__index">phase E · command contract</span>
+            <h3>Depth decision</h3>
+            <p>Either reject deeper trees at creation or replace the two active pointers with a path.</p>
+          </div>
+          <div class="card reveal">
+            <span class="card__index">phase F · optional graph work</span>
+            <h3>Constraint solver boundary</h3>
+            <p>Keep predicates, one-of semantics, and satisfiability separate unless consumers require them.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Acceptance gates</p>
+            <h2>Every feature crosses the same surfaces.</h2>
+          </div>
+          <p>
+            A parser feature is not complete when one token branch works. It is complete
+            when schema, lifecycle, errors, help, and repeated parsing agree.
+          </p>
+        </div>
+
+        <div class="grid grid--2">
+          <div class="card reveal">
+            <span class="card__index">contract gate</span>
+            <ul class="checklist">
+              <li>Public schema or behavior is explicit and documented.</li>
+              <li>Ambiguity and precedence rules are deterministic.</li>
+              <li>Invalid declarations fail during <code>vl_create()</code>.</li>
+              <li>Reserved tokens retain their precedence contract.</li>
+            </ul>
+          </div>
+          <div class="card reveal">
+            <span class="card__index">runtime gate</span>
+            <ul class="checklist">
+              <li>Owned state clears on repeated parse and destroy.</li>
+              <li>Errors retain argv index, stable key, code, and message.</li>
+              <li>Inferred help displays every accepted spelling.</li>
+              <li>Global, verb, and sub-verb scopes behave consistently.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="callout">
+          <span class="callout__key">source</span>
+          <p>
+            The canonical prose audit remains
+            <a href="../source/task/posix-cli-terminology.md"><code>docs/source/task/posix-cli-terminology.md</code></a>.
+            This microsite is its navigable architectural road-map.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div class="shell pager">
+      <a href="help.html">
+        <small>previous</small>
+        <strong>← Generated help</strong>
+      </a>
+      <a href="public.html">
+        <small>next chapter</small>
+        <strong>Go public →</strong>
+      </a>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell site-footer__inner">
+      <span>Valve road-map · implementation priorities</span>
+        <span>status dated 2026-07-27</span>
+    </div>
+  </footer>
+  <script src="site.js"></script>
+</body>
+</html>

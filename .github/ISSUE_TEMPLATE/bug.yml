@@ -1,0 +1,110 @@
+name: Bug report
+description: Something Valve parses, validates, or reports incorrectly.
+title: "[bug] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug.
+
+        Valve is **experimental 1.0.x** — the API may change while that status remains.
+        Please search [existing issues](https://github.com/relicloops/valve/issues?q=is%3Aissue)
+        before filing a duplicate.
+
+  - type: input
+    id: version
+    attributes:
+      label: Valve version
+      description: >-
+        From meson.build project version, or the string returned by
+        vl_version_get() (1.0.0-000 style).
+      placeholder: "1.0.0-000"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: feature-area
+    attributes:
+      label: Feature area
+      description: Which part of Valve is involved?
+      options:
+        - Parsing / argv
+        - Options / forms / assignment
+        - Schema / value types / targets
+        - Verbs / sub-verbs
+        - Requirements / conflicts
+        - Help / reserved tokens
+        - Color / terminal capabilities
+        - Errors / targets teardown
+        - Values (KV, arrays, duration, path)
+        - Build (Meson) / tests (Ceedling)
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: OS
+      description: Run `uname -srm` (or paste macOS / Linux distro + version).
+      placeholder: "Darwin 25.5.0 arm64"
+    validations:
+      required: true
+
+  - type: input
+    id: compiler
+    attributes:
+      label: Compiler
+      description: Run the selected C compiler with `--version`.
+      placeholder: "Apple clang version 17.0.0"
+    validations:
+      required: true
+
+  - type: textarea
+    id: argv
+    attributes:
+      label: argv reproduction
+      description: Exact `argv` (or shell command) that triggers the bug. Prefer a minimal line.
+      render: shell
+      placeholder: |
+        your-app network --proxy.cpus=999
+    validations:
+      required: true
+
+  - type: textarea
+    id: schema
+    attributes:
+      label: Relevant schema (optional)
+      description: Minimal `vl_option_t` / `vl_executable_t` snippet if the bug depends on schema shape.
+      render: c
+      placeholder: |
+        const vl_option_t options[] = {
+            { .name = "proxy.cpus", .value = VL_OPTION_VALUE_INT, /* ... */ },
+            { .name = NULL },
+        };
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected vs actual behaviour
+      description: What should happen, and what happened instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / console output
+      description: Paste `vl_errors_print` output, compiler errors, or Ceedling failure text.
+      render: shell

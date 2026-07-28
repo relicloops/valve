@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Valve required, requires, and conflicts option relationships, scope, ownership, and runtime flow.">
+  <title>Valve road-map — constraint graph</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="shell site-header__inner">
+      <a class="brand" href="index.html" aria-label="Valve roadmap home">
+        <span class="brand__mark" aria-hidden="true">
+          <svg viewBox="0 0 48 48">
+            <circle cx="24" cy="24" r="12" fill="none" stroke="currentColor" stroke-width="3"/>
+            <circle cx="24" cy="24" r="4" fill="currentColor"/>
+            <path d="M24 3v12M24 33v12M3 24h12M33 24h12M9.2 9.2l8.5 8.5M30.3 30.3l8.5 8.5M38.8 9.2l-8.5 8.5M17.7 30.3l-8.5 8.5" stroke="currentColor" stroke-width="2"/>
+          </svg>
+        </span>
+        <span>
+          <span class="brand__name">valve</span>
+          <span class="brand__meta">parser road-map</span>
+        </span>
+      </a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">menu</button>
+      <nav class="site-nav" id="site-nav" aria-label="Roadmap">
+        <a href="index.html">overview</a>
+        <a href="parsing.html">parsing</a>
+        <a href="forms.html">forms</a>
+        <a href="constraints.html">constraints</a>
+        <a href="help.html">help</a>
+        <a href="roadmap.html">next work</a>
+        <a href="public.html">public</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="shell hero hero--compact">
+      <div>
+        <p class="eyebrow">03 · option relationships</p>
+        <h1>Constraints live in the <em>schema.</em></h1>
+        <p class="lede">
+          Valve models three presence-based relationships. Required is unconditional.
+          Requires is directed and conditional. Conflicts is undirected. Runtime and
+          generated help read the same Valve-owned edge tables.
+        </p>
+      </div>
+      <div class="card">
+        <span class="card__index">post-parse order</span>
+        <pre>1. .required
+2. .requires
+3. .conflicts</pre>
+        <p class="card__meta">reserved behavior returns before enforcement</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Relationship model</p>
+            <h2>Three semantics, no hidden reciprocity.</h2>
+          </div>
+          <p>
+            Presence means the user supplied the option. An explicitly supplied false
+            boolean is still present for both requirements and conflicts.
+          </p>
+        </div>
+
+        <div class="grid grid--3">
+          <div class="card reveal">
+            <span class="status status--complete">complete</span>
+            <h3><code>.required = true</code></h3>
+            <p>The option must appear whenever its command scope is active. No target table is involved.</p>
+          </div>
+          <div class="card reveal">
+            <span class="status status--complete">directed</span>
+            <h3><code>A .requires B</code></h3>
+            <p>If A appears, B must appear. B alone is valid. One source may require any number of targets.</p>
+          </div>
+          <div class="card reveal">
+            <span class="status status--complete">undirected</span>
+            <h3><code>A .conflicts B</code></h3>
+            <p>A and B cannot appear together. One declaration annotates and enforces both directions.</p>
+          </div>
+        </div>
+
+        <div class="diagram reveal">
+          <svg viewBox="0 0 1020 440" role="img" aria-labelledby="relation-title relation-desc">
+            <title id="relation-title">Valve option relationship graph</title>
+            <desc id="relation-desc">Publish requires id and list, limit requires list, and limit conflicts with no-limit.</desc>
+            <defs>
+              <marker id="relation-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0 0L8 4L0 8Z" fill="#ffb000"/>
+              </marker>
+            </defs>
+            <path class="wire" marker-end="url(#relation-arrow)" d="M250 130C360 130 380 90 470 90"/>
+            <path class="wire" marker-end="url(#relation-arrow)" d="M250 155C360 155 380 300 470 300"/>
+            <path class="wire" marker-end="url(#relation-arrow)" d="M690 280C760 250 760 175 805 155"/>
+            <path d="M690 320C760 350 775 350 825 320" fill="none" stroke="#ff725c" stroke-width="2" stroke-dasharray="7 5"/>
+            <path d="M815 310l20 20M835 310l-20 20" stroke="#ff725c" stroke-width="2"/>
+
+            <rect class="node node--active" x="50" y="90" width="200" height="110" rx="12"/>
+            <text class="label" x="150" y="133" text-anchor="middle">--publish</text>
+            <text class="label label--small" x="150" y="160" text-anchor="middle">source present</text>
+
+            <rect class="node" x="470" y="45" width="220" height="90" rx="12"/>
+            <text class="label" x="580" y="82" text-anchor="middle">--id=&lt;string&gt;</text>
+            <text class="label label--small" x="580" y="107" text-anchor="middle">required by publish</text>
+
+            <rect class="node" x="470" y="255" width="220" height="90" rx="12"/>
+            <text class="label" x="580" y="292" text-anchor="middle">--list</text>
+            <text class="label label--small" x="580" y="317" text-anchor="middle">required target</text>
+
+            <rect class="node node--active" x="805" y="90" width="170" height="90" rx="12"/>
+            <text class="label" x="890" y="127" text-anchor="middle">--limit</text>
+            <text class="label label--small" x="890" y="152" text-anchor="middle">requires list</text>
+
+            <rect class="node node--missing" x="805" y="275" width="170" height="90" rx="12"/>
+            <text class="label" x="890" y="312" text-anchor="middle">--no-limit</text>
+            <text class="label label--small" x="890" y="337" text-anchor="middle">conflicts with limit</text>
+
+            <text class="label label--small" x="357" y="87">requires</text>
+            <text class="label label--small" x="345" y="245">requires</text>
+            <text class="label label--small" x="735" y="242">requires</text>
+            <text x="755" y="382" fill="#ff725c" font-family="Space Mono, monospace" font-size="10">conflict edge</text>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Truth table</p>
+            <h2>Directed means exactly one invalid state.</h2>
+          </div>
+          <p>
+            For <code>A requires B</code>, only A-present and B-absent is invalid.
+            Reverse edges and cycles are legal because each declaration retains its
+            direction.
+          </p>
+        </div>
+
+        <div class="table-wrap reveal">
+          <table>
+            <thead>
+              <tr>
+                <th>A present</th>
+                <th>B present</th>
+                <th>Result</th>
+                <th>Reason</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>no</td>
+                <td>no</td>
+                <td><span class="status status--complete">valid</span></td>
+                <td>The source is absent, so the edge is inactive.</td>
+              </tr>
+              <tr>
+                <td>no</td>
+                <td>yes</td>
+                <td><span class="status status--complete">valid</span></td>
+                <td>Requirements do not imply reciprocity.</td>
+              </tr>
+              <tr>
+                <td>yes</td>
+                <td>yes</td>
+                <td><span class="status status--complete">valid</span></td>
+                <td>The target satisfies the active edge.</td>
+              </tr>
+              <tr>
+                <td>yes</td>
+                <td>no</td>
+                <td><span class="status status--missing">error</span></td>
+                <td><code>VL_ERROR_UNSATISFIED_REQUIREMENT</code> at A's argv index.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Ownership flow</p>
+            <h2>Cross-references cross a lifetime boundary.</h2>
+          </div>
+          <p>
+            Public tables point at caller-owned <code>vl_option_t</code> objects during
+            creation. Valve validates exact identity, maps each endpoint to its copied
+            option, then stores normalized private edges.
+          </p>
+        </div>
+
+        <div class="flow">
+          <div class="flow__step reveal">
+            <span class="flow__number">01</span>
+            <strong>Caller pointers</strong>
+            <p><code>.requires</code> and <code>.conflicts</code> reference declared options.</p>
+          </div>
+          <div class="flow__step reveal">
+            <span class="flow__number">02</span>
+            <strong>Validate</strong>
+            <p>Check table shape, exact identity, visibility, self-reference, and duplicates.</p>
+          </div>
+          <div class="flow__step reveal">
+            <span class="flow__number">03</span>
+            <strong>Map</strong>
+            <p>Resolve source and target against copied global, verb, and sub-verb options.</p>
+          </div>
+          <div class="flow__step reveal">
+            <span class="flow__number">04</span>
+            <strong>Store edges</strong>
+            <p>Keep direction for requirements and normalize either order for conflicts.</p>
+          </div>
+          <div class="flow__step reveal">
+            <span class="flow__number">05</span>
+            <strong>Consume</strong>
+            <p>Runtime checks and help annotations use only Valve-owned identities.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Scope matrix</p>
+            <h2>A target must be visible to its source.</h2>
+          </div>
+          <p>
+            Local sources may reference upward to owning or global options. They cannot
+            reference downward or sideways into a scope that is not always active with
+            them.
+          </p>
+        </div>
+
+        <div class="table-wrap reveal">
+          <table>
+            <thead>
+              <tr>
+                <th>Source scope</th>
+                <th>Target scope</th>
+                <th>Valid</th>
+                <th>Reason</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>global</td><td>global</td><td>yes</td><td>Both are always visible.</td></tr>
+              <tr><td>global</td><td>verb or sub-verb</td><td>no</td><td>The target is not always active.</td></tr>
+              <tr><td>verb</td><td>same verb or global</td><td>yes</td><td>The target is visible in the active chain.</td></tr>
+              <tr><td>verb</td><td>sub-verb</td><td>no</td><td>The source can appear without that child scope.</td></tr>
+              <tr><td>sub-verb</td><td>same sub-verb, owner, or global</td><td>yes</td><td>All are active together.</td></tr>
+              <tr><td>local</td><td>sibling scope</td><td>no</td><td>Sibling commands cannot be active together.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Deliberate boundary</p>
+            <h2>Structural validation is not a solver.</h2>
+          </div>
+          <p>
+            Valve rejects malformed relation tables, but it does not prove that every
+            combination of required, requires, and conflicts is satisfiable.
+          </p>
+        </div>
+
+        <div class="callout">
+          <span class="callout__key">out of scope</span>
+          <p>
+            Predicate-based requirements, one-of requirements, value-dependent edges,
+            callback conditions, and full graph satisfiability remain separate future
+            features rather than hidden behavior in the first relationship model.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div class="shell pager">
+      <a href="forms.html">
+        <small>previous</small>
+        <strong>← Option forms</strong>
+      </a>
+      <a href="help.html">
+        <small>next chapter</small>
+        <strong>Generated help →</strong>
+      </a>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell site-footer__inner">
+      <span>Valve road-map · option relationships</span>
+      <span>presence-based · scope-aware · copied</span>
+    </div>
+  </footer>
+  <script src="site.js"></script>
+</body>
+</html>
