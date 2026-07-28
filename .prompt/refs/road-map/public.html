@@ -46,12 +46,10 @@
         <p class="eyebrow">06 · public release</p>
         <h1>Ship an <em>experimental 1.0.x.</em></h1>
         <p class="lede">
-          Experimental <code>1.0.x</code> under Apache-2.0 is the public bar.
-          Product, packaging, multi-OS CI, coverage, and in-repo docs are ready.
-          The GitHub repo is <strong>public</strong> again (empty history after
-          delete/recreate). Live <code>valve.relicloops.org</code> is <strong>not</strong>
-          a blocker. Remaining ceremony: first commit on the clean tree, then annotated
-          <code>v1.0.0-000</code> + Release notes.
+          Experimental <code>1.0.x</code> under Apache-2.0.
+          Public baseline, annotated <code>v1.0.0-000</code> (prerelease), and multi-OS CI
+          on that tag are cut. <code>valve.relicloops.org</code> is <strong>live</strong>
+          and serving. Optional: branch protection, consumer notify, follow-up issues.
           Lines <strong>100.0%</strong> on <code>src/core</code> (3068 exec / 26 excl / 3094 total via Ceedling gcov); Functions <strong>100.0%</strong> — 204/204; Branches <strong>100.0%</strong> — 1764/1764; 99.9% ambition met.
         </p>
       </div>
@@ -77,13 +75,11 @@
             Durations, requires, conflicts, and color probes are shipped. Operands remain unimplemented.
             CI is Meson-first: configure writes the Ceedling toolchain; <code>meson test</code> runs
             <code>gcov:all</code> + gcovr on Ubuntu (gcc-14, clang-18) and macOS.
-            In-tree library version is <code>1.0.0-000</code> (meson / tests / badge) — that is
-            <strong>not</strong> a published git tag until <code>v1.0.0-000</code> is cut.
-            Multi-OS CI was proven green on probe tag <code>v0.999.999-999</code> before the
-            history reset. GitHub <code>relicloops/valve</code> is <strong>public</strong> with
-            description and topics; local git is re-inited with <code>origin</code> and
-            <strong>no commits yet</strong>. Branch protection waits for the first push to
-            <code>main</code>.
+            Library version <code>1.0.0-000</code> matches annotated tag <code>v1.0.0-000</code>
+            on <code>c946bc5</code> (GitHub Release marked experimental prerelease).
+            Multi-OS CI is green on that tag (Ubuntu gcc-14, clang-18, macOS).
+            GitHub <code>relicloops/valve</code> is public. Optional: branch protection on
+            <code>main</code>, consumer notify, follow-up issues.
           </p>
         </div>
       </div>
@@ -105,19 +101,19 @@
         <div class="readiness">
           <div class="readiness__card reveal">
             <span class="card__index">public checklist</span>
-            <h3>66 / 76 = 86%</h3>
+            <h3>73 / 77 = 95%</h3>
             <p class="readiness__note">
               Required checklist items across Phases 0–8 (global out-of-scope list excluded).
-              Product, CI, public repo, and clean history base are ready. Remaining:
-              first commit/push, branch protection, annotated <code>v1.0.0-000</code>,
-              notify/follow-ups (docs site items stay optional follow-ups).
+              Product, CI, public repo, tag/Release, and the live docs site are done.
+              Remaining: branch protection on <code>main</code>, consumer notify,
+              follow-up issues.
             </p>
             <div class="readiness__rail" aria-hidden="true">
-              <span class="readiness__fill" style="--readiness: 86%"></span>
+              <span class="readiness__fill" style="--readiness: 95%"></span>
             </div>
             <div class="readiness__marks">
               <span>0%</span>
-              <span class="done">86% now</span>
+              <span class="done">95% now</span>
               <span>100%</span>
             </div>
           </div>
@@ -227,8 +223,8 @@
           </div>
           <p>
             License first, then a blocking README rewrite. Community docs and
-            versioning policy ride alongside. The public docs site is a
-            follow-up at <code>valve.relicloops.org</code>.
+            versioning policy ride alongside. The public docs site is live at
+            <code>valve.relicloops.org</code>.
           </p>
         </div>
 
@@ -279,17 +275,19 @@
             </ul>
           </div>
           <div class="card reveal">
-            <span class="card__index">2.5 · public docs site (follow-up)</span>
+            <span class="card__index">2.5 · public docs site · shipped</span>
             <h3><code>valve.relicloops.org</code></h3>
             <p>
-              Public docs live at <code>https://valve.relicloops.org</code>
-              (tracked separately). In-repo interim docs: README + <code>docs/example/</code> + <code>docs/reference/</code> (WIP). Not a blocker for experimental <code>1.0</code>.
+              Public docs are live at <code>https://valve.relicloops.org</code>
+              (six pages: overview, install, concepts, status, download, search).
+              The repository stays the source of truth: README + <code>docs/example/</code> + <code>docs/reference/</code>.
+              The download page serves a <code>git archive</code> of the signed tag with its SHA-256.
             </p>
             <ul class="checklist">
-              <li>Add <code>valve.relicloops.org</code> site (hostname-named dir + <code>manifest.tsx</code>)</li>
-              <li>Build on the shared components library</li>
-              <li>Containerize and host (OCI), fronted by cloudflared</li>
-              <li>Point README / release notes at <code>https://valve.relicloops.org</code> when live</li>
+              <li class="is-done">Add <code>valve.relicloops.org</code> site (hostname-named dir + <code>manifest.tsx</code>)</li>
+              <li class="is-done">Build on the shared components library</li>
+              <li class="is-done">Containerize and host (OCI), fronted by cloudflared</li>
+              <li class="is-done">Point README / release notes at <code>https://valve.relicloops.org</code> when live</li>
               <li class="is-done">Experimental 1.0 may ship without the live site; README/examples/reference are the interim docs</li>
             </ul>
           </div>
@@ -382,10 +380,11 @@
               <li class="is-done">Example <code>program_version</code> stays <code>0.1.0</code> — sample app banner, not libvalve</li>
               <li class="is-done">CHANGELOG.md present (<code>cliff.toml</code> ready)</li>
               <li class="is-done">Repository public with description/topics</li>
-              <li>First commit(s) + push to <code>origin/main</code></li>
-              <li>Annotated tag <code>v1.0.0-000</code> + GitHub Release (experimental warning)</li>
+              <li class="is-done">First commit(s) + push to <code>origin/main</code> (<code>2fba545</code> / <code>c946bc5</code>)</li>
+              <li class="is-done">Annotated tag <code>v1.0.0-000</code> + GitHub Release (experimental prerelease)</li>
+              <li class="is-done">Multi-OS CI green on <code>v1.0.0-000</code></li>
               <li>Notify known consumers</li>
-              <li>Open follow-up issues (operands, <code>valve.relicloops.org</code> docs site)</li>
+              <li>Open follow-up issues (operands)</li>
             </ul>
           </div>
         </div>
@@ -410,7 +409,7 @@
             <li>Stable status</li>
             <li>Operands implementation</li>
             <li class="is-done">99.9% line coverage (met at <strong>100%</strong> on <code>src/core</code>)</li>
-            <li>Live <code>valve.relicloops.org</code> docs site</li>
+            <li class="is-done">Live <code>valve.relicloops.org</code> docs site (shipped after the tag)</li>
             <li>Distro packages</li>
           </ul>
         </div>
@@ -422,10 +421,10 @@
         <div class="section-heading">
           <div>
             <p class="eyebrow">Release order</p>
-            <h2>What is left for the tag.</h2>
+            <h2>Experimental public is cut.</h2>
           </div>
           <p>
-            Product and gates are done. Ceremony is the remaining pressure.
+            Baseline, tag, Release, and multi-OS CI on <code>v1.0.0-000</code> are done.
           </p>
         </div>
 
@@ -448,37 +447,36 @@
               </div>
               <span class="status status--complete">shipped</span>
             </div>
-            <p>Probe tag green on Ubuntu gcc-14, Ubuntu clang-18, and macOS (Meson → Ceedling gcovr). Will re-fire on the real release tag.</p>
+            <p>Ubuntu gcc-14, Ubuntu clang-18, and macOS green on tag <code>v1.0.0-000</code>.</p>
           </article>
           <article class="timeline__item reveal" data-expense="low">
             <div class="timeline__top">
               <div>
                 <span class="card__meta">done</span>
-                <h3>Public repo + clean history base</h3>
+                <h3>Public repo + baseline</h3>
               </div>
               <span class="status status--complete">shipped</span>
             </div>
-            <p>Remote recreated public with description/topics; local git re-inited with <code>origin</code>. No commits yet by design.</p>
+            <p>Public <code>relicloops/valve</code>; clean history; first commits on <code>main</code>.</p>
           </article>
           <article class="timeline__item reveal" data-expense="low">
             <div class="timeline__top">
               <div>
-                <span class="card__meta">now</span>
-                <h3>First commit + experimental tag</h3>
+                <span class="card__meta">done</span>
+                <h3>Experimental tag + release</h3>
               </div>
-              <span class="status status--missing">release</span>
+              <span class="status status--complete">shipped</span>
             </div>
-            <p>On instruction: initial commit(s) → push → annotated <code>v1.0.0-000</code> + GitHub Release. Docs site is not a gate.</p>
+            <p>Annotated <code>v1.0.0-000</code> + prerelease notes. Optional: branch protection, consumer notify, follow-up issues.</p>
           </article>
         </div>
 
         <div class="callout callout--good">
-          <span class="callout__key">done when</span>
+          <span class="callout__key">status</span>
           <p>
-            First public baseline is on <code>origin/main</code>, multi-OS CI is green on
-            the release tag, and annotated experimental <code>v1.0.0-000</code> release
-            notes name unfinished work (operands; live <code>valve.relicloops.org</code>
-            may still be pending).
+            Experimental public <code>v1.0.0-000</code> is published and
+            <code>valve.relicloops.org</code> is live. Unfinished work remains honest:
+            operands are not implemented.
           </p>
         </div>
       </div>
