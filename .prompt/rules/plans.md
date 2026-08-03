@@ -14,7 +14,7 @@ This may override a per project rule.
 When assigning a task or plan we can override the plans rules in the prompt.
 
 Active plans live in `.prompt/plans/`.  
-Move completed plans to `.prompt/refs/plans/done/`;  
+Move completed plans to `.prompt/plans/done/`;  
 keep that directory in the repository even when it contains no completed plans.
 
 *an example usage.*

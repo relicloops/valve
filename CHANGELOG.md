@@ -8,6 +8,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Documentation
 
+- Regenerate CHANGELOG for the docs-site entries
 - **road-map**: Reconcile the status surface with the shipped site
 - Point the public docs at valve.relicloops.org
 - Add GitHub community standards files
