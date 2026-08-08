@@ -282,18 +282,33 @@ typedef enum vl_help_kind {
  *  into the caller's `target` string. Absent fields are NULL. */
 typedef struct vl_help_resolution {
   vl_help_kind_t kind;
-  const vl_verb_t *verb;     /** owning verb (VERB / SUBVERB / OPTION) */
-  const vl_verb_t *subverb;  /** owning sub-verb (SUBVERB / nested OPTION) */
+  const vl_verb_t *verb;     /** owning verb (VERB / SUBVERB / OPTION / a
+                              *  verb-scoped GROUP; NULL for a bare GROUP) */
+  const vl_verb_t *subverb;  /** owning sub-verb (SUBVERB / nested OPTION or
+                              *  GROUP) */
   const vl_option_t *option; /** matched option (OPTION) */
   const char *group;         /** group prefix (GROUP), e.g. "proxy" */
 } vl_help_resolution_t;
 
 /** Resolve a (possibly dotted) `--help=<target>` against a verb table and
- *  global options. Pure and allocation-free. Exact option-name match wins
- *  first (dotted names like "proxy.lane" match literally), then structural
- *  forms (`verb`, `verb.subverb`, `verb.option`, `verb.subverb.option`), then
- *  a group prefix (`proxy` when `proxy.*` options exist). A count of 0 means
- *  the array is NULL-terminated. Returns true and fills *out on a match. */
+ *  global options. Pure and allocation-free.
+ *
+ *  Structural forms win first, innermost scope before outermost: `verb`, a
+ *  unique `subverb`, `verb.subverb`, then an option under the matched
+ *  sub-verb, then one under the matched verb. Every segment after the matched
+ *  verb / sub-verb is rejoined with dots to form the option name, so a dotted
+ *  option name reaches its owner (`verb.subverb.group.leaf` matches
+ *  `.name = "group.leaf"`, `verb.group.leaf` matches an option on the verb).
+ *  A trailing single segment that is not an option name resolves as a group
+ *  prefix instead (`verb.proxy`, `verb.subverb.proxy`, or bare `proxy` when
+ *  `proxy.*` options exist). An exact option name anywhere in the tree is the
+ *  last resort, which is what matches a bare dotted name like `proxy.lane`.
+ *
+ *  Targets longer than 127 bytes, or with more than VL_PATH_MAX_SEGMENTS
+ *  segments, skip structural resolution and match by exact name only.
+ *
+ *  A count of 0 means the array is NULL-terminated. Returns true and fills
+ *  *out on a match. */
 bool vl_help_resolve(const vl_verb_t *const *verbs, size_t verb_count,
                      const vl_option_t *const *globals, size_t global_count,
                      const char *target, vl_help_resolution_t *out);

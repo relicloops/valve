@@ -146,7 +146,7 @@ Complete list of syntactic forms for passing values to options:
 | dot notation         | ``--proxy.lane=fast``          | Hierarchical option names                       |
 | operands             | ``file.txt``                   | Positional arguments (no prefix)                |
 
-## Valve status -- 2026-07-24
+## Valve status -- 2026-08-08
 
 | Capability | Status today | Current behavior | Missing implementation |
 |---|---|---|---|
@@ -162,6 +162,7 @@ Complete list of syntactic forms for passing values to options:
 | Bare booleans | complete extension | Bare bool means true; inline ``=true``/``=false`` is accepted | General optional option-arguments remain unsupported |
 | Enable/disable toggles | complete extension | ``--enable-X`` and ``--disable-X`` map to one toggle option | none |
 | Dotted option names | complete extension | Exact dotted matching, target-typed values, target population, grouped help and targeted group help | none |
+| Scoped help targets | complete extension | Segments after the matched verb or sub-verb rejoin into the option name, so ``?verb.sub.group.leaf`` and ``?verb.group.leaf`` reach a dotted option; a trailing lone segment resolves as a group prefix (``?verb.group``) | Group help cards are still rendered tree-wide, not narrowed to the owning verb |
 | Joined ``?target`` help | complete custom extension | Reserved parser resolves joined help targets | Standardization or removal remains a policy choice |
 | Operands | declared, missing | Ordinary positional tokens are rejected | Operand storage, accessors, behavior flag wiring and lifecycle |
 | ``--`` end marker | incorrect partial behavior | Parsing stops and the remaining argv tail is ignored | Collect tail as operands or reject it when operands are disabled |

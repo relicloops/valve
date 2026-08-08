@@ -130,6 +130,16 @@ static bool resolve_active_(const valve_t *v, const char *target,
   return false;
 }
 
+/* The remaining segments from `k` onward, rejoined with dots. vl_path_split
+ * copies `target` into `scratch` and turns each dot into NUL, so the same
+ * offset in `target` already spans the rest of the path, NUL-terminated. Read
+ * from `target` rather than `scratch` so a VL_HELP_GROUP `.group` pointer
+ * outlives this frame. Mirrors suffix_from_ in help_resolve.c. */
+static const char *suffix_from_(const char *target, const char *scratch,
+                                const vl_path_t *path, size_t k) {
+  return target + (size_t)(path->segments[k] - scratch);
+}
+
 bool vl_help_resolve_internal_(const valve_t *v, const char *target,
                                vl_help_internal_t *out) {
   if (!v || !target || target[0] == '\0' || !out)
@@ -172,36 +182,24 @@ bool vl_help_resolve_internal_(const valve_t *v, const char *target,
     return false;
   }
 
-  if (n == 2) {
+  /* Verb-prefixed forms. The option suffix is every segment after the matched
+   * verb / sub-verb rejoined, so a dotted option name (disposition.will) is
+   * reachable through its owner. Scopes are tried innermost first. */
+  if (n >= 2) {
     const valve_verb_t *verb =
         verb_by_name_(v->verbs_, v->verb_count_, path.segments[0]);
     if (verb) {
       const valve_verb_t *sub =
           verb_by_name_(verb->verbs, verb->verb_count, path.segments[1]);
       if (sub) {
-        *out = (vl_help_internal_t){
-            .kind = VL_HELP_SUBVERB, .verb = verb, .subverb = sub};
-        return true;
-      }
-      const vl_option_t *opt =
-          opt_by_name_(verb->options, verb->option_count, path.segments[1]);
-      if (opt) {
-        *out = (vl_help_internal_t){
-            .kind = VL_HELP_OPTION, .verb = verb, .option = opt};
-        return true;
-      }
-    }
-  }
-
-  if (n == 3) {
-    const valve_verb_t *verb =
-        verb_by_name_(v->verbs_, v->verb_count_, path.segments[0]);
-    if (verb) {
-      const valve_verb_t *sub =
-          verb_by_name_(verb->verbs, verb->verb_count, path.segments[1]);
-      if (sub) {
+        if (n == 2) {
+          *out = (vl_help_internal_t){
+              .kind = VL_HELP_SUBVERB, .verb = verb, .subverb = sub};
+          return true;
+        }
+        const char *tail = suffix_from_(target, scratch, &path, 2);
         const vl_option_t *opt =
-            opt_by_name_(sub->options, sub->option_count, path.segments[2]);
+            opt_by_name_(sub->options, sub->option_count, tail);
         if (opt) {
           *out = (vl_help_internal_t){.kind = VL_HELP_OPTION,
                                       .verb = verb,
@@ -209,6 +207,32 @@ bool vl_help_resolve_internal_(const valve_t *v, const char *target,
                                       .option = opt};
           return true;
         }
+        /* A group prefix only when the tail is a single segment; otherwise
+         * .group would name a prefix but point at a longer path. */
+        if (n == 3 &&
+            group_in_(sub->options, sub->option_count, tail, strlen(tail))) {
+          *out = (vl_help_internal_t){.kind = VL_HELP_GROUP,
+                                      .verb = verb,
+                                      .subverb = sub,
+                                      .group = tail};
+          return true;
+        }
+      }
+
+      /* Verb scope: verb.option and verb.group.leaf resolve the same way. */
+      const char *tail = suffix_from_(target, scratch, &path, 1);
+      const vl_option_t *opt =
+          opt_by_name_(verb->options, verb->option_count, tail);
+      if (opt) {
+        *out = (vl_help_internal_t){
+            .kind = VL_HELP_OPTION, .verb = verb, .option = opt};
+        return true;
+      }
+      if (n == 2 &&
+          group_in_(verb->options, verb->option_count, tail, strlen(tail))) {
+        *out = (vl_help_internal_t){
+            .kind = VL_HELP_GROUP, .verb = verb, .group = tail};
+        return true;
       }
     }
   }

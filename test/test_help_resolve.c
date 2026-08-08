@@ -195,6 +195,146 @@ void test_help_resolve_cases(void) {
          "empty target -> no match");
 }
 
+/* A DOT_NOTATION option name already contains dots, so a verb-prefixed help
+ * target splits into more segments than the walker has scopes. Everything
+ * after the matched verb / sub-verb is rejoined into the option name, and a
+ * trailing lone segment that names no option resolves as a group prefix. */
+void test_help_resolve_dotted_option_suffix(void) {
+  const vl_option_t *const call_opts[] = {
+      VL_OPT(.name = "disposition.will", .type = VL_OPT_TYPE_LONG,
+             .value = VL_OPTION_VALUE_DOT_NOTATION, .target = VL_TARGET_INT),
+      VL_OPT(.name = "no-traits", .type = VL_OPT_TYPE_LONG,
+             .value = VL_OPTION_VALUE_BOOL),
+      NULL,
+  };
+  const vl_verb_t *const agent_subs[] = {
+      VL_CMD(.name = "call", .description = "call an agent",
+             .options = call_opts),
+      NULL,
+  };
+  const vl_option_t *const net_opts[] = {
+      VL_OPT(.name = "proxy.lane", .type = VL_OPT_TYPE_LONG,
+             .value = VL_OPTION_VALUE_DOT_NOTATION, .target = VL_TARGET_STRING),
+      NULL,
+  };
+  const vl_verb_t *const verbs[] = {
+      VL_CMD(.name = "agent", .description = "agent ops", .verbs = agent_subs),
+      VL_CMD(.name = "network", .description = "network", .options = net_opts),
+      NULL,
+  };
+
+  vl_help_resolution_t r = {0};
+
+  EXPECT(vl_help_resolve(verbs, 0, NULL, 0, "agent.call.disposition.will", &r) &&
+             r.kind == VL_HELP_OPTION && strcmp(r.verb->name, "agent") == 0 &&
+             r.subverb && strcmp(r.subverb->name, "call") == 0 && r.option &&
+             strcmp(r.option->name, "disposition.will") == 0,
+         "resolve 'agent.call.disposition.will' -> OPTION disposition.will");
+
+  EXPECT(vl_help_resolve(verbs, 0, NULL, 0, "network.proxy.lane", &r) &&
+             r.kind == VL_HELP_OPTION && strcmp(r.verb->name, "network") == 0 &&
+             r.subverb == NULL && r.option &&
+             strcmp(r.option->name, "proxy.lane") == 0,
+         "resolve 'network.proxy.lane' -> OPTION on the verb itself");
+
+  EXPECT(vl_help_resolve(verbs, 0, NULL, 0, "network.proxy", &r) &&
+             r.kind == VL_HELP_GROUP && r.group &&
+             strcmp(r.group, "proxy") == 0 && r.verb &&
+             strcmp(r.verb->name, "network") == 0,
+         "resolve 'network.proxy' -> GROUP proxy scoped to the verb");
+
+  EXPECT(vl_help_resolve(verbs, 0, NULL, 0, "agent.call.disposition", &r) &&
+             r.kind == VL_HELP_GROUP && r.group &&
+             strcmp(r.group, "disposition") == 0 && r.subverb &&
+             strcmp(r.subverb->name, "call") == 0,
+         "resolve 'agent.call.disposition' -> GROUP scoped to the sub-verb");
+
+  EXPECT(vl_help_resolve(verbs, 0, NULL, 0, "agent.call.no-traits", &r) &&
+             r.kind == VL_HELP_OPTION && r.option &&
+             strcmp(r.option->name, "no-traits") == 0,
+         "resolve 'agent.call.no-traits' -> OPTION (single-segment suffix)");
+
+  EXPECT(vl_help_resolve(verbs, 0, NULL, 0, "proxy.lane", &r) &&
+             r.kind == VL_HELP_OPTION && strcmp(r.verb->name, "network") == 0 &&
+             r.option && strcmp(r.option->name, "proxy.lane") == 0,
+         "bare 'proxy.lane' still resolves by exact name");
+
+  EXPECT(vl_help_resolve(verbs, 0, NULL, 0, "agent.call", &r) &&
+             r.kind == VL_HELP_SUBVERB && r.subverb &&
+             strcmp(r.subverb->name, "call") == 0,
+         "resolve 'agent.call' -> SUBVERB (sub-verb still wins at n == 2)");
+
+  EXPECT(!vl_help_resolve(verbs, 0, NULL, 0, "agent.call.disposition.missing",
+                          &r),
+         "'agent.call.disposition.missing' -> no match");
+
+  EXPECT(!vl_help_resolve(verbs, 0, NULL, 0, "network.missing", &r),
+         "'network.missing' (no option, no group) -> no match");
+
+  /* Past VL_PATH_MAX_SEGMENTS vl_path_split reports 0, so structural
+   * resolution is skipped and only an exact option name could still match. */
+  EXPECT(!vl_help_resolve(verbs, 0, NULL, 0, "agent.call.disposition.will.deep",
+                          &r),
+         "over-deep path skips structural resolution -> no match");
+}
+
+/* An explicit verb_count is taken verbatim, so a caller may hand over a verb
+ * or sub-verb table with NULL slots. Walking past them must not fault. */
+void test_help_resolve_null_verb_slots(void) {
+  const vl_option_t *const solo_opts[] = {
+      VL_OPT(.name = "g.a", .type = VL_OPT_TYPE_LONG,
+             .value = VL_OPTION_VALUE_DOT_NOTATION, .target = VL_TARGET_STRING),
+      NULL,
+  };
+  const vl_option_t *const only_opts[] = {
+      VL_OPT(.name = "deep.leaf", .type = VL_OPT_TYPE_LONG,
+             .value = VL_OPTION_VALUE_DOT_NOTATION, .target = VL_TARGET_STRING),
+      NULL,
+  };
+  /* Explicit counts, so the leading and trailing NULL slots stay visible to
+   * the scanners instead of terminating the walk. */
+  const vl_verb_t *const solo_subs[] = {
+      NULL,
+      VL_CMD(.name = "only", .description = "only sub", .options = only_opts),
+      NULL,
+  };
+  const vl_verb_t *const sparse[] = {
+      NULL,
+      VL_CMD(.name = "solo", .description = "solo", .options = solo_opts,
+             .verbs = solo_subs, .verb_count = 3),
+      NULL,
+  };
+
+  vl_help_resolution_t r = {0};
+
+  EXPECT(!vl_help_resolve(sparse, 3, NULL, 0, "nope", &r),
+         "bare miss over NULL verb and sub-verb slots -> no match, no fault");
+
+  EXPECT(vl_help_resolve(sparse, 3, NULL, 0, "g", &r) &&
+             r.kind == VL_HELP_GROUP && r.group && strcmp(r.group, "g") == 0,
+         "group_anywhere_ walks past NULL verb slots");
+
+  EXPECT(vl_help_resolve(sparse, 3, NULL, 0, "g.a", &r) &&
+             r.kind == VL_HELP_OPTION && r.option &&
+             strcmp(r.option->name, "g.a") == 0,
+         "option_anywhere_ walks past NULL verb slots");
+
+  EXPECT(vl_help_resolve(sparse, 3, NULL, 0, "only", &r) &&
+             r.kind == VL_HELP_SUBVERB && r.subverb &&
+             strcmp(r.subverb->name, "only") == 0,
+         "unique_subverb_ walks past NULL verb slots");
+
+  EXPECT(vl_help_resolve(sparse, 3, NULL, 0, "deep.leaf", &r) &&
+             r.kind == VL_HELP_OPTION && r.subverb &&
+             strcmp(r.subverb->name, "only") == 0 && r.option &&
+             strcmp(r.option->name, "deep.leaf") == 0,
+         "option_anywhere_ walks past NULL sub-verb slots");
+
+  EXPECT(vl_help_resolve(sparse, 3, NULL, 0, "deep", &r) &&
+             r.kind == VL_HELP_GROUP && r.group && strcmp(r.group, "deep") == 0,
+         "group_anywhere_ walks past NULL sub-verb slots");
+}
+
 /* Bare verb name must beat a same-named nested option (architect: generate
  * verb vs skinjo.call --generate). */
 void test_help_resolve_verb_beats_option(void) {

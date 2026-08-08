@@ -39,6 +39,8 @@ static bool option_anywhere_(const vl_verb_t *const *verbs, size_t vc,
   }
   for (size_t c = 0; c < vc; ++c) {
     const vl_verb_t *verb = verbs[c];
+    if (!verb) /* GCOVR_EXCL_BR_LINE: null verb slots rare in schema tables */
+      continue;
     size_t voc = option_count_(verb->options, verb->option_count);
     opt = opt_by_name_(verb->options, voc, target);
     if (opt) {
@@ -49,6 +51,8 @@ static bool option_anywhere_(const vl_verb_t *const *verbs, size_t vc,
     size_t svc = verb_table_count_(verb->verbs, verb->verb_count);
     for (size_t s = 0; s < svc; ++s) {
       const vl_verb_t *sub = verb->verbs[s];
+      if (!sub) /* GCOVR_EXCL_BR_LINE: null sub-verb slots rare */
+        continue;
       size_t soc = option_count_(sub->options, sub->option_count);
       opt = opt_by_name_(sub->options, soc, target);
       if (opt) {
@@ -73,6 +77,8 @@ static const vl_verb_t *unique_subverb_(const vl_verb_t *const *verbs,
 
   for (size_t c = 0; c < vc; ++c) {
     const vl_verb_t *cand = verbs[c];
+    if (!cand) /* GCOVR_EXCL_BR_LINE: null verb slots rare in schema tables */
+      continue;
     size_t candsvc = verb_table_count_(cand->verbs, cand->verb_count);
     const vl_verb_t *sub = verb_by_name_(cand->verbs, candsvc, name);
     if (sub) {
@@ -92,18 +98,32 @@ static bool group_anywhere_(const vl_verb_t *const *verbs, size_t vc,
     return true;
   for (size_t c = 0; c < vc; ++c) {
     const vl_verb_t *verb = verbs[c];
+    if (!verb) /* GCOVR_EXCL_BR_LINE: null verb slots rare in schema tables */
+      continue;
     size_t voc = option_count_(verb->options, verb->option_count);
     if (group_in_(verb->options, voc, group, glen))
       return true;
     size_t svc = verb_table_count_(verb->verbs, verb->verb_count);
     for (size_t s = 0; s < svc; ++s) {
       const vl_verb_t *sub = verb->verbs[s];
+      if (!sub) /* GCOVR_EXCL_BR_LINE: null sub-verb slots rare */
+        continue;
       size_t soc = option_count_(sub->options, sub->option_count);
       if (group_in_(sub->options, soc, group, glen))
         return true;
     }
   }
   return false;
+}
+
+/* The remaining segments from `k` onward, rejoined with dots. vl_path_split
+ * copies `target` into `scratch` and turns each dot into NUL, so the same
+ * offset in `target` already spans the rest of the path, NUL-terminated. Read
+ * from `target` rather than `scratch` so a VL_HELP_GROUP `.group` pointer
+ * outlives this frame, as the public contract requires. */
+static const char *suffix_from_(const char *target, const char *scratch,
+                                const vl_path_t *path, size_t k) {
+  return target + (size_t)(path->segments[k] - scratch);
 }
 
 bool vl_help_resolve(const vl_verb_t *const *verbs, size_t verb_count,
@@ -148,36 +168,23 @@ bool vl_help_resolve(const vl_verb_t *const *verbs, size_t verb_count,
     return false;
   }
 
-  if (n == 2) {
+  /* Verb-prefixed forms. The option suffix is every segment after the matched
+   * verb / sub-verb rejoined, so a dotted option name (disposition.will) is
+   * reachable through its owner. Scopes are tried innermost first. */
+  if (n >= 2) {
     const vl_verb_t *verb = verb_by_name_(verbs, vc, path.segments[0]);
     if (verb) {
       size_t svc = verb_table_count_(verb->verbs, verb->verb_count);
       const vl_verb_t *sub = verb_by_name_(verb->verbs, svc, path.segments[1]);
       if (sub) {
-        *out = (vl_help_resolution_t){
-            .kind = VL_HELP_SUBVERB, .verb = verb, .subverb = sub};
-        return true;
-      }
-      size_t voc = option_count_(verb->options, verb->option_count);
-      const vl_option_t *opt =
-          opt_by_name_(verb->options, voc, path.segments[1]);
-      if (opt) {
-        *out = (vl_help_resolution_t){
-            .kind = VL_HELP_OPTION, .verb = verb, .option = opt};
-        return true;
-      }
-    }
-  }
-
-  if (n == 3) {
-    const vl_verb_t *verb = verb_by_name_(verbs, vc, path.segments[0]);
-    if (verb) {
-      size_t svc = verb_table_count_(verb->verbs, verb->verb_count);
-      const vl_verb_t *sub = verb_by_name_(verb->verbs, svc, path.segments[1]);
-      if (sub) {
+        if (n == 2) {
+          *out = (vl_help_resolution_t){
+              .kind = VL_HELP_SUBVERB, .verb = verb, .subverb = sub};
+          return true;
+        }
+        const char *tail = suffix_from_(target, scratch, &path, 2);
         size_t soc = option_count_(sub->options, sub->option_count);
-        const vl_option_t *opt =
-            opt_by_name_(sub->options, soc, path.segments[2]);
+        const vl_option_t *opt = opt_by_name_(sub->options, soc, tail);
         if (opt) {
           *out = (vl_help_resolution_t){.kind = VL_HELP_OPTION,
                                         .verb = verb,
@@ -185,6 +192,30 @@ bool vl_help_resolve(const vl_verb_t *const *verbs, size_t verb_count,
                                         .option = opt};
           return true;
         }
+        /* A group prefix only when the tail is a single segment; otherwise
+         * .group would name a prefix but point at a longer path. */
+        if (n == 3 && group_in_(sub->options, soc, tail, strlen(tail))) {
+          *out = (vl_help_resolution_t){.kind = VL_HELP_GROUP,
+                                        .verb = verb,
+                                        .subverb = sub,
+                                        .group = tail};
+          return true;
+        }
+      }
+
+      /* Verb scope: verb.option and verb.group.leaf resolve the same way. */
+      const char *tail = suffix_from_(target, scratch, &path, 1);
+      size_t voc = option_count_(verb->options, verb->option_count);
+      const vl_option_t *opt = opt_by_name_(verb->options, voc, tail);
+      if (opt) {
+        *out = (vl_help_resolution_t){
+            .kind = VL_HELP_OPTION, .verb = verb, .option = opt};
+        return true;
+      }
+      if (n == 2 && group_in_(verb->options, voc, tail, strlen(tail))) {
+        *out = (vl_help_resolution_t){
+            .kind = VL_HELP_GROUP, .verb = verb, .group = tail};
+        return true;
       }
     }
   }

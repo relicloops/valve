@@ -750,6 +750,64 @@ void test_help_resolve_internal_paths(void) {
   vl_destroy(v);
 }
 
+/* The parser-tree resolver must rejoin a dotted option suffix the same way the
+ * public one does, through both entry forms: --help=<target> and ?<target>. */
+void test_help_resolve_internal_dotted_suffix(void) {
+  const vl_option_t *const roll_opts[] = {
+      VL_OPT(.name = "disposition.will", .type = VL_OPT_TYPE_LONG,
+             .value = VL_OPTION_VALUE_DOT_NOTATION, .target = VL_TARGET_INT),
+      VL_OPT(.name = "no-traits", .type = VL_OPT_TYPE_LONG,
+             .value = VL_OPTION_VALUE_BOOL),
+      NULL,
+  };
+  const vl_option_t *const net_opts[] = {
+      VL_OPT(.name = "proxy.cpus", .type = VL_OPT_TYPE_LONG,
+             .value = VL_OPTION_VALUE_DOT_NOTATION, .target = VL_TARGET_INT),
+      NULL,
+  };
+  const vl_verb_t *const subs[] = {
+      VL_CMD(.name = "roll", .options = roll_opts),
+      NULL,
+  };
+  const vl_verb_t *const verbs[] = {
+      VL_CMD(.name = "dice", .verbs = subs),
+      VL_CMD(.name = "network", .options = net_opts),
+      NULL,
+  };
+  vl_executable_t settings = {
+      .verbs = verbs, .assign = VL_ASSIGN_INLINE, .color = VAL_COLOR_NEVER};
+
+  static const char *const ok[] = {
+      "--help=dice.roll.disposition.will", /* sub-verb + dotted option */
+      "?dice.roll.disposition.will",        /* same, joined reserved form */
+      "--help=dice.roll.no-traits",         /* single-segment suffix */
+      "--help=network.proxy.cpus",          /* dotted option on the verb */
+      "--help=network.proxy",               /* group scoped to the verb */
+      "--help=dice.roll.disposition",       /* group scoped to the sub-verb */
+  };
+  for (size_t i = 0; i < sizeof ok / sizeof *ok; ++i) {
+    valve_t *v = vl_create(&settings);
+    char *argv[] = {(char *)"valve", (char *)ok[i]};
+    EXPECT(v != NULL && vl_parse(v, 2, argv) == 0, ok[i]);
+    vl_destroy(v);
+  }
+
+  static const char *const bad[] = {
+      "--help=dice.roll.disposition.missing",
+      "--help=network.proxy.missing",
+      "--help=dice.roll.missing",
+      /* past VL_PATH_MAX_SEGMENTS: vl_path_split reports 0 segments, so only
+       * an exact option name could still match */
+      "--help=dice.roll.disposition.will.deep",
+  };
+  for (size_t i = 0; i < sizeof bad / sizeof *bad; ++i) {
+    valve_t *v = vl_create(&settings);
+    char *argv[] = {(char *)"valve", (char *)bad[i]};
+    EXPECT(v != NULL && vl_parse(v, 2, argv) == -1, bad[i]);
+    vl_destroy(v);
+  }
+}
+
 void test_parse_edges_number_toggle_array_kv(void) {
   const vl_option_t *const options[] = {
       VL_OPT(.name = "n", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_NUMBER),
