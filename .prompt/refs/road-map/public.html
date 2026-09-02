@@ -44,13 +44,12 @@
     <section class="shell hero hero--compact">
       <div>
         <p class="eyebrow">06 · public release</p>
-        <h1>Ship an <em>experimental 1.0.x.</em></h1>
+        <h1>Ship an <em>experimental 1.x.</em></h1>
         <p class="lede">
-          Experimental <code>1.0.x</code> under Apache-2.0.
-          Public baseline, annotated <code>v1.0.0-000</code> (prerelease), and multi-OS CI
-          on that tag are cut. <code>valve.relicloops.org</code> is <strong>live</strong>
-          and serving. Optional: branch protection, consumer notify, follow-up issues.
-          Lines <strong>100.0%</strong> on <code>src/core</code> (3068 exec / 26 excl / 3094 total via Ceedling gcov); Functions <strong>100.0%</strong> — 204/204; Branches <strong>100.0%</strong> — 1764/1764; 99.9% ambition met.
+          Experimental <code>1.1.0-001</code> adds schema-owned command tails after
+          <code>--</code>. The release candidate is locally verified and the public
+          baseline remains live at <code>valve.relicloops.org</code>.
+          Lines <strong>100.0%</strong> on <code>src/core</code> (3187/3187 via Ceedling gcov); Functions <strong>100.0%</strong> — 210/210; Branches <strong>100.0%</strong> — 1851/1851.
         </p>
       </div>
       <div class="card">
@@ -66,13 +65,13 @@
     <section class="section">
       <div class="shell">
         <div class="card reveal">
-          <span class="card__index">codebase snapshot · 2026-07-28</span>
-          <h3>Version <code>1.0.0-000</code> · experimental <code>1.0.x</code></h3>
+          <span class="card__index">codebase snapshot · 2026-09-02</span>
+          <h3>Version <code>1.1.0-001</code> · experimental <code>1.x</code></h3>
           <p>
             Installable <code>libvalve</code> / <code>valve.pc</code> / <code>valve_dep</code>.
-            Headers under <code>include/valve/</code>. Ceedling tests in <code>test/</code> (30 files).
+            Headers under <code>include/valve/</code>. Ceedling tests in <code>test/</code> (31 files).
             Docs: README + <code>docs/example/</code> + <code>docs/reference/</code>.
-            Durations, requires, conflicts, and color probes are shipped. Operands remain unimplemented.
+            Durations, requires, conflicts, color probes, and schema-owned command tails are shipped. Operands remain unimplemented.
             CI is Meson-first: configure writes the Ceedling toolchain; <code>meson test</code> runs
             <code>gcov:all</code> + gcovr on Ubuntu (gcc-14, clang-18) and macOS.
             Library version <code>1.0.0-000</code> matches annotated tag <code>v1.0.0-000</code>
@@ -121,10 +120,10 @@
             <span class="card__index">line coverage · src/core</span>
             <h3>100% · 99.9% ✓</h3>
             <p class="readiness__note">
-              Measured Ceedling gcov: Lines <strong>100.0%</strong> — 3068 exec / 26 excl / 3094 total;
-              Functions <strong>100.0%</strong> — 204/204; Branches <strong>100.0%</strong> — 1764/1764.
+              Measured Ceedling gcov: Lines <strong>100.0%</strong> — 3187/3187;
+              Functions <strong>100.0%</strong> — 210/210; Branches <strong>100.0%</strong> — 1851/1851.
               Baseline was 64.8%; soft 90% and 99.9% ambition both met.
-              377/377 Unity tests; CMock off.
+              395/395 Unity tests; CMock off.
             </p>
             <div class="readiness__rail" aria-hidden="true">
               <span class="readiness__fill readiness__fill--good" style="--readiness: 100%"></span>
