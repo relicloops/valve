@@ -4,6 +4,11 @@ All notable changes to this project are documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project uses [Conventional Commits](https://www.conventionalcommits.org/).
 
+## [1.1.0-001] - 2026-09-02
+
+### Added
+
+- **parser**: Capture schema-owned command tails
 ## [1.0.1-000] - 2026-08-08
 
 ### Fixed
