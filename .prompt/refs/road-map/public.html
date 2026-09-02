@@ -47,8 +47,8 @@
         <h1>Ship an <em>experimental 1.x.</em></h1>
         <p class="lede">
           Experimental <code>1.1.0-001</code> adds schema-owned command tails after
-          <code>--</code>. The release candidate is locally verified and the public
-          baseline remains live at <code>valve.relicloops.org</code>.
+          <code>--</code>. The signed tag and experimental prerelease are published,
+          tag CI is green, and the public docs remain live at <code>valve.relicloops.org</code>.
           Lines <strong>100.0%</strong> on <code>src/core</code> (3187/3187 via Ceedling gcov); Functions <strong>100.0%</strong> — 210/210; Branches <strong>100.0%</strong> — 1851/1851.
         </p>
       </div>
@@ -74,8 +74,8 @@
             Durations, requires, conflicts, color probes, and schema-owned command tails are shipped. Operands remain unimplemented.
             CI is Meson-first: configure writes the Ceedling toolchain; <code>meson test</code> runs
             <code>gcov:all</code> + gcovr on Ubuntu (gcc-14, clang-18) and macOS.
-            Library version <code>1.0.0-000</code> matches annotated tag <code>v1.0.0-000</code>
-            on <code>c946bc5</code> (GitHub Release marked experimental prerelease).
+            Library version <code>1.1.0-001</code> matches signed annotated tag <code>v1.1.0-001</code>
+            on <code>bee3aa3</code> (GitHub Release marked experimental prerelease).
             Multi-OS CI is green on that tag (Ubuntu gcc-14, clang-18, macOS).
             GitHub <code>relicloops/valve</code> is public. Optional: branch protection on
             <code>main</code>, consumer notify, follow-up issues.
