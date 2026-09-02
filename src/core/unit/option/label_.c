@@ -8,7 +8,9 @@ char *option_label_(const vl_option_t *option) {
     return nullptr;
 
   int length;
-  if ((option->type & VL_OPT_TYPE_TOGGLE) && option->toggle_ref) {
+  if (option->value == VL_OPTION_VALUE_COMMAND) {
+    length = snprintf(nullptr, 0, "-- <command> [args…]");
+  } else if ((option->type & VL_OPT_TYPE_TOGGLE) && option->toggle_ref) {
     length = snprintf(nullptr, 0, "--enable-%s | --disable-%s",
                       option->toggle_ref, option->toggle_ref);
   } else if (option->type & VL_OPT_TYPE_LONG) {
@@ -26,7 +28,9 @@ char *option_label_(const vl_option_t *option) {
   if (!label)
     return nullptr;
 
-  if ((option->type & VL_OPT_TYPE_TOGGLE) && option->toggle_ref) { /* GCOVR_EXCL_BR_LINE: toggle_ref null after type check rare */
+  if (option->value == VL_OPTION_VALUE_COMMAND) {
+    (void)snprintf(label, (size_t)length + 1, "-- <command> [args…]");
+  } else if ((option->type & VL_OPT_TYPE_TOGGLE) && option->toggle_ref) { /* GCOVR_EXCL_BR_LINE: toggle_ref null after type check rare */
     (void)snprintf(label, (size_t)length + 1, "--enable-%s | --disable-%s",
                    option->toggle_ref, option->toggle_ref);
   } else if (option->type & VL_OPT_TYPE_LONG) {

@@ -3,6 +3,11 @@
 #include <stdio.h>
 
 void option_usage_print_(const valve_t *v, const vl_option_t *option) {
+  if (option->value == VL_OPTION_VALUE_COMMAND) {
+    printf("-- <command> [args…]");
+    return;
+  }
+
   if (option->type & VL_OPT_TYPE_TOGGLE) {
     printf("--enable-%s | --disable-%s", option->toggle_ref,
            option->toggle_ref);

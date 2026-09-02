@@ -18,6 +18,8 @@ const char *option_value_label_(const vl_option_t *option) {
     return "bool";
   case VL_OPTION_VALUE_TIME:
     return "duration";
+  case VL_OPTION_VALUE_COMMAND:
+    return "command";
   case VL_OPTION_VALUE_DOT_NOTATION:
     switch (option->target) { /* GCOVR_EXCL_BR_LINE: TOGGLE/VALUE/NONE share default */
     case VL_TARGET_STRING:

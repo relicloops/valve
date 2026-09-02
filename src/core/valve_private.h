@@ -124,6 +124,8 @@ bool options_have_duplicate_short_(const vl_option_t *const *options, size_t cou
 bool option_type_valid_(vl_opt_type_t style);
 bool option_value_valid_(vl_option_value_t value);
 bool option_repeat_valid_(vl_option_repeat_t repeat);
+bool option_command_valid_(const vl_option_t *option);
+size_t options_command_count_(const vl_option_t *const *options, size_t count);
 void option_array_free_(vl_option_t *options, size_t count);
 bool option_name_valid_(const char *name);
 size_t option_conflict_count_(const vl_option_t *option);
@@ -255,7 +257,9 @@ const vl_option_t *vl_option_find_(const valve_t *v, const char *name);
 const vl_option_t *vl_option_find_n_(const valve_t *v, const char *name,
                                      size_t len);
 const vl_option_t *vl_option_find_short_(const valve_t *v, char short_name);
+const vl_option_t *vl_option_find_command_(const valve_t *v);
 
+int vl_parse_command_(valve_t *v, int argc, char **argv, int argv_index);
 
 int vl_result_set_(valve_t *v, const vl_option_t *opt, vl_value_t *value,
                    int argv_index);

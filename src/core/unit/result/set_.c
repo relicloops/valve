@@ -19,6 +19,8 @@ static int value_clone_(vl_value_t *dst, const vl_value_t *src) {
     dst->as.number = src->as.number;
   } else if (src->kind == VL_VALUE_BOOL) {
     dst->as.boolean = src->as.boolean;
+  } else if (src->kind == VL_VALUE_COMMAND) {
+    dst->as.command = src->as.command;
   } else if (src->kind == VL_VALUE_KV) {
     vl_kv_pair_t *pairs = NULL;
 
@@ -117,6 +119,12 @@ static int target_set_(valve_t *v, const vl_option_t *opt,
       return vl_error_add_(v, VL_ERROR_INVALID_VALUE, argv_index, opt->name,
                            "target expects bool value");
     *(bool *)target = value->as.boolean;
+    return 0;
+  case VL_TARGET_COMMAND:
+    if (value->kind != VL_VALUE_COMMAND)
+      return vl_error_add_(v, VL_ERROR_INVALID_VALUE, argv_index, opt->name,
+                           "target expects command value");
+    *(vl_command_t *)target = value->as.command;
     return 0;
   case VL_TARGET_TOGGLE:
   case VL_TARGET_VALUE: {

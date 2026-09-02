@@ -134,6 +134,9 @@ typedef enum vl_option_value {
    *  `.has_int_max` still bound it, and a VL_TARGET_INT or VL_TARGET_INT64
    *  target receives the converted count. */
   VL_OPTION_VALUE_TIME,
+  /** Opaque command tail captured after `--`. This value has no long, short,
+   *  or toggle form; `.name` remains its result key and help target. */
+  VL_OPTION_VALUE_COMMAND,
 } vl_option_value_t;
 
 typedef enum vl_option_repeat {
@@ -150,6 +153,7 @@ typedef enum vl_target {
   VL_TARGET_BOOL,
   VL_TARGET_VALUE,
   VL_TARGET_TOGGLE,
+  VL_TARGET_COMMAND,
 } vl_target_t;
 
 typedef struct vl_option {
@@ -197,6 +201,18 @@ typedef struct vl_array {
   size_t count;
 } vl_array_t;
 
+/** Borrowed command tail captured after `--`.
+ *
+ * `argv` points into the vector passed to vl_parse() and is never copied or
+ * freed by Valve. A schema declaring VL_OPTION_VALUE_COMMAND requires a
+ * main-style input vector with `argv[argc] == NULL`, which makes this slice
+ * directly suitable for execvp(). The strings and vector must outlive every
+ * use of this value. */
+typedef struct vl_command {
+  char *const *argv;
+  int argc;
+} vl_command_t;
+
 typedef enum vl_value_kind {
   VL_VALUE_STRING = 0,
   VL_VALUE_INT,
@@ -204,6 +220,7 @@ typedef enum vl_value_kind {
   VL_VALUE_BOOL,
   VL_VALUE_KV,
   VL_VALUE_ARRAY,
+  VL_VALUE_COMMAND,
 } vl_value_kind_t;
 
 struct vl_value {
@@ -215,6 +232,7 @@ struct vl_value {
     bool boolean;
     vl_kv_list_t kv;
     vl_array_t array;
+    vl_command_t command;
   } as;
 };
 
@@ -329,7 +347,9 @@ void vl_argv_destroy(int argc, char **argv);
 /** Parse argv, replacing prior results and errors on `v`. Returns 0 on
  *  success (including a reserved help/version request) and -1 on invalid
  *  input or parse errors. Result/error pointers remain valid until the next
- *  vl_parse call or vl_destroy. */
+ *  vl_parse call or vl_destroy. When the active schema declares a command
+ *  option, argv must be main-style and include `argv[argc] == NULL`; ordinary
+ *  schemas remain argc-bounded and do not read that sentinel. */
 int vl_parse(valve_t *v, int argc, char **argv);
 
 bool vl_has(const valve_t *v, const char *key);
@@ -376,6 +396,7 @@ void vl_errors_print(const valve_t *v, FILE *stream);
  * options) and clear Valve-owned target memory:
  *   VL_TARGET_STRING              → free(*(char **)ptr); *ptr = NULL
  *   VL_TARGET_VALUE / TOGGLE      → vl_value_clear
+ *   VL_TARGET_COMMAND             → zero the borrowed command view
  *   VL_TARGET_INT / INT64 / DOUBLE / BOOL → zero
  * Idempotent. Does not free `settings` itself or any valve_t.
  *

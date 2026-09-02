@@ -33,6 +33,9 @@ static void clear_option_(const vl_option_t *opt) {
   case VL_TARGET_BOOL:
     *(bool *)target = false;
     return;
+  case VL_TARGET_COMMAND:
+    *(vl_command_t *)target = (vl_command_t){0};
+    return;
   case VL_TARGET_VALUE:
   case VL_TARGET_TOGGLE:
     vl_value_clear((vl_value_t *)target);

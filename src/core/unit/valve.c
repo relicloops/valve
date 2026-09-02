@@ -14,6 +14,7 @@ bool target_valid_(vl_target_t target) {
   case VL_TARGET_BOOL:
   case VL_TARGET_VALUE:
   case VL_TARGET_TOGGLE:
+  case VL_TARGET_COMMAND:
     return true;
   }
 

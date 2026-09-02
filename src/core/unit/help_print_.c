@@ -46,8 +46,14 @@ static void print_options_(const valve_t *v, const vl_option_t *options,
     return;
 
   printf("\n%s:\n", heading);
-  for (size_t i = 0; i < count; ++i)
-    print_option_(v, &options[i]);
+  for (size_t i = 0; i < count; ++i) {
+    if (options[i].value != VL_OPTION_VALUE_COMMAND)
+      print_option_(v, &options[i]);
+  }
+  for (size_t i = 0; i < count; ++i) {
+    if (options[i].value == VL_OPTION_VALUE_COMMAND)
+      print_option_(v, &options[i]);
+  }
 }
 
 static void print_subverbs_(const valve_verb_t *verb) {
@@ -116,8 +122,13 @@ static void print_option_card_(const valve_t *v,
     snprintf(owner, sizeof owner, "global");
 
   banner_(v);
-  printf("\n%s▸%s %s option %s--%s%s\n\n", c_(VAL_FG_CYAN), c_(VAL_RESET), owner,
-         c_(VAL_BOLD), res->option->name, c_(VAL_RESET));
+  printf("\n%s▸%s %s option %s", c_(VAL_FG_CYAN), c_(VAL_RESET), owner,
+         c_(VAL_BOLD));
+  if (res->option->value == VL_OPTION_VALUE_COMMAND)
+    printf("-- <command> [args…]");
+  else
+    printf("--%s", res->option->name);
+  printf("%s\n\n", c_(VAL_RESET));
   print_option_(v, res->option);
 }
 

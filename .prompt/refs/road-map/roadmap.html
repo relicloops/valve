@@ -47,7 +47,8 @@
         <h1>Finish the parser by <em>pressure surface.</em></h1>
         <p class="lede">
           Expense and priority are recorded separately. Operands are the largest missing
-          capability and also repair incorrect <code>--</code> behavior. Smaller syntax
+          capability; schema-owned command tails now cover the executable-forwarding
+          case after <code>--</code>. Smaller syntax
           additions should follow explicit ambiguity policies instead of accidental
           parser branches.
         </p>
@@ -71,7 +72,7 @@
           </div>
           <p>
             This table separates complete core contracts, deliberate Valve extensions,
-            and missing parser surfaces. It reflects the implementation on 2026-07-27.
+            and missing parser surfaces. It reflects the implementation on 2026-09-02.
           </p>
         </div>
 
@@ -148,9 +149,9 @@
               </tr>
               <tr>
                 <td><code>--</code> end marker</td>
-                <td><span class="status status--partial">incorrect partial</span></td>
-                <td>Parsing stops and ignores the remaining tail.</td>
-                <td>Collect operands or reject tail when operands are disabled.</td>
+                <td><span class="status status--custom">command extension</span></td>
+                <td>A scoped command option captures the opaque tail; otherwise the tail is ignored.</td>
+                <td>Collect operands or reject an unowned tail when operands are disabled.</td>
               </tr>
               <tr>
                 <td>Required options</td>
@@ -207,14 +208,14 @@
             <div class="timeline__top">
               <div>
                 <span class="card__meta">rank 01 · very high</span>
-                <h3>Operands and correct <code>--</code></h3>
+                <h3>Operands and general <code>--</code></h3>
               </div>
               <span class="status status--missing">missing</span>
             </div>
             <p>
               New public query surface, owned result storage, repeated-parse lifecycle,
-              trailing positional collection, separate-value disambiguation, correct
-              end-marker semantics, errors, and help notation.
+              trailing positional collection, separate-value disambiguation, unowned-tail
+              policy, errors, and help notation. Command forwarding is already complete.
             </p>
           </article>
 
@@ -287,16 +288,16 @@
             <h2>Correctness first, then grammar breadth.</h2>
           </div>
           <p>
-            Expense alone should not dictate sequence. The first phase repairs existing
-            incorrect behavior; later phases can be chosen according to consumer demand.
+            Expense alone should not dictate sequence. Command forwarding is complete;
+            later phases can be chosen according to consumer demand.
           </p>
         </div>
 
         <div class="grid grid--3">
           <div class="card reveal">
             <span class="card__index">phase A · correctness</span>
-            <h3>Operands and <code>--</code></h3>
-            <p>Implement the declared behavior flag and eliminate silent argv-tail loss.</p>
+            <h3>Operands and unowned <code>--</code></h3>
+            <p>Implement the declared behavior flag and decide whether an unowned tail is collected or rejected.</p>
           </div>
           <div class="card reveal">
             <span class="card__index">phase B · low-risk reach</span>

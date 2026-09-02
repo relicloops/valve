@@ -64,9 +64,11 @@ as unexpected positional arguments. ``VL_BEHAVIOR_ACCEPT_OPERANDS`` is
 declared but not implemented, and the documented ``vl_operand_count()`` /
 ``vl_operand_at()`` accessors do not exist yet.
 
-The current ``--`` branch stops parsing and silently ignores every remaining
-token. It does not collect operands or reject the ignored tail. Correct POSIX
-end-of-options behavior therefore remains incomplete.
+The ``--`` branch can now hand every remaining token to one schema-declared
+``VL_OPTION_VALUE_COMMAND`` as an opaque, borrowed command view. With no command
+option in the active scope it preserves the legacy behavior of ignoring the
+tail. It still does not collect operands or reject an unowned tail, so general
+POSIX end-of-options behavior remains incomplete.
 
 ### Operands as option shorthand
 
@@ -146,7 +148,7 @@ Complete list of syntactic forms for passing values to options:
 | dot notation         | ``--proxy.lane=fast``          | Hierarchical option names                       |
 | operands             | ``file.txt``                   | Positional arguments (no prefix)                |
 
-## Valve status -- 2026-08-08
+## Valve status -- 2026-09-02
 
 | Capability | Status today | Current behavior | Missing implementation |
 |---|---|---|---|
@@ -165,7 +167,7 @@ Complete list of syntactic forms for passing values to options:
 | Scoped help targets | complete extension | Segments after the matched verb or sub-verb rejoin into the option name, so ``?verb.sub.group.leaf`` and ``?verb.group.leaf`` reach a dotted option; a trailing lone segment resolves as a group prefix (``?verb.group``) | Group help cards are still rendered tree-wide, not narrowed to the owning verb |
 | Joined ``?target`` help | complete custom extension | Reserved parser resolves joined help targets | Standardization or removal remains a policy choice |
 | Operands | declared, missing | Ordinary positional tokens are rejected | Operand storage, accessors, behavior flag wiring and lifecycle |
-| ``--`` end marker | incorrect partial behavior | Parsing stops and the remaining argv tail is ignored | Collect tail as operands or reject it when operands are disabled |
+| ``--`` end marker | command-tail extension | A scoped ``VL_OPTION_VALUE_COMMAND`` captures the opaque tail; otherwise the tail is ignored | Collect tail as operands or reject an unowned tail when operands are disabled |
 | Required options | complete | ``.required`` is enforced across the active command chain and shown in help | none |
 | Conflicting options | complete | Many-option, undirected, presence-based conflicts with automatic help | Constraint-graph satisfiability is intentionally absent |
 | Conditional requirements | complete | Directed many-option ``.requires`` with ``requires``/``required by`` help | Predicate/value-based and one-of requirements are out of scope |
@@ -178,7 +180,7 @@ Relative expense against Valve's current parser, ordered high to low:
 
 | Rank | Missing capability | Expense | Main cost |
 |---|---|---|---|
-| 1 | Operands and correct ``--`` behavior | very high | Add public storage and accessors, ownership and lifecycle, positional collection, option-value disambiguation, end-of-options behavior and help |
+| 1 | Operands and general ``--`` behavior | very high | Add public storage and accessors, ownership and lifecycle, positional collection, option-value disambiguation, and an unowned-tail policy |
 | 2 | Short stacking (``-abc``) | high | Add per-character cluster parsing, per-member errors and duplicates, and rules for a value-taking final member; it also overlaps short joined syntax |
 | 3 | Long joined (``--flagvalue``) | high | Resolve arbitrary option-name prefixes, exact-name precedence and ambiguous schemas before separating the joined value |
 | 4 | Short joined (``-fvalue``) | medium | Split after the unambiguous short name, define boolean/value behavior, and coordinate with future stacking |

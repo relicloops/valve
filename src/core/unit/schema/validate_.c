@@ -12,6 +12,12 @@ static bool verb_entry_valid_(const vl_option_t *const *globals,
 
   size_t local_count = option_count_(verb->options, verb->option_count);
 
+  if (options_command_count_(globals, global_count) +
+          options_command_count_(parents, parent_count) +
+          options_command_count_(verb->options, local_count) >
+      1)
+    return false;
+
   if (options_have_invalid_(verb->options, local_count))
     return false;
   if (options_have_duplicate_long_(verb->options, local_count))
@@ -74,6 +80,8 @@ bool vl_schema_validate_(const vl_executable_t *settings){
   size_t verb_count = verb_count_(settings);
 
   if (options_have_invalid_(settings->options, global_count))
+    return false;
+  if (options_command_count_(settings->options, global_count) > 1)
     return false;
   if (options_have_duplicate_long_(settings->options, global_count))
     return false;

@@ -696,6 +696,10 @@ static int parse_long_(valve_t *v, int argc, char **argv, int *index) {
       free(tmp);
       return rc;
     }
+    if (opt->value == VL_OPTION_VALUE_COMMAND) {
+      return vl_error_add_(v, VL_ERROR_DISABLED_FORM, flag_index, opt->name,
+                           "command is given after --");
+    }
     if (!has_style_(opt, VL_OPT_TYPE_LONG) || v->assign_ != VL_ASSIGN_INLINE) { /* GCOVR_EXCL_BR_LINE: style false short-circuit */
       return vl_error_add_(v, VL_ERROR_DISABLED_FORM, flag_index, opt->name,
                            "long inline form is disabled");
@@ -707,6 +711,10 @@ static int parse_long_(valve_t *v, int argc, char **argv, int *index) {
   if (!opt) {
     return vl_error_add_(v, VL_ERROR_UNKNOWN_OPTION, flag_index, name,
                          "unknown option");
+  }
+  if (opt->value == VL_OPTION_VALUE_COMMAND) {
+    return vl_error_add_(v, VL_ERROR_DISABLED_FORM, flag_index, opt->name,
+                         "command is given after --");
   }
   /* GCOVR_EXCL_BR_START — style false short-circuit */
   if (has_style_(opt, VL_OPT_TYPE_LONG) &&
@@ -1120,6 +1128,12 @@ int vl_parse(valve_t *v, int argc, char **argv) {
       rc = vl_error_add_(v, VL_ERROR_UNEXPECTED_ARGUMENT, i, NULL,
                          "empty argument");
     } else if (strcmp(arg, "--") == 0) {
+      rc = vl_parse_command_(v, argc, argv, i);
+      if (rc < 0) {
+        (void)vl_error_add_(v, VL_ERROR_OUT_OF_MEMORY, i, NULL,
+                            "out of memory");
+        return -1;
+      }
       break;
     } else {
       reserved_token_form_t form = RESERVED_TOKEN_BARE;

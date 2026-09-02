@@ -4,7 +4,7 @@ This guide describes Valve's parser behavior, schema relationships, terminal cap
 
 ## Limitations
 
-Valve does not implement operands. `VL_BEHAVIOR_ACCEPT_OPERANDS` is a reserved constant with no runtime effect, and there are no public operand accessors. `vl_parse()` reports an ordinary positional token as `VL_ERROR_UNEXPECTED_ARGUMENT`; when it encounters `--`, it stops parsing and currently discards every remaining argument.
+Valve does not implement operands. `VL_BEHAVIOR_ACCEPT_OPERANDS` is a reserved constant with no runtime effect, and there are no public operand accessors. `vl_parse()` reports an ordinary positional token as `VL_ERROR_UNEXPECTED_ARGUMENT`. A schema-declared command option can capture the tail after `--`; without one in the active scope, Valve preserves the legacy behavior of discarding that tail.
 
 Choose one assignment mode per executable. `VL_ASSIGN_INLINE` and `VL_ASSIGN_SEPARATE` cannot be enabled together, and Valve does not expand short-option clusters or joined option values.
 
@@ -63,6 +63,16 @@ The nested `.metadata` aggregate remains in the public structure for an unfinish
 Use `.data`, `.offset`, and `.target` to write parsed values into caller-owned configuration fields. Initialize string and `VL_TARGET_VALUE` fields to zero before parsing.
 
 String targets receive allocated copies. `VL_TARGET_VALUE` targets receive deep copies for compound values such as arrays and key/value trees; release both through `vl_targets_clear()` after the application finishes using them.
+
+### Command values
+
+An option with `.value = VL_OPTION_VALUE_COMMAND` declares that its active verb chain accepts an opaque command after `--`. It has no long, short, or toggle form, must use the default non-repeatable policy, and may target `VL_TARGET_COMMAND`, `VL_TARGET_VALUE`, or no target. At most one command option may exist in an active global, verb, and sub-verb chain; sibling sub-verbs may each declare their own.
+
+The result has kind `VL_VALUE_COMMAND` and is available through the option's required `.name`, for example `vl_get(v, "command")`. Its `.as.command.argv` points at the first tail token and `.as.command.argc` records the tail length. The view is borrowed directly from the vector passed to `vl_parse()`, so a schema with a command option requires main-style input with `argv[argc] == NULL`. Ordinary schemas remain strictly `argc`-bounded.
+
+Valve does not interpret any tail token. Reserved forms, options, toggles, and another `--` belong to the forwarded command. An empty tail reports `VL_ERROR_MISSING_VALUE`; attempting the option's name as `--command` or `--command=value` reports `VL_ERROR_DISABLED_FORM` and directs the user to the `-- <command> [args…]` syntax.
+
+`VL_TARGET_COMMAND` copies only the borrowed `{argv, argc}` view. It remains usable after `vl_destroy()` because the caller still owns the original `argv`; `vl_targets_clear()` then zeroes the view without freeing it. A consumer that needs the strings to outlive its input vector must copy them itself.
 
 ## Required options
 
@@ -134,7 +144,7 @@ The project will lift the experimental status explicitly in its release notes an
 - `vl_create()` copies option and verb dictionaries.
 - When `option_count` is zero, the option pointer table must end with `NULL`.
 - When `verb_count` is zero, the verb pointer table must end with `NULL`.
-- `vl_parse()` never owns the `argv` passed to `main()`.
+- `vl_parse()` never owns the `argv` passed to `main()`; command results borrow it.
 - Use `vl_argv_destroy()` only for an argument array the caller explicitly allocated and wants Valve to release.
 
 See the public [`valve.h`](../../include/valve/valve.h) header for declarations and the [example programs](../example/README.md) for complete parse, error, handler, and teardown flows.

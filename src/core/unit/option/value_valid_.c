@@ -15,6 +15,7 @@ bool option_value_valid_(vl_option_value_t value) {
   case VL_OPTION_VALUE_BOOL:
   case VL_OPTION_VALUE_DOT_NOTATION:
   case VL_OPTION_VALUE_TIME:
+  case VL_OPTION_VALUE_COMMAND:
 
     return true;
   }

@@ -28,33 +28,28 @@ Evaluate in order. Take the FIRST match. If more than one applies, take the high
 
 ## BUILD counter
 
-- BUILD is zero-padded to the current width and incremented numerically.
+- BUILD is the element's lifetime release counter. It increments numerically for every published version and never resets when MAJOR, MINOR, or PATCH changes.
+- BUILD is zero-padded to at least three digits.
   - `-009` -> `-010`, `-099` -> `-100`.
-- When BUILD reaches the max of its width, bump PATCH and reset BUILD:
-  - `v0.6.0-999` -> `v0.6.1-000`.
+- The field grows naturally beyond its current width: `-999` -> `-1000`.
+- The first published version of a new element may use `-000`; every later release uses the next lifetime BUILD value.
 
-## BUILD width is a function of MINOR
+## Component semantics
 
-- `MINOR` 0..9   -> BUILD width 3  (`-000` .. `-999`)
-- `MINOR` 10..99 -> BUILD width 4  (`-0000` .. `-9999`)
-- `MINOR` 100+   -> BUILD width grows by one digit per decade.
-- Crossing a MINOR digit boundary (e.g. `0.9.x` -> `0.10.0`) starts the new tag at BUILD `-0000`. **Do NOT rewrite previously published tags** -- git tags are immutable.
-
-## Reset semantics
-
-- Bump **BUILD**: MAJOR, MINOR, PATCH unchanged.
-- Bump **PATCH**: BUILD resets to padded zeros; MAJOR, MINOR unchanged.
-- Bump **MINOR**: PATCH -> 0; BUILD -> padded zeros at the new width; MAJOR unchanged.
-- Bump **MAJOR**: MINOR -> 0; PATCH -> 0; BUILD -> 3-digit padded zeros (MINOR is back to single digit).
+- Bump **BUILD**: MAJOR, MINOR, PATCH unchanged; increment BUILD.
+- Bump **PATCH**: increment PATCH; increment BUILD; MAJOR and MINOR unchanged.
+- Bump **MINOR**: increment MINOR; set PATCH to 0; increment BUILD; MAJOR unchanged.
+- Bump **MAJOR**: increment MAJOR; set MINOR and PATCH to 0; increment BUILD.
 
 ## Unbounded components
 
 - MAJOR has no digit cap.
-- PATCH has no digit cap. PATCH does NOT drive BUILD width -- only MINOR does.
+- PATCH has no digit cap.
+- BUILD has no digit cap.
 
 ## Before you write the tag
 
 1. Re-check the decision table. If MAJOR, or if ambiguity between PATCH and BUILD, you must have the user's explicit go-ahead in the current conversation.
 2. Derive the new version from the **latest existing tag**, not memory. Use `git tag --list 'v*' --sort=-v:refname | head -1` or equivalent.
-3. Apply reset semantics, then format with the correct BUILD width.
+3. Apply component semantics and increment the lifetime BUILD, then format it with at least three digits.
 4. Write the tag, then mirror the same version string into every file listed under the project's `Where Version Appears` section.

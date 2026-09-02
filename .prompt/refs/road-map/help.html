@@ -193,8 +193,14 @@
             <span class="card__index">label fidelity</span>
             <pre>--long
 -s
---enable-toggle | --disable-toggle</pre>
+--enable-toggle | --disable-toggle
+-- &lt;command&gt; [args…]</pre>
           </div>
+        </div>
+
+        <div class="callout callout--good">
+          <span class="callout__key">command position</span>
+          <p>A schema-declared command tail prints last in its scope, and targeted help plus relationship annotations use its real <code>-- &lt;command&gt; [args…]</code> syntax instead of inventing a named option.</p>
         </div>
       </div>
     </section>

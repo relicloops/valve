@@ -138,13 +138,14 @@ consumer:
           </div>
         </div>
 
-        <div class="callout callout--danger">
+        <div class="callout callout--good">
           <span class="callout__key">today</span>
           <p>
             Valve rejects ordinary positional tokens. The declared
             <code>VL_BEHAVIOR_ACCEPT_OPERANDS</code> flag is not wired, its documented
-            public accessors do not exist, and <code>--</code> currently discards the
-            remaining tail instead of collecting it.
+            public accessors do not exist, and a scoped
+            <code>VL_OPTION_VALUE_COMMAND</code> now captures the opaque tail after
+            <code>--</code>. Without that declaration, the legacy discard remains.
           </p>
         </div>
       </div>

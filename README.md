@@ -21,7 +21,7 @@ Documentation lives at [valve.relicloops.org](https://valve.relicloops.org), inc
 
 Valve `1.x` is experimental. Minor releases may change the public source or ABI contract, so consumers should pin an exact version tag. Valve will announce when the experimental status is lifted; from that release onward, breaking public API or ABI changes require a major-version bump, backward-compatible additions require a minor-version bump, and fixes require a patch-version bump. The final `BUILD` component identifies the published build.
 
-Operands are not implemented. `VL_BEHAVIOR_ACCEPT_OPERANDS` is reserved and currently has no effect: ordinary positional arguments are rejected, while `--` stops parsing and discards the remaining `argv` tail. Do not rely on operand storage or accessors until they are added to the public header.
+Operands are not implemented. `VL_BEHAVIOR_ACCEPT_OPERANDS` is reserved and currently has no effect, so ordinary positional arguments are rejected. A schema may instead declare one `VL_OPTION_VALUE_COMMAND` in its active verb chain to capture the opaque tail after `--`; without that declaration, Valve preserves the legacy behavior of discarding the tail. Do not rely on operand storage or accessors until they are added to the public header.
 
 For the current metadata contract and other parser boundaries, see the [reference guide](docs/reference/README.md).
 
@@ -117,6 +117,23 @@ executable('demo', 'main.c', dependencies: valve_dep)
 ```
 
 Meson resolves Valve from the pinned Wrap and exposes its `valve_dep` dependency.
+
+### Command tails
+
+Declare a command option when the program needs to forward everything after `--` unchanged:
+
+```c
+vl_command_t command = {0};
+const vl_option_t command_option = {
+    .name = "command",
+    .value = VL_OPTION_VALUE_COMMAND,
+    .required = true,
+    .data = &command,
+    .target = VL_TARGET_COMMAND,
+};
+```
+
+For `demo -- generator cron list`, `command.argv` points at `generator` and `command.argc` is `3`. The tail is borrowed from the main-style, NULL-terminated `argv`, remains suitable for `execvp`, and is not copied or freed by Valve. Tokens such as `--help` inside the tail belong to the forwarded command. Call `vl_targets_clear()` after the last use to zero the command view.
 
 ### Build and run
 

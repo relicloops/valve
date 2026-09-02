@@ -203,12 +203,12 @@
           </svg>
         </div>
 
-        <div class="callout callout--danger">
-          <span class="callout__key">known gap</span>
+        <div class="callout callout--good">
+          <span class="callout__key">command tail</span>
           <p>
-            The current <code>--</code> branch stops the loop and silently ignores all
-            remaining tokens. Correct behavior requires either collecting the tail as
-            operands or rejecting it when operand support is disabled.
+            A scoped <code>VL_OPTION_VALUE_COMMAND</code> receives the opaque,
+            NULL-terminated tail after <code>--</code> as a borrowed view. General
+            operands and the policy for an unowned tail remain future work.
           </p>
         </div>
       </div>
