@@ -4,11 +4,20 @@ All notable changes to this project are documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project uses [Conventional Commits](https://www.conventionalcommits.org/).
 
+## [1.1.0-002] - 2026-09-09
+
+### Documentation
+
+- **road-map**: Mark 1.1 release published
 ## [1.1.0-001] - 2026-09-02
 
 ### Added
 
 - **parser**: Capture schema-owned command tails
+
+### Documentation
+
+- **road-map**: Record 1.1 release gates
 ## [1.0.1-000] - 2026-08-08
 
 ### Fixed

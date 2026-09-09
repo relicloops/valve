@@ -1,7 +1,7 @@
 project(
   'valve',
   'c',
-  version: '1.1.0-001',
+  version: '1.1.0-002',
   license: 'Apache-2.0',
   meson_version: '>=1.4',
   default_options: [
@@ -13,6 +13,11 @@ project(
 
 # binary version
 valve_version = meson.project_version()
+fs = import('fs')
+authoritative_version = fs.read('VERSION').strip()
+if authoritative_version != valve_version
+  error('VERSION and meson.build disagree: ' + authoritative_version + ' != ' + valve_version)
+endif
 
 # include directory
 

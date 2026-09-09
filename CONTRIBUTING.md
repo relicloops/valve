@@ -70,7 +70,7 @@ Static project layout lives in [`project.yml`](project.yml). Coverage plugin and
 
 GitHub Actions runs the Meson-to-Ceedling workflow with GCC and Clang on **Ubuntu** plus Clang on **macOS**. Every runner requires the tests and gcovr HTML report to succeed, then uploads its report as a workflow artifact. The workflow runs on version tags matching `v[0-9]+.[0-9]+.[0-9]+-[0-9]+` (for example, `v1.0.0-000`; bare `v1.0.0` is not a release tag) and through manual `workflow_dispatch`; see [the CI workflow](.github/workflows/ci.yml).
 
-Valve’s own version string is always `MAJOR.MINOR.PATCH-BUILD`, with the same value in `meson.build`, `project.yml` / `VALVE_VERSION`, and `vl_version_get()`.
+Valve’s own version string is always `MAJOR.MINOR.PATCH-BUILD`. `VERSION` is the authoritative release value; after reserving it, run `scripts/sync-version.py` to update the build and test mirrors in `meson.build`, `project.yml`, `test/ceedling-gcov.yml`, and `src/core/valve_private.h`. The build refuses a mismatch between `VERSION` and `meson.build`, and `vl_version_get()` reports that synchronized value. Public README tag references move only when that tag is actually published.
 
 Before opening a PR, run the same build and test entry points locally:
 
