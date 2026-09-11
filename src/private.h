@@ -10,6 +10,8 @@
 
 #include "valve.h"
 
+#include <locale.h>
+
 typedef struct valve_verb valve_verb_t;
 typedef struct valve_conflict valve_conflict_t;
 typedef struct valve_requirement valve_requirement_t;
@@ -162,6 +164,39 @@ typedef enum option_duration_status {
 } option_duration_status_t;
 option_duration_status_t option_duration_parse_(const char *raw, int64_t *out);
 const char *option_duration_message_(option_duration_status_t status);
+/** Result of classifying an unquoted literal (AUTO, KV leaves, array
+ *  elements). Text that is not a number is never an error; a number that
+ *  does not fit is. */
+typedef enum option_scalar_status {
+  OPTION_SCALAR_OK = 0,
+  OPTION_SCALAR_INT_RANGE,
+  OPTION_SCALAR_DOUBLE_RANGE,
+} option_scalar_status_t;
+option_scalar_status_t option_scalar_auto_(vl_value_t *value);
+const char *option_scalar_message_(option_scalar_status_t status);
+locale_t option_c_locale_(void);
+double option_strtod_c_(const char *raw, char **end);
+/** Outcome of parsing a VL_OPTION_VALUE_KV literal, with the byte offset of
+ *  the failure so the message can point at it. */
+typedef enum option_kv_status {
+  OPTION_KV_OK = 0,
+  OPTION_KV_KEY,
+  OPTION_KV_COLON,
+  OPTION_KV_VALUE,
+  OPTION_KV_QUOTE,
+  OPTION_KV_ESCAPE,
+  OPTION_KV_SEPARATOR,
+  OPTION_KV_BRACE,
+  OPTION_KV_DEPTH,
+  OPTION_KV_DUPLICATE,
+  OPTION_KV_INT_RANGE,
+  OPTION_KV_DOUBLE_RANGE,
+  OPTION_KV_BANG,
+  OPTION_KV_OUT_OF_MEMORY,
+} option_kv_status_t;
+option_kv_status_t option_kv_parse_(const char *raw, vl_kv_list_t *list,
+                                    size_t *error_at);
+const char *option_kv_message_(option_kv_status_t status);
 void option_usage_print_(const valve_t *v, const vl_option_t *option);
 void option_annotations_print_(const valve_t *v,
                                const vl_option_t *option);

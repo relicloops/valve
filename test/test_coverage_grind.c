@@ -17,6 +17,7 @@ TEST_SOURCE_FILE("actions_valid_.c")
 TEST_SOURCE_FILE("annotations_print_.c")
 TEST_SOURCE_FILE("array_free_.c")
 TEST_SOURCE_FILE("at.c")
+TEST_SOURCE_FILE("c_locale_.c")
 TEST_SOURCE_FILE("clear.c")
 TEST_SOURCE_FILE("collides_with_globals_.c")
 TEST_SOURCE_FILE("color.c")
@@ -44,6 +45,7 @@ TEST_SOURCE_FILE("help_resolve.c")
 TEST_SOURCE_FILE("help_resolve_internal_.c")
 TEST_SOURCE_FILE("help_target.c")
 TEST_SOURCE_FILE("in_.c")
+TEST_SOURCE_FILE("kv_parse_.c")
 TEST_SOURCE_FILE("label_.c")
 TEST_SOURCE_FILE("label_print_.c")
 TEST_SOURCE_FILE("mapped_.c")
@@ -64,8 +66,10 @@ TEST_SOURCE_FILE("requirements_valid_.c")
 TEST_SOURCE_FILE("reserved.c")
 TEST_SOURCE_FILE("reserved_fired.c")
 TEST_SOURCE_FILE("reverse_seen_.c")
+TEST_SOURCE_FILE("scalar_auto_.c")
 TEST_SOURCE_FILE("seen_.c")
 TEST_SOURCE_FILE("set_.c")
+TEST_SOURCE_FILE("strtod_c_.c")
 TEST_SOURCE_FILE("subverb_get.c")
 TEST_SOURCE_FILE("table_count_.c")
 TEST_SOURCE_FILE("targets_clear.c")
@@ -395,7 +399,7 @@ void test_parse_kv_quote_oom(void) {
   for (int n = 1; n <= 10; ++n) {
     vl_test_alloc_reset();
     vl_test_alloc_fail_after(n);
-    char *q[] = {(char *)"valve", (char *)"--meta=!a:\"hi\""};
+    char *q[] = {(char *)"valve", (char *)"--meta=a:\"hi\""};
     (void)vl_parse(v, 2, q);
     vl_test_alloc_reset();
   }
@@ -916,7 +920,7 @@ void test_result_set_kv_clone_oom(void) {
     valve_t *v = parser_(options, 1);
     vl_test_alloc_reset();
     vl_test_alloc_fail_after(n);
-    char *argv[] = {(char *)"valve", (char *)"--meta=!a:1|b:{!c:2}"};
+    char *argv[] = {(char *)"valve", (char *)"--meta=a:1|b:{c:2}"};
     (void)vl_parse(v, 2, argv);
     vl_test_alloc_reset();
     vl_destroy(v);

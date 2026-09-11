@@ -55,14 +55,39 @@ The nested `.metadata` aggregate remains in the public structure for an unfinish
 - Repeatable options become arrays only when declared with `VL_OPTION_REPEAT_ARRAY`; duplicate non-repeatable options fail.
 - Integer minimum and maximum bounds are enforced during parsing.
 - `VL_OPTION_VALUE_BOOL` accepts a bare flag as true in every assignment mode and accepts explicit boolean literals in inline mode.
-- `VL_OPTION_VALUE_AUTO` converts `true` and `false` to booleans, integers to `int`, decimals to `double`, and other unquoted scalars to strings.
-- `VL_OPTION_VALUE_KV` builds structured key/value trees. Nested values use `{!...}`, and quoted scalar leaves remain strings.
+- `VL_OPTION_VALUE_AUTO` converts `true` and `false` to booleans, decimal integers to `int`, decimals to `double`, and every other literal to a string, using the same strict grammar as key/value leaves; a number that does not fit its type is an error.
+- `VL_OPTION_VALUE_KV` builds structured key/value trees: `key:value` pairs separated by `|`, nested maps in `{...}`, and quoted scalar leaves that always remain strings.
 - `VL_OPTION_VALUE_TIME` converts durations to whole seconds before applying integer bounds.
 - Dotted option names are parsed and validated as schema keys.
 
 Use `.data`, `.offset`, and `.target` to write parsed values into caller-owned configuration fields. Initialize string and `VL_TARGET_VALUE` fields to zero before parsing.
 
 String targets receive allocated copies. `VL_TARGET_VALUE` targets receive deep copies for compound values such as arrays and key/value trees; release both through `vl_targets_clear()` after the application finishes using them.
+
+### Key/value literals
+
+A `VL_OPTION_VALUE_KV` value is one argument holding a small map:
+
+```text
+key:value|key:value|key:{nested:value|other:"quoted string"}
+```
+
+- `:` binds a key to its value, `|` separates pairs, `{` and `}` delimit a nested map. There is no leading marker; the option type already tells Valve to expect a map. The 1.x `!` prefix is rejected with a hint so old literals fail loudly instead of parsing `!a` as a key.
+- Whitespace is allowed around every separator and ignored there (`a: 1 | b: {c: 2}`); inside a bare key or value it is a syntax error. Quoted tokens keep their whitespace.
+- Unquoted values follow a strict decimal grammar: `true` and `false` become booleans, `[+-]digits` becomes `int`, and `[+-]digits.digits` or an `e`/`E` exponent becomes `double`. Everything else is a string, including hexadecimal, `inf`, `nan` and `1e` — Valve never lets `strtod` decide. A number that does not fit its type is an error, not a string.
+- A bare key stops at `:`, `|`, `{`, `}`, `"` or whitespace. A bare value additionally admits `:`, so `url:http://host/path` needs no quotes.
+- A token wrapped in `"` is always a string and may contain any separator. Inside quotes `\"` and `\\` are the only escapes. Keys may be quoted too.
+- Duplicate keys in the same map are rejected at every depth; empty maps, empty keys and empty values are rejected; nesting is limited to 32 levels.
+- A malformed literal fails as `VL_ERROR_INVALID_VALUE` with the reason and the byte offset, for example `expected '|' or end of value at offset 4`.
+
+`|`, `{`, `}` and `"` are all special to POSIX shells: `|` starts a pipeline, `{a:1,b:2}` is brace-expanded into two words by bash and zsh, and `"` opens a shell string. Always wrap the literal in single quotes so the shell hands it to the program untouched:
+
+```bash
+demo-inline network --meta='k:v|n:{x:1|name:"api gateway"}'
+demo-separate network --meta 'k:v|n:{x:1|name:"api gateway"}'
+```
+
+Inside single quotes the inner `"` need no escaping. A literal `'` cannot appear anywhere in the value when the argument is single-quoted; wrap the argument in double quotes and escape the inner `"` as `\"` for that case.
 
 ### Command values
 

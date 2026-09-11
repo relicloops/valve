@@ -7,6 +7,7 @@ TEST_SOURCE_FILE("actions_valid_.c")
 TEST_SOURCE_FILE("annotations_print_.c")
 TEST_SOURCE_FILE("array_free_.c")
 TEST_SOURCE_FILE("at.c")
+TEST_SOURCE_FILE("c_locale_.c")
 TEST_SOURCE_FILE("clear.c")
 TEST_SOURCE_FILE("collides_with_globals_.c")
 TEST_SOURCE_FILE("color.c")
@@ -34,6 +35,7 @@ TEST_SOURCE_FILE("help_resolve.c")
 TEST_SOURCE_FILE("help_resolve_internal_.c")
 TEST_SOURCE_FILE("help_target.c")
 TEST_SOURCE_FILE("in_.c")
+TEST_SOURCE_FILE("kv_parse_.c")
 TEST_SOURCE_FILE("label_.c")
 TEST_SOURCE_FILE("label_print_.c")
 TEST_SOURCE_FILE("mapped_.c")
@@ -54,8 +56,10 @@ TEST_SOURCE_FILE("requirements_valid_.c")
 TEST_SOURCE_FILE("reserved.c")
 TEST_SOURCE_FILE("reserved_fired.c")
 TEST_SOURCE_FILE("reverse_seen_.c")
+TEST_SOURCE_FILE("scalar_auto_.c")
 TEST_SOURCE_FILE("seen_.c")
 TEST_SOURCE_FILE("set_.c")
+TEST_SOURCE_FILE("strtod_c_.c")
 TEST_SOURCE_FILE("subverb_get.c")
 TEST_SOURCE_FILE("table_count_.c")
 TEST_SOURCE_FILE("targets_clear.c")
@@ -169,13 +173,11 @@ void test_parse_kv_depth_and_syntax_errors(void) {
   };
   char deep[512];
   size_t pos = 0;
-  /* Build {!a:{!a:{...}}} deeper than VL_KV_MAX_DEPTH (32). */
-  deep[pos++] = '!';
+  /* Build a:{a:{a:{...}}} deeper than VL_KV_MAX_DEPTH (32). */
   deep[pos++] = 'a';
   deep[pos++] = ':';
   for (int i = 0; i < 40; ++i) {
     deep[pos++] = '{';
-    deep[pos++] = '!';
     deep[pos++] = 'a';
     deep[pos++] = ':';
   }
@@ -194,37 +196,37 @@ void test_parse_kv_depth_and_syntax_errors(void) {
   vl_destroy(v);
 
   v = parser_(options, 1);
-  char *bad_empty[] = {(char *)"valve", (char *)"--meta=!a:"};
+  char *bad_empty[] = {(char *)"valve", (char *)"--meta=a:"};
   EXPECT(vl_parse(v, 2, bad_empty) == -1, "empty kv scalar");
   vl_destroy(v);
 
   v = parser_(options, 1);
-  char *bad_pipe[] = {(char *)"valve", (char *)"--meta=!a:1|"};
+  char *bad_pipe[] = {(char *)"valve", (char *)"--meta=a:1|"};
   EXPECT(vl_parse(v, 2, bad_pipe) == -1, "trailing pipe");
   vl_destroy(v);
 
   v = parser_(options, 1);
-  char *bad_key[] = {(char *)"valve", (char *)"--meta=!:1"};
+  char *bad_key[] = {(char *)"valve", (char *)"--meta=:1"};
   EXPECT(vl_parse(v, 2, bad_key) == -1, "empty key");
   vl_destroy(v);
 
   v = parser_(options, 1);
-  char *bad_nest[] = {(char *)"valve", (char *)"--meta=!a:{!b:1"};
+  char *bad_nest[] = {(char *)"valve", (char *)"--meta=a:{b:1"};
   EXPECT(vl_parse(v, 2, bad_nest) == -1, "unclosed nest");
   vl_destroy(v);
 
   v = parser_(options, 1);
-  char *bad_quote[] = {(char *)"valve", (char *)"--meta=!a:\"hi"};
+  char *bad_quote[] = {(char *)"valve", (char *)"--meta=a:\"hi"};
   EXPECT(vl_parse(v, 2, bad_quote) == -1, "unterminated kv quote");
   vl_destroy(v);
 
   v = parser_(options, 1);
-  char *ok_quote[] = {(char *)"valve", (char *)"--meta=!a:\"hi\"|b:x"};
+  char *ok_quote[] = {(char *)"valve", (char *)"--meta=a:\"hi\"|b:x"};
   EXPECT(vl_parse(v, 2, ok_quote) == 0, "quoted kv ok");
   vl_destroy(v);
 
   v = parser_(options, 1);
-  char *bad_junk[] = {(char *)"valve", (char *)"--meta=!a:{!b:1}x"};
+  char *bad_junk[] = {(char *)"valve", (char *)"--meta=a:{b:1}x"};
   EXPECT(vl_parse(v, 2, bad_junk) == -1, "junk after nested kv");
   vl_destroy(v);
 }
@@ -509,7 +511,7 @@ void test_oom_parse_kv_array_unknown(void) {
   for (int n = 1; n <= 12; ++n) {
     vl_test_alloc_reset();
     vl_test_alloc_fail_after(n);
-    char *kv[] = {(char *)"valve", (char *)"--meta=!a:1|b:2"};
+    char *kv[] = {(char *)"valve", (char *)"--meta=a:1|b:2"};
     (void)vl_parse(v, 2, kv);
     vl_test_alloc_reset();
   }
@@ -557,7 +559,7 @@ void test_oom_error_add_and_result_set(void) {
     vl_test_alloc_reset();
     vl_test_alloc_fail_after(n);
     char *a[] = {(char *)"valve", (char *)"--s=hello", (char *)"--mode=a",
-                 (char *)"--mode=b", (char *)"--box=!k:1"};
+                 (char *)"--mode=b", (char *)"--box=k:1"};
     (void)vl_parse(v, 5, a);
     vl_test_alloc_reset();
     vl_destroy(v);

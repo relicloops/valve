@@ -6,6 +6,7 @@ TEST_SOURCE_FILE("actions_valid_.c")
 TEST_SOURCE_FILE("annotations_print_.c")
 TEST_SOURCE_FILE("array_free_.c")
 TEST_SOURCE_FILE("at.c")
+TEST_SOURCE_FILE("c_locale_.c")
 TEST_SOURCE_FILE("clear.c")
 TEST_SOURCE_FILE("collides_with_globals_.c")
 TEST_SOURCE_FILE("color.c")
@@ -33,6 +34,7 @@ TEST_SOURCE_FILE("help_resolve.c")
 TEST_SOURCE_FILE("help_resolve_internal_.c")
 TEST_SOURCE_FILE("help_target.c")
 TEST_SOURCE_FILE("in_.c")
+TEST_SOURCE_FILE("kv_parse_.c")
 TEST_SOURCE_FILE("label_.c")
 TEST_SOURCE_FILE("label_print_.c")
 TEST_SOURCE_FILE("mapped_.c")
@@ -53,8 +55,10 @@ TEST_SOURCE_FILE("requirements_valid_.c")
 TEST_SOURCE_FILE("reserved.c")
 TEST_SOURCE_FILE("reserved_fired.c")
 TEST_SOURCE_FILE("reverse_seen_.c")
+TEST_SOURCE_FILE("scalar_auto_.c")
 TEST_SOURCE_FILE("seen_.c")
 TEST_SOURCE_FILE("set_.c")
+TEST_SOURCE_FILE("strtod_c_.c")
 TEST_SOURCE_FILE("subverb_get.c")
 TEST_SOURCE_FILE("table_count_.c")
 TEST_SOURCE_FILE("targets_clear.c")
@@ -113,13 +117,13 @@ void test_kv_equals(void) {
   };
   char *argv[] = {
       (char *)"valve",
-      (char *)"--kv-flag=!key:value|key1:simboltodefineamulti",
+      (char *)"--kv-flag=key:value|key1:simboltodefineamulti",
   };
   valve_t *v = parser_(options, 1);
   const vl_value_t *value = NULL;
 
   EXPECT(v != NULL, "parser for kv equals");
-  EXPECT(vl_parse(v, 2, argv) == 0, "parse --kv-flag=!k:v");
+  EXPECT(vl_parse(v, 2, argv) == 0, "parse --kv-flag=k:v");
   value = vl_get(v, "kv-flag");
   EXPECT(value && value->kind == VL_VALUE_KV && value->as.kv.count == 2,
          "kv equals stores pair list");
@@ -144,13 +148,13 @@ void test_kv_next(void) {
   char *argv[] = {
       (char *)"valve",
       (char *)"--kv",
-      (char *)"!a:b|c:d",
+      (char *)"a:b|c:d",
   };
   valve_t *v = parser_with_form_(options, 1, VL_ASSIGN_SEPARATE);
   const vl_value_t *value = NULL;
 
   EXPECT(v != NULL, "parser for kv next");
-  EXPECT(vl_parse(v, 3, argv) == 0, "parse --kv !k:v");
+  EXPECT(vl_parse(v, 3, argv) == 0, "parse --kv k:v");
   value = vl_get(v, "kv");
   EXPECT(value && value->kind == VL_VALUE_KV && value->as.kv.count == 2 &&
              strcmp(value->as.kv.pairs[1].key, "c") == 0 &&
@@ -168,7 +172,7 @@ void test_kv_tree_and_auto_scalars(void) {
   };
   char *argv[] = {
       (char *)"valve",
-      (char *)"--kv=!proxy:{!lane:\"api.xxx.loop\"|cpus:2|enabled:true|label:"
+      (char *)"--kv=proxy:{lane:\"api.xxx.loop\"|cpus:2|enabled:true|label:"
               "\"true\"|workers:\"2\"}|ratio:1.5",
   };
   valve_t *v = parser_(options, 1);

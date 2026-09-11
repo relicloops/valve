@@ -16,6 +16,7 @@ TEST_SOURCE_FILE("actions_valid_.c")
 TEST_SOURCE_FILE("annotations_print_.c")
 TEST_SOURCE_FILE("array_free_.c")
 TEST_SOURCE_FILE("at.c")
+TEST_SOURCE_FILE("c_locale_.c")
 TEST_SOURCE_FILE("clear.c")
 TEST_SOURCE_FILE("collides_with_globals_.c")
 TEST_SOURCE_FILE("color.c")
@@ -43,6 +44,7 @@ TEST_SOURCE_FILE("help_resolve.c")
 TEST_SOURCE_FILE("help_resolve_internal_.c")
 TEST_SOURCE_FILE("help_target.c")
 TEST_SOURCE_FILE("in_.c")
+TEST_SOURCE_FILE("kv_parse_.c")
 TEST_SOURCE_FILE("label_.c")
 TEST_SOURCE_FILE("label_print_.c")
 TEST_SOURCE_FILE("mapped_.c")
@@ -63,8 +65,10 @@ TEST_SOURCE_FILE("requirements_valid_.c")
 TEST_SOURCE_FILE("reserved.c")
 TEST_SOURCE_FILE("reserved_fired.c")
 TEST_SOURCE_FILE("reverse_seen_.c")
+TEST_SOURCE_FILE("scalar_auto_.c")
 TEST_SOURCE_FILE("seen_.c")
 TEST_SOURCE_FILE("set_.c")
+TEST_SOURCE_FILE("strtod_c_.c")
 TEST_SOURCE_FILE("subverb_get.c")
 TEST_SOURCE_FILE("table_count_.c")
 TEST_SOURCE_FILE("targets_clear.c")
@@ -372,17 +376,17 @@ void test_parse_kv_pipe_and_trailing(void) {
       NULL,
   };
   valve_t *v = parser_(options, 1);
-  char *pipe_end[] = {(char *)"valve", (char *)"--meta=!a:1|"};
+  char *pipe_end[] = {(char *)"valve", (char *)"--meta=a:1|"};
   EXPECT(v != NULL && vl_parse(v, 2, pipe_end) == -1, "kv trailing pipe");
   vl_destroy(v);
 
   v = parser_(options, 1);
-  char *nested_junk[] = {(char *)"valve", (char *)"--meta=!a:{!b:1}x"};
+  char *nested_junk[] = {(char *)"valve", (char *)"--meta=a:{b:1}x"};
   EXPECT(vl_parse(v, 2, nested_junk) == -1, "kv junk after nest");
   vl_destroy(v);
 
   v = parser_(options, 1);
-  char *pipe_empty[] = {(char *)"valve", (char *)"--meta=!a:1|{}"};
+  char *pipe_empty[] = {(char *)"valve", (char *)"--meta=a:1|{}"};
   EXPECT(vl_parse(v, 2, pipe_empty) == -1, "kv pipe then bad");
   vl_destroy(v);
 }

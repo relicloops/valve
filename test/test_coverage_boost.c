@@ -6,6 +6,7 @@ TEST_SOURCE_FILE("actions_valid_.c")
 TEST_SOURCE_FILE("annotations_print_.c")
 TEST_SOURCE_FILE("array_free_.c")
 TEST_SOURCE_FILE("at.c")
+TEST_SOURCE_FILE("c_locale_.c")
 TEST_SOURCE_FILE("clear.c")
 TEST_SOURCE_FILE("collides_with_globals_.c")
 TEST_SOURCE_FILE("color.c")
@@ -33,6 +34,7 @@ TEST_SOURCE_FILE("help_resolve.c")
 TEST_SOURCE_FILE("help_resolve_internal_.c")
 TEST_SOURCE_FILE("help_target.c")
 TEST_SOURCE_FILE("in_.c")
+TEST_SOURCE_FILE("kv_parse_.c")
 TEST_SOURCE_FILE("label_.c")
 TEST_SOURCE_FILE("label_print_.c")
 TEST_SOURCE_FILE("mapped_.c")
@@ -53,8 +55,10 @@ TEST_SOURCE_FILE("requirements_valid_.c")
 TEST_SOURCE_FILE("reserved.c")
 TEST_SOURCE_FILE("reserved_fired.c")
 TEST_SOURCE_FILE("reverse_seen_.c")
+TEST_SOURCE_FILE("scalar_auto_.c")
 TEST_SOURCE_FILE("seen_.c")
 TEST_SOURCE_FILE("set_.c")
+TEST_SOURCE_FILE("strtod_c_.c")
 TEST_SOURCE_FILE("subverb_get.c")
 TEST_SOURCE_FILE("table_count_.c")
 TEST_SOURCE_FILE("targets_clear.c")
@@ -406,7 +410,7 @@ void test_parse_kv_nested_and_quoted(void) {
   };
   char *argv[] = {
       (char *)"valve",
-      (char *)"--meta=!a:1|b:\"hi\"|c:{!d:true|e:2.5}",
+      (char *)"--meta=a:1|b:\"hi\"|c:{d:true|e:2.5}",
   };
   valve_t *v = parser_(options, 1);
   const vl_value_t *val;
@@ -418,7 +422,7 @@ void test_parse_kv_nested_and_quoted(void) {
          "kv has pairs");
   vl_destroy(v);
 
-  char *bad[] = {(char *)"valve", (char *)"--meta=!a:\"unterminated"};
+  char *bad[] = {(char *)"valve", (char *)"--meta=a:\"unterminated"};
   v = parser_(options, 1);
   EXPECT(vl_parse(v, 2, bad) == -1, "unterminated quote fails");
   vl_destroy(v);
@@ -834,7 +838,7 @@ void test_parse_edges_number_toggle_array_kv(void) {
   char *tog_bad[] = {(char *)"valve", (char *)"--enable-x"};
   char *arr_q[] = {(char *)"valve", (char *)"--arr=\"a\",b"};
   char *arr_bad_q[] = {(char *)"valve", (char *)"--arr=\"unterminated"};
-  char *kv_bad[] = {(char *)"valve", (char *)"--meta=!a"};
+  char *kv_bad[] = {(char *)"valve", (char *)"--meta=a"};
   char *kv_empty[] = {(char *)"valve", (char *)"--meta="};
   char *auto_d[] = {(char *)"valve", (char *)"--auto=1.5"};
   char *dashdash[] = {(char *)"valve", (char *)"--n=1", (char *)"--",
@@ -1003,7 +1007,7 @@ void test_kv_target_value_and_value_labels(void) {
   };
   vl_executable_t settings = {.options = options, .color = VAL_COLOR_NEVER};
   valve_t *v = vl_create(&settings);
-  char *argv[] = {(char *)"valve", (char *)"--meta=!k:1|n:{!z:true}",
+  char *argv[] = {(char *)"valve", (char *)"--meta=k:1|n:{z:true}",
                   (char *)"--g.s=hi", (char *)"--g.d=1.5", (char *)"--g.b=true",
                   (char *)"--g.x=z", (char *)"--t=1s"};
   char *help[] = {(char *)"valve", (char *)"--help"};
@@ -1146,9 +1150,9 @@ void test_kv_and_array_malformed_edges(void) {
       VL_OPT(.name = "arr", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_ARRAY),
       NULL,
   };
-  char *pipe[] = {(char *)"valve", (char *)"--meta=!a:1|"};
-  char *brace[] = {(char *)"valve", (char *)"--meta=!a:{!b:1"};
-  char *no_bang[] = {(char *)"valve", (char *)"--meta=a:1"};
+  char *pipe[] = {(char *)"valve", (char *)"--meta=a:1|"};
+  char *brace[] = {(char *)"valve", (char *)"--meta=a:{b:1"};
+  char *plain[] = {(char *)"valve", (char *)"--meta=a:1"};
   char *empty_el[] = {(char *)"valve", (char *)"--arr=a,,b"};
   char *semi[] = {(char *)"valve", (char *)"--arr=\"a\"b"};
   valve_t *v;
@@ -1160,7 +1164,7 @@ void test_kv_and_array_malformed_edges(void) {
   EXPECT(vl_parse(v, 2, brace) == -1, "kv unclosed brace");
   vl_destroy(v);
   v = parser_(options, 2);
-  EXPECT(vl_parse(v, 2, no_bang) == -1, "kv missing bang");
+  EXPECT(vl_parse(v, 2, plain) == 0, "kv parses without a sentinel");
   vl_destroy(v);
   v = parser_(options, 2);
   EXPECT(vl_parse(v, 2, empty_el) == -1, "array empty element");
@@ -1298,7 +1302,7 @@ void test_kv_nested_target_and_repeat_array_target(void) {
       NULL,
   };
   valve_t *v = parser_(options, 2);
-  char *argv[] = {(char *)"valve", (char *)"--meta=!a:{!b:1|c:true}|d:\"x\"",
+  char *argv[] = {(char *)"valve", (char *)"--meta=a:{b:1|c:true}|d:\"x\"",
                   (char *)"--groups=1,2", (char *)"--groups=3,4"};
   EXPECT(v != NULL && vl_parse(v, 4, argv) == 0, "nested kv + array repeat target");
   EXPECT(meta.kind == VL_VALUE_KV, "nested kv target");
@@ -1349,7 +1353,7 @@ void test_parse_short_form_guards_and_cluster(void) {
       .options = options, .assign = VL_ASSIGN_SEPARATE, .color = VAL_COLOR_NEVER};
   valve_t *v = vl_create(&inline_as);
   char *long_as_short[] = {(char *)"valve", (char *)"-L=x"};
-  char *kv_short[] = {(char *)"valve", (char *)"-t=!a:1"};
+  char *kv_short[] = {(char *)"valve", (char *)"-t=a:1"};
   char *sep_disabled[] = {(char *)"valve", (char *)"-m", (char *)"x"};
   char *inline_disabled[] = {(char *)"valve", (char *)"-m=x"};
   char *cluster[] = {(char *)"valve", (char *)"-fo"};

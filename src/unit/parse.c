@@ -227,7 +227,7 @@ static bool parse_double_(const char *raw, double *out) {
     return false;
 
   errno = 0;
-  value = strtod(raw, &end);
+  value = option_strtod_c_(raw, &end);
   if (errno == ERANGE || !end || *end != '\0' || !isfinite(value)) /* GCOVR_EXCL_BR_LINE: !end never — strtod always sets end */
     return false;
 
@@ -352,17 +352,12 @@ static int scalar_value_(valve_t *v, const vl_option_t *opt, const char *raw,
     value.kind = VL_VALUE_BOOL;
     value.as.boolean = boolean;
   } else if (vk == VL_OPTION_VALUE_AUTO) {
-    bool boolean = false;
+    option_scalar_status_t status = option_scalar_auto_(&value);
 
-    if (parse_bool_literal_(raw, &boolean)) {
-      value.kind = VL_VALUE_BOOL;
-      value.as.boolean = boolean;
-    } else if (token_has_double_mark_(raw) && parse_double_(raw, &number)) {
-      value.kind = VL_VALUE_DOUBLE;
-      value.as.number = number;
-    } else if (parse_int_(raw, &integer)) {
-      value.kind = VL_VALUE_INT;
-      value.as.integer = integer;
+    if (status != OPTION_SCALAR_OK) {
+      vl_value_clear(&value);
+      return vl_error_add_(v, VL_ERROR_INVALID_VALUE, argv_index, opt->name,
+                           option_scalar_message_(status));
     }
   }
 
@@ -372,170 +367,6 @@ static int scalar_value_(valve_t *v, const vl_option_t *opt, const char *raw,
   }
 
   return 0;
-}
-
-static int kv_pair_push_(vl_kv_list_t *list, vl_kv_pair_t *pair) {
-  size_t next_count, bytes;
-  /* GCOVR_EXCL_BR_START — size_t wrap on pathological count */
-  if (__builtin_add_overflow(list->count, (size_t)1, &next_count) ||
-      __builtin_mul_overflow(next_count, sizeof(vl_kv_pair_t), &bytes))
-    return -1; /* GCOVR_EXCL_LINE */
-  /* GCOVR_EXCL_BR_STOP */
-
-  vl_kv_pair_t *next = realloc((vl_kv_pair_t *)list->pairs, bytes);
-
-  if (!next)
-    return -1;
-
-  next[list->count] = *pair;
-  list->pairs = next;
-  ++list->count;
-  *pair = (vl_kv_pair_t){0};
-  return 0;
-}
-
-#define VL_KV_MAX_DEPTH 32
-
-static int parse_kv_list_(const char **cursor, vl_kv_list_t *list,
-                          char end_char, int depth);
-
-static int kv_scalar_from_raw_(const char *raw, size_t len, bool force_string,
-                               vl_value_t *value) {
-  char *copy = strndup(raw, len);
-  int64_t integer = 0;
-  double number = 0.0;
-  bool boolean = false;
-
-  if (!copy)
-    return -1;
-
-  value->kind = VL_VALUE_STRING;
-  value->raw = copy;
-
-  if (force_string)
-    return 0;
-
-  if (parse_bool_literal_(copy, &boolean)) {
-    value->kind = VL_VALUE_BOOL;
-    value->as.boolean = boolean;
-  } else if (token_has_double_mark_(copy) && parse_double_(copy, &number)) {
-    value->kind = VL_VALUE_DOUBLE;
-    value->as.number = number;
-  } else if (parse_int_(copy, &integer)) {
-    value->kind = VL_VALUE_INT;
-    value->as.integer = integer;
-  }
-
-  return 0;
-}
-
-static int parse_kv_scalar_(const char **cursor, vl_value_t *value,
-                            char end_char) {
-  const char *start = *cursor;
-  const char *p = start;
-  bool force_string = false;
-
-  if (*p == '"') {
-    force_string = true;
-    start = ++p;
-    while (*p && *p != '"') {
-      ++p;
-    }
-
-    if (*p != '"')
-      return -1;
-
-    if (kv_scalar_from_raw_(start, (size_t)(p - start), force_string, value) !=
-        0)
-      return -1;
-
-    *cursor = p + 1;
-    return 0;
-  }
-
-  while (*p && *p != '|' && (end_char == '\0' || *p != end_char)) {
-    ++p;
-  }
-
-  if (p == start)
-    return -1;
-
-  if (kv_scalar_from_raw_(start, (size_t)(p - start), force_string, value) != 0)
-    return -1;
-
-  *cursor = p;
-  return 0;
-}
-
-static int parse_kv_value_(const char **cursor, vl_value_t *value, int depth,
-                           char end_char) {
-  if (**cursor == '{') {
-    ++(*cursor);
-    value->kind = VL_VALUE_KV;
-    value->raw = NULL;
-    return parse_kv_list_(cursor, &value->as.kv, '}', depth + 1);
-  }
-
-  return parse_kv_scalar_(cursor, value, end_char);
-}
-
-static int parse_kv_list_(const char **cursor, vl_kv_list_t *list,
-                          char end_char, int depth) {
-  if (depth > VL_KV_MAX_DEPTH)
-    return -1;
-
-  if (**cursor != '!')
-    return -1;
-
-  ++(*cursor);
-
-  while (**cursor && **cursor != end_char) {
-    const char *key_start = *cursor;
-    vl_kv_pair_t pair = {0};
-
-    /* GCOVR_EXCL_BR_START — end_char short-circuit in key scan */
-    while (**cursor && **cursor != ':' && **cursor != '|' &&
-           **cursor != end_char) {
-      ++(*cursor);
-    }
-    /* GCOVR_EXCL_BR_STOP */
-
-    if (*cursor == key_start || **cursor != ':')
-      return -1;
-
-    pair.key = strndup(key_start, (size_t)(*cursor - key_start));
-    if (!pair.key)
-      return -1;
-
-    ++(*cursor);
-    if (parse_kv_value_(cursor, &pair.value, depth, end_char) != 0) {
-      free((char *)pair.key);
-      vl_value_clear(&pair.value);
-      return -1;
-    }
-
-    if (kv_pair_push_(list, &pair) != 0) {
-      free((char *)pair.key);
-      vl_value_clear(&pair.value);
-      return -1;
-    }
-
-    if (**cursor == '|') {
-      ++(*cursor);
-      if (**cursor == '\0' || **cursor == end_char) /* GCOVR_EXCL_BR_LINE: end_char after pipe */
-        return -1;
-    } else if (**cursor != end_char && **cursor != '\0') {
-      return -1;
-    }
-  }
-
-  if (end_char != '\0') {
-    if (**cursor != end_char)
-      return -1;
-    ++(*cursor);
-  }
-
-  return list->count > 0 ? 0 : -1;
 }
 
 static int kv_value_(valve_t *v, const vl_option_t *opt, const char *raw,
@@ -548,11 +379,21 @@ static int kv_value_(valve_t *v, const vl_option_t *opt, const char *raw,
   if (!value.raw)
     return -1;
 
-  const char *cursor = raw;
-  if (parse_kv_list_(&cursor, &value.as.kv, '\0', 1) != 0 || *cursor != '\0') { /* GCOVR_EXCL_BR_LINE: trailing-cursor arm */
+  size_t error_at = 0;
+  option_kv_status_t status = option_kv_parse_(raw, &value.as.kv, &error_at);
+
+  if (status == OPTION_KV_OUT_OF_MEMORY) {
+    vl_value_clear(&value);
+    return -1;
+  }
+  if (status != OPTION_KV_OK) {
+    char message[96];
+
+    snprintf(message, sizeof message, "%s at offset %zu",
+             option_kv_message_(status), error_at);
     vl_value_clear(&value);
     return vl_error_add_(v, VL_ERROR_INVALID_VALUE, argv_index, opt->name,
-                         "expected !key:value|key:{!nested:value}");
+                         message);
   }
 
   if (vl_result_set_(v, opt, &value, argv_index) != 0) {
@@ -563,13 +404,16 @@ static int kv_value_(valve_t *v, const vl_option_t *opt, const char *raw,
   return 0;
 }
 
-static int parse_array_element_(const char **cursor, vl_value_t *value) {
+/* Returns 0 on success, -1 on a syntax error (message left NULL), -1 with
+ * *message set on a range error, -2 on allocation failure. */
+static int parse_array_element_(const char **cursor, vl_value_t *value,
+                                const char **message) {
   const char *start = *cursor;
   const char *p = start;
-  bool force_string = false;
+
+  *message = NULL;
 
   if (*p == '"') {
-    force_string = true;
     start = ++p;
     while (*p && *p != '"') {
       ++p;
@@ -578,9 +422,10 @@ static int parse_array_element_(const char **cursor, vl_value_t *value) {
     if (*p != '"')
       return -1;
 
-    if (kv_scalar_from_raw_(start, (size_t)(p - start), force_string, value) !=
-        0)
-      return -1;
+    value->kind = VL_VALUE_STRING;
+    value->raw = strndup(start, (size_t)(p - start));
+    if (!value->raw)
+      return -2;
 
     *cursor = p + 1;
     return 0;
@@ -593,8 +438,15 @@ static int parse_array_element_(const char **cursor, vl_value_t *value) {
   if (p == start)
     return -1;
 
-  if (kv_scalar_from_raw_(start, (size_t)(p - start), force_string, value) != 0)
+  value->raw = strndup(start, (size_t)(p - start));
+  if (!value->raw)
+    return -2;
+
+  option_scalar_status_t status = option_scalar_auto_(value);
+  if (status != OPTION_SCALAR_OK) {
+    *message = option_scalar_message_(status);
     return -1;
+  }
 
   *cursor = p;
   return 0;
@@ -639,12 +491,19 @@ static int array_value_(valve_t *v, const vl_option_t *opt, const char *raw,
   const char *cursor = raw;
   while (*cursor) {
     vl_value_t element = {0};
+    const char *message = NULL;
+    int rc = parse_array_element_(&cursor, &element, &message);
 
-    if (parse_array_element_(&cursor, &element) != 0) {
+    if (rc == -2) {
+      vl_value_clear(&element);
+      vl_value_clear(&value);
+      return -1;
+    }
+    if (rc != 0) {
       vl_value_clear(&element);
       vl_value_clear(&value);
       return vl_error_add_(v, VL_ERROR_INVALID_VALUE, argv_index, opt->name,
-                           "expected comma-separated values");
+                           message ? message : "expected comma-separated values");
     }
 
     if (array_push_value_(&value.as.array, &element) != 0) {

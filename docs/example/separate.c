@@ -76,7 +76,7 @@ static const vl_option_t opt_meta = {
     .offset = offsetof(app_config_t, meta),
     .target = VL_TARGET_VALUE,
     .description = "Key/value metadata bag.",
-    .usage = "--meta '!k:v|n:1'",
+    .usage = "--meta 'k:v|n:{x:1}'",
 };
 
 static const vl_option_t opt_timeout = {
