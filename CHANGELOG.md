@@ -4,11 +4,20 @@ All notable changes to this project are documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project uses [Conventional Commits](https://www.conventionalcommits.org/).
 
-## [1.1.0-002] - 2026-09-09
+## [1.2.0-008] - 2026-09-11
+
+### Added
+
+- **parse**: Add executable actions
 
 ### Documentation
 
+- **plans**: Record the command-option and worker docs releases
 - **road-map**: Mark 1.1 release published
+
+### Build
+
+- **version**: Make VERSION authoritative and bump to 1.1.0-002
 ## [1.1.0-001] - 2026-09-02
 
 ### Added
