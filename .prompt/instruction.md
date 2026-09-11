@@ -9,7 +9,7 @@ required:
 # Repository Guidelines `valve`
 
 **NOTE**: This file is symlinked at multiple locations in the repository root:
-- [`CLAUDE.md`, `GEMINI.MD`, `AGENTS.MD`] -> `.prompt/instruction.md`
+- [`CLAUDE.md`, `AGENTS.MD`] -> `.prompt/instruction.md`
 - Always follow symlinks and edit the actual file, not copies.
 
 ## Policy
