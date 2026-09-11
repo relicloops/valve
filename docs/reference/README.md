@@ -147,4 +147,4 @@ The project will lift the experimental status explicitly in its release notes an
 - `vl_parse()` never owns the `argv` passed to `main()`; command results borrow it.
 - Use `vl_argv_destroy()` only for an argument array the caller explicitly allocated and wants Valve to release.
 
-See the public [`valve.h`](../../include/valve/valve.h) header for declarations and the [example programs](../example/README.md) for complete parse, error, handler, and teardown flows.
+See the public [`valve.h`](../../include/valve.h) header for declarations and the [example programs](../example/README.md) for complete parse, error, handler, and teardown flows.

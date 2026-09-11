@@ -1,6 +1,6 @@
 #include "test_support.h"
 #include "fault_alloc.h"
-#include "valve_private.h"
+#include "private.h"
 
 /* === ceedling valve sources (auto) === */
 TEST_SOURCE_FILE("annotations_print_.c")

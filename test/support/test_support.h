@@ -3,8 +3,8 @@
 
 #include "unity.h"
 
-#include "valve/color.h"
-#include "valve/valve.h"
+#include "color.h"
+#include "valve.h"
 
 #include <stddef.h>
 #include <stdio.h>

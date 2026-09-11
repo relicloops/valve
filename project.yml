@@ -27,19 +27,19 @@
     - +:test/**
     - -:test/support
   :source:
-    - src/core/unit
-    - src/core/unit/argv
-    - src/core/unit/option
-    - src/core/unit/conflict
-    - src/core/unit/requirement
-    - src/core/unit/result
-    - src/core/unit/schema
-    - src/core/unit/value
-    - src/core/unit/verb
+    - src/unit
+    - src/unit/argv
+    - src/unit/option
+    - src/unit/conflict
+    - src/unit/requirement
+    - src/unit/result
+    - src/unit/schema
+    - src/unit/value
+    - src/unit/verb
     - test/support
   :include:
     - include
-    - src/core
+    - src
     - test/support
   :support: []
   :libraries: []

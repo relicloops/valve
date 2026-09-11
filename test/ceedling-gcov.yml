@@ -38,7 +38,7 @@
     - HtmlDetailed
   :gcovr:
     :report_root: .
-    :report_include: "^src/core/"
+    :report_include: "^src/"
     :report_exclude: "(^|/)build/"
     :gcov_exclude: "(^|/)build/"
     :exclude_directories: "(^|/)build($|/)"

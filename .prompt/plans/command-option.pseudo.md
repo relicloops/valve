@@ -69,11 +69,11 @@ Whether `--` with no command option in scope should keep discarding the tail is 
 
 Units follow the one-function-per-file rule. Each new unit is added to the Meson source list, the canonical Ceedling list under `test/support/`, and every test-file Ceedling preamble that links the full library. No tracked generator currently synchronizes those preambles.
 
-- `include/valve/valve.h`: the three enum values, `vl_command_t`, the union member, doc comments stating the borrowed lifetime.
-- `src/core/unit/option/command_valid_.c`: the schema shape rules, called from `options_have_invalid_`.
-- `src/core/unit/option/options_command_count_.c`: counts command options in a table; `schema/validate_.c` refuses more than one across globals, verb and sub-verb.
-- `src/core/unit/option/find_command_.c`: `vl_option_find_command_` over the active scope.
-- `src/core/unit/parse.c`: the `break` at `--` calls the separately implemented `vl_parse_command_`; `parse_long_` gains the disabled-form refusal for a command option matched by name.
+- `include/valve.h`: the three enum values, `vl_command_t`, the union member, doc comments stating the borrowed lifetime.
+- `src/unit/option/command_valid_.c`: the schema shape rules, called from `options_have_invalid_`.
+- `src/unit/option/options_command_count_.c`: counts command options in a table; `schema/validate_.c` refuses more than one across globals, verb and sub-verb.
+- `src/unit/option/find_command_.c`: `vl_option_find_command_` over the active scope.
+- `src/unit/parse.c`: the `break` at `--` calls the separately implemented `vl_parse_command_`; `parse_long_` gains the disabled-form refusal for a command option matched by name.
 - `result/set_.c`, `value/clear.c`, `targets_clear.c`, `valve.c` target validity, `option/value_valid_.c`, `option/value_label_.c`, `option/label_.c`, `option/usage_print_.c`, and `help_print_.c`: command cases for copying, clearing, relationship diagnostics, usage, ordering, and targeted help.
 - `test/test_command.c`: tail captured with pointer identity into a main-style NULL-terminated argv; empty tail refused; `--help` in the tail not fired; disabled form on the name; each schema rule refused; one per chain enforced; sub-verb scope resolved; `--` without a declared option still discards; required, conflicts and requires checks; direct and `VL_TARGET_VALUE` targets survive `vl_destroy`; targets clear; help ordering and targeted help render the command form; `vl_get` kind. Branch-coverage annotations where a branch is unreachable, as the existing units carry them.
 - README, `docs/reference/README.md`, the status table in the terminology rule, and the road-map: the `--` row moves from incorrect partial behaviour to a schema-owned command tail, operands still missing.
@@ -84,7 +84,7 @@ Valve is public, on GitHub and at valve.relicloops.org, so this ships as a relea
 
 The version is `1.1.0-001`, set by the maintainer 2026-09-02. MINOR because the change adds public API without breaking any, and BUILD `-001` because the counter is monotonic across the element's life and never resets, the rule the fleet already follows in key. The local `version-bumping` rule still describes a reset on MINOR and is aligned with the fleet rule in the same change, so the next bump does not re-derive from two texts.
 
-Where the version appears, all eight active occurrences are mirrored together before the changelog: `meson.build`; `VALVE_VERSION` and `PROGRAM_VERSION` in `src/core/valve_private.h`; `project.yml`; `test/ceedling-gcov.yml`; and the README badge, wrap revision and current-tag sentence.
+Where the version appears, all eight active occurrences are mirrored together before the changelog: `meson.build`; `VALVE_VERSION` and `PROGRAM_VERSION` in `src/private.h`; `project.yml`; `test/ceedling-gcov.yml`; and the README badge, wrap revision and current-tag sentence.
 
 Sequence: source and tests green, `git-cliff --output CHANGELOG.md`, version mirrored, signed commit, annotated tag `v1.1.0-001`, GitHub Release, docs site regenerated. The README's consumer section then names `v1.1.0-001` as the tag to pin.
 

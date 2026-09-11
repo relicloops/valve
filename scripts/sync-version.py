@@ -13,7 +13,7 @@ VERSION_RE = re.compile(r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)-([0
 MIRRORS = (
     (Path("meson.build"), re.compile(r"(?<=version: ')[0-9]+\.[0-9]+\.[0-9]+-[0-9]+(?=',)"), 1),
     (
-        Path("src/core/valve_private.h"),
+        Path("src/private.h"),
         re.compile(r'(?<=#define VALVE_VERSION ")[0-9]+\.[0-9]+\.[0-9]+-[0-9]+(?=")|(?<=#define PROGRAM_VERSION ")[0-9]+\.[0-9]+\.[0-9]+-[0-9]+(?=")'),
         2,
     ),

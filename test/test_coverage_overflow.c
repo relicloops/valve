@@ -1,6 +1,6 @@
 #include "test_support.h"
 #include "fault_alloc.h"
-#include "valve_private.h"
+#include "private.h"
 
 #include <limits.h>
 #include <stdint.h>
