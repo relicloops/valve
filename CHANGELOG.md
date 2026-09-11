@@ -4,6 +4,15 @@ All notable changes to this project are documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project uses [Conventional Commits](https://www.conventionalcommits.org/).
 
+## [2.0.0-011] - 2026-09-11
+
+### Fixed
+
+- **parse**: Make key/value literals strict and predictable
+
+### Documentation
+
+- **prompt**: Drop GEMINI.md from the symlink note
 ## [1.2.0-008] - 2026-09-11
 
 ### Added

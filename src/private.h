@@ -2,10 +2,10 @@
 #define VALVE_PRIVATE_H
 
 #ifndef VALVE_VERSION
-#define VALVE_VERSION "1.2.0-008"
+#define VALVE_VERSION "2.0.0-011"
 #endif
 
-#define PROGRAM_VERSION "1.2.0-008"
+#define PROGRAM_VERSION "2.0.0-011"
 #define PROGRAM_NAME "program"
 
 #include "valve.h"
