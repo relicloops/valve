@@ -69,4 +69,13 @@ void vl_targets_clear(const vl_executable_t *settings) {
 
   clear_options_(settings->options, settings->option_count);
   clear_verbs_(settings->verbs, settings->verb_count);
+
+  if (settings->behavior & VL_BEHAVIOR_ACCEPT_NO_VERB) {
+    size_t n = action_count_(settings->actions, settings->action_count);
+
+    for (size_t i = 0; i < n; ++i) {
+      if (settings->actions[i])
+        clear_option_(&settings->actions[i]->option);
+    }
+  }
 }

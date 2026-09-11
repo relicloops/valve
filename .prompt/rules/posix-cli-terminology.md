@@ -173,6 +173,7 @@ Complete list of syntactic forms for passing values to options:
 | Conditional requirements | complete | Directed many-option ``.requires`` with ``requires``/``required by`` help | Predicate/value-based and one-of requirements are out of scope |
 | Inferred option help | complete | Signature comes from type, value, target and assignment mode | ``.usage`` remains optional supplementary guidance |
 | Verbs and sub-verbs | complete at fixed depth | Any number of verbs and sibling sub-verbs; parsing selects one verb and one nested sub-verb | Reject deeper schemas or add recursive parsing, active-path state and help |
+| Executable actions | complete extension, opt-in | With ``VL_BEHAVIOR_ACCEPT_NO_VERB``, a ``vl_executable_action_t`` table joins the reserved set: recognised at ``argv[1]`` only, parsed with ordinary option rules, dispatched through ``run`` without a verb, listed on the reserved help line | ``--help=<action>`` targeting; optional option-arguments remain unsupported |
 
 ### Missing parser implementation expense
 

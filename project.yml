@@ -28,6 +28,7 @@
     - -:test/support
   :source:
     - src/unit
+    - src/unit/action
     - src/unit/argv
     - src/unit/option
     - src/unit/conflict

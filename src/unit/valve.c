@@ -90,9 +90,17 @@ valve_t *vl_create(const vl_executable_t *settings) {
     return NULL;
   }
 
+  if (settings && vl_actions_copy_(v, settings) != 0) {
+    vl_options_clear_(v);
+    vl_settings_meta_clear_(v);
+    free(v);
+    return NULL;
+  }
+
   if (verb_count > 0 &&
       verbs_copy_(settings->verbs, verb_count, &v->verbs_,
                   &v->verb_count_) != 0) {
+    vl_actions_clear_(v);
     vl_options_clear_(v);
     vl_settings_meta_clear_(v);
     free(v);
@@ -102,6 +110,7 @@ valve_t *vl_create(const vl_executable_t *settings) {
   if (settings && vl_conflicts_copy_(v, settings) != 0) {
     vl_conflicts_clear_(v);
     vl_verbs_clear_(v);
+    vl_actions_clear_(v);
     vl_options_clear_(v);
     vl_settings_meta_clear_(v);
     free(v);
@@ -112,6 +121,7 @@ valve_t *vl_create(const vl_executable_t *settings) {
     vl_requirements_clear_(v);
     vl_conflicts_clear_(v);
     vl_verbs_clear_(v);
+    vl_actions_clear_(v);
     vl_options_clear_(v);
     vl_settings_meta_clear_(v);
     free(v);
@@ -127,6 +137,7 @@ void vl_destroy(valve_t *v) {
     return;
   vl_requirements_clear_(v);
   vl_conflicts_clear_(v);
+  vl_actions_clear_(v);
   vl_options_clear_(v);
   vl_verbs_clear_(v);
   vl_results_clear_(v);

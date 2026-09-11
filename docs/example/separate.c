@@ -29,6 +29,7 @@ typedef struct app_config {
   bool verbose;
   vl_value_t meta;
   int64_t timeout_s;
+  char *update_channel;
 } app_config_t;
 
 static app_config_t config;
@@ -257,6 +258,52 @@ static const vl_verb_t *const verbs[] = {
     NULL,
 };
 
+/* ---- executable actions (fire at argv[1], no verb) ---- */
+
+static void run_update_(const valve_t *v) {
+  (void)v;
+  fprintf(stdout, "update: would replace demo-separate with the %s release\n",
+          config.update_channel);
+}
+
+static void run_doctor_(const valve_t *v) {
+  fprintf(stdout, "doctor: action %s fired, verb = %s\n", vl_action_fired(v),
+          vl_verb_get(v) ? vl_verb_get(v) : "(none)");
+}
+
+static const vl_executable_action_t act_update = {
+    .option =
+        {
+            .name = "update",
+            .short_name = 'u',
+            .type = VL_OPT_TYPE_LONG | VL_OPT_TYPE_SHORT,
+            .value = VL_OPTION_VALUE_STRING,
+            .data = &config,
+            .offset = offsetof(app_config_t, update_channel),
+            .target = VL_TARGET_STRING,
+            .description = "Replace this binary with a release channel.",
+            .usage = "--update <channel>",
+        },
+    .run = run_update_,
+};
+
+static const vl_executable_action_t act_doctor = {
+    .option =
+        {
+            .name = "doctor",
+            .type = VL_OPT_TYPE_LONG,
+            .value = VL_OPTION_VALUE_BOOL,
+            .description = "Check this installation and exit.",
+        },
+    .run = run_doctor_,
+};
+
+static const vl_executable_action_t *const actions[] = {
+    &act_update,
+    &act_doctor,
+    NULL,
+};
+
 static void print_value_(const vl_value_t *value) {
   if (!value)
     return;
@@ -291,6 +338,13 @@ static void print_value_(const vl_value_t *value) {
       print_value_(&value->as.array.items[i]);
     }
     fputc(']', stdout);
+    break;
+  case VL_VALUE_COMMAND:
+    for (int i = 0; i < value->as.command.argc; ++i) {
+      if (i)
+        fputc(' ', stdout);
+      fputs(value->as.command.argv[i], stdout);
+    }
     break;
   }
 }
@@ -349,8 +403,10 @@ int main(int argc, char **argv) {
       .usage = "demo-separate <verb> [options]",
       .assign = VL_ASSIGN_SEPARATE,
       .color = VAL_COLOR_AUTO,
+      .behavior = VL_BEHAVIOR_ACCEPT_NO_VERB,
       .options = global_options,
       .verbs = verbs,
+      .actions = actions,
   };
 
   valve_t *v = vl_create(&settings);

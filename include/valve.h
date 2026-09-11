@@ -10,6 +10,7 @@
 typedef struct valve valve_t;
 typedef struct vl_metadata vl_metadata_t;
 typedef struct vl_option vl_option_t;
+typedef struct vl_executable_action vl_executable_action_t;
 
 typedef struct vl_verb vl_verb_t;
 
@@ -22,6 +23,13 @@ typedef enum vl_behavior {
    *  currently has no effect. vl_parse rejects ordinary positional tokens;
    *  `--` stops parsing and the remaining argv tail is ignored. */
   VL_BEHAVIOR_ACCEPT_OPERANDS = 1u << 1,
+  /** When set, the executable's `actions` table joins the reserved set:
+   *  each action is recognised at argv[1] like --help / --version / --valve,
+   *  fires without a verb, and is listed on the reserved help line.
+   *  Actions must be opted into explicitly: vl_create returns NULL when
+   *  `action_count` is non-zero and this flag is clear. With the flag set
+   *  and no actions declared, it has no effect. */
+  VL_BEHAVIOR_ACCEPT_NO_VERB = 1u << 2,
 } vl_behavior_t;
 
 typedef enum vl_assign {
@@ -72,6 +80,11 @@ typedef struct vl_executable {
 
   const vl_option_t *const *options;
   size_t option_count;
+
+  /** Executable-level actions (see vl_executable_action_t). Recognised at
+   *  argv[1] only, in the same position as --help / --version / --valve. */
+  const vl_executable_action_t *const *actions;
+  size_t action_count;
 
   void (*on_help)(const valve_t *v);
   void (*on_version)(const valve_t *v);
@@ -168,7 +181,8 @@ typedef struct vl_option {
   vl_option_repeat_t repeat;
   /** When true, vl_parse() fails with VL_ERROR_MISSING_REQUIRED if the
    *  option was never provided. Checked for globals and the active verb
-   *  chain; skipped when a reserved token (--help/--version/--valve) fires. */
+   *  chain; skipped when a reserved token (--help/--version/--valve) or an
+   *  executable action fires. */
   bool required;
   /** Options that cannot appear with this option. One declaration establishes
    *  the relationship in both directions for parsing and default help. A
@@ -187,6 +201,32 @@ typedef struct vl_option {
   int64_t int_min;
   int64_t int_max;
 } vl_option_t;
+
+/** Executable-level action: an option that acts on the executable itself
+ *  rather than on a verb's domain, in the same category as --help, --version
+ *  and --valve. Enabled by VL_BEHAVIOR_ACCEPT_NO_VERB. It is recognised at
+ *  argv[1] only, never enters the option lookup chain (`program verb --name`
+ *  is an unknown option), and once it fires no verb is required and nothing
+ *  else may follow it on the command line.
+ *
+ *  `option` is parsed with the ordinary option rules: `.type` selects
+ *  --name / -c / --enable-ref forms, `.value` decides whether a bare token is
+ *  accepted (BOOL / TOGGLE) or an option-argument is required in the
+ *  executable's assign mode, `.target` / `.data` / `.offset` and the int
+ *  bounds apply as usual, and help infers the signature from them. The
+ *  parsed value is stored under `.name` and readable with vl_get(). Fields
+ *  without meaning for an action make vl_create() return NULL when set:
+ *  `.required`, `.repeat`, `.conflicts`, `.requires`, and
+ *  VL_OPTION_VALUE_COMMAND. Names may not collide with the built-in reserved
+ *  names, another action, or a global option, regardless of
+ *  VL_BEHAVIOR_ALLOW_OVERRIDE_RESERVED. Strings are copied by vl_create;
+ *  `.data` stays caller-owned, as for options. */
+struct vl_executable_action {
+  vl_option_t option;
+  /** Required. Called after the value is stored and targets are populated;
+   *  vl_reserved_fired() and vl_action_fired() are already set inside. */
+  void (*run)(const valve_t *v);
+};
 
 typedef struct vl_kv_pair vl_kv_pair_t;
 typedef struct vl_value vl_value_t;
@@ -369,6 +409,10 @@ bool vl_reserved_fired(const valve_t *v);
 
 const char *vl_help_target(const valve_t *v);
 
+/** Name of the executable action that fired during the last vl_parse, or
+ *  NULL when none (or a built-in reserved token) fired. Parser-owned. */
+const char *vl_action_fired(const valve_t *v);
+
 size_t vl_result_count(const valve_t *v);
 
 /** Return a parser-owned result, or NULL when `index` is out of range. */
@@ -392,8 +436,9 @@ void vl_errors_foreach(const valve_t *v, vl_error_fn fn, void *userdata);
 void vl_errors_print(const valve_t *v, FILE *stream);
 
 /**
- * Walk `settings` option tables (executable globals + every verb/subverb
- * options) and clear Valve-owned target memory:
+ * Walk `settings` option tables (executable globals, every verb/subverb
+ * options, and the actions table when VL_BEHAVIOR_ACCEPT_NO_VERB is set)
+ * and clear Valve-owned target memory:
  *   VL_TARGET_STRING              → free(*(char **)ptr); *ptr = NULL
  *   VL_TARGET_VALUE / TOGGLE      → vl_value_clear
  *   VL_TARGET_COMMAND             → zero the borrowed command view

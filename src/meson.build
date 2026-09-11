@@ -4,6 +4,12 @@ if host_machine.system() == 'linux'
 endif
 
 valve_sources = files(
+  'unit/action/action_count_.c',
+  'unit/action/actions_valid_.c',
+  'unit/action/vl_action_find_.c',
+  'unit/action/vl_action_fired.c',
+  'unit/action/vl_actions_clear_.c',
+  'unit/action/vl_actions_copy_.c',
   'unit/argv/destroy.c',
   'unit/color.c',
   'unit/conflict/other_.c',

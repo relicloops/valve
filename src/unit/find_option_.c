@@ -52,6 +52,9 @@ const vl_option_t *vl_option_find_(const valve_t *v, const char *name) {
   if (!v || !name)
     return NULL;
 
+  if (v->active_action_)
+    return option_find_in_(v->active_action_, 1, name);
+
   if (v->active_subverb_) {
     opt = option_find_in_(v->active_subverb_->options,
                           v->active_subverb_->option_count, name);
@@ -76,6 +79,9 @@ const vl_option_t *vl_option_find_n_(const valve_t *v, const char *name,
   if (!v || !name)
     return NULL;
 
+  if (v->active_action_)
+    return option_find_n_in_(v->active_action_, 1, name, len);
+
   if (v->active_subverb_) {
     opt = option_find_n_in_(v->active_subverb_->options,
                             v->active_subverb_->option_count, name, len);
@@ -98,6 +104,9 @@ const vl_option_t *vl_option_find_short_(const valve_t *v, char short_name) {
 
   if (!v || short_name == '\0')
     return NULL;
+
+  if (v->active_action_)
+    return option_find_short_in_(v->active_action_, 1, short_name);
 
   if (v->active_subverb_) {
     opt = option_find_short_in_(v->active_subverb_->options,

@@ -193,6 +193,7 @@ static void print_overview_(const valve_t *v) {
     printf("\nusage:\n  %s\n", v->usage_);
 
   print_options_(v, v->options_, v->option_count_, "global options");
+  print_options_(v, v->actions_, v->action_count_, "actions");
 
   if (v->verb_count_ > 0) {
     printf("\nverbs:\n");
@@ -210,8 +211,13 @@ static void print_overview_(const valve_t *v) {
            "--help=<group>\n",
            c_(VAL_DIM), c_(VAL_RESET));
   }
-  printf("  %s↳%s reserved: --help  --version  --valve\n", c_(VAL_DIM),
+  printf("  %s↳%s reserved: --help  --version  --valve", c_(VAL_DIM),
          c_(VAL_RESET));
+  for (size_t i = 0; i < v->action_count_; ++i) {
+    printf("  ");
+    option_label_print_(&v->actions_[i], false);
+  }
+  putchar('\n');
 }
 
 void vl_help_print_default_(const valve_t *v) {

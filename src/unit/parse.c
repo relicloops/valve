@@ -137,6 +137,15 @@ static const vl_option_t *find_toggle_ref_(const valve_t *v, const char *ref) {
   if (!v || !ref) /* GCOVR_EXCL_BR_LINE: null guard */
     return NULL; /* GCOVR_EXCL_LINE */
 
+  if (v->active_action_) {
+    /* GCOVR_EXCL_BR_START — action matched by toggle_ref, so this holds */
+    if (v->active_action_->toggle_ref &&
+        strcmp(v->active_action_->toggle_ref, ref) == 0)
+      return v->active_action_;
+    /* GCOVR_EXCL_BR_STOP */
+    return NULL; /* GCOVR_EXCL_LINE */
+  }
+
   if (v->active_subverb_) {
     for (size_t i = 0; i < v->active_subverb_->option_count; ++i) {
       const vl_option_t *opt = &v->active_subverb_->options[i];
@@ -1007,6 +1016,46 @@ static int extract_reserved_target_(valve_t *v, vl_reserved_kind_t kind,
   return 0;
 }
 
+/* Executable action at argv[1]. The token is parsed with the ordinary option
+ * rules while lookup is narrowed to the matched action, then the action is
+ * dispatched like a reserved token. Returns 1 when argv[1] is not an action,
+ * 0 when it fired, -1 on error. */
+static int parse_action_(valve_t *v, int argc, char **argv) {
+  const vl_option_t *action = vl_action_find_(v, argv[1]);
+  int i = 1;
+  int rc;
+
+  if (!action)
+    return 1;
+
+  v->active_action_ = action;
+  if (argv[1][1] == '-') {
+    rc = parse_enable_disable_(v, argv[1], i);
+    if (rc == 1)
+      rc = parse_long_(v, argc, argv, &i);
+  } else {
+    rc = parse_short_(v, argc, argv, &i);
+  }
+  v->active_action_ = NULL;
+
+  if (rc < 0) {
+    (void)vl_error_add_(v, VL_ERROR_OUT_OF_MEMORY, i, NULL, "out of memory");
+    return -1;
+  }
+  if (v->error_count_)
+    return -1;
+  if (i + 1 < argc) {
+    (void)vl_error_add_(v, VL_ERROR_UNEXPECTED_ARGUMENT, i + 1, argv[i + 1],
+                        "unexpected argument after action");
+    return -1;
+  }
+
+  v->reserved_fired_ = true;
+  v->action_fired_ = action;
+  v->action_run_[action - v->actions_](v);
+  return 0;
+}
+
 int vl_parse(valve_t *v, int argc, char **argv) {
   int start = 1;
 
@@ -1018,11 +1067,19 @@ int vl_parse(valve_t *v, int argc, char **argv) {
   v->active_verb_ = NULL;
   v->active_subverb_ = NULL;
   v->reserved_fired_ = false;
+  v->active_action_ = NULL;
+  v->action_fired_ = NULL;
   v->parsed_ = true;
 
   if (argc <= 1) {
     dispatch_reserved_(v, VL_RESERVED_HELP);
     return 0;
+  }
+
+  if (v->action_count_ > 0) {
+    int rc = parse_action_(v, argc, argv);
+    if (rc <= 0)
+      return rc;
   }
 
   if (v->verb_count_ > 0) {

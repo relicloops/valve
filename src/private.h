@@ -41,6 +41,17 @@ struct valve {
   vl_option_t *options_;
   size_t option_count_;
 
+  /* Executable actions, gated by VL_BEHAVIOR_ACCEPT_NO_VERB. `actions_` is a
+   * plain option table so option copy/find/clear helpers apply unchanged;
+   * `action_run_[i]` is the callback for `actions_[i]`. `active_action_` is
+   * set only while argv[1] is being parsed as an action and narrows option
+   * lookup to that single option. */
+  vl_option_t *actions_;
+  void (**action_run_)(const valve_t *v);
+  size_t action_count_;
+  const vl_option_t *active_action_;
+  const vl_option_t *action_fired_;
+
   valve_conflict_t *conflicts_;
   size_t conflict_count_;
   size_t conflict_cap_;
@@ -266,6 +277,14 @@ int vl_result_set_(valve_t *v, const vl_option_t *opt, vl_value_t *value,
 const vl_result_t *vl_result_find_(const valve_t *v, const char *name);
 
 int vl_required_check_(valve_t *v);
+
+// action
+size_t action_count_(const vl_executable_action_t *const *actions,
+                     size_t count);
+bool actions_valid_(const vl_executable_t *settings);
+int vl_actions_copy_(valve_t *v, const vl_executable_t *settings);
+void vl_actions_clear_(valve_t *v);
+const vl_option_t *vl_action_find_(const valve_t *v, const char *token);
 
 vl_reserved_kind_t vl_reserved_kind_(const char *token);
 vl_reserved_kind_t vl_reserved_name_(const char *name);

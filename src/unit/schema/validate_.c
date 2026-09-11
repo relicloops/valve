@@ -107,6 +107,9 @@ bool vl_schema_validate_(const vl_executable_t *settings){
       return false;
   }
 
+  if (!actions_valid_(settings))
+    return false;
+
   for (size_t i = 0; i < verb_count; ++i) {
     if (!verb_entry_valid_(settings->options, global_count, nullptr, 0,
                            settings->verbs[i], allow_override))
