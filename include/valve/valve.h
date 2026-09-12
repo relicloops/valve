@@ -1,7 +1,7 @@
 #ifndef VALVE_H
 #define VALVE_H
 
-#include "color.h"
+#include "valve/color.h"
 
 #include <stddef.h>
 #include <stdint.h>

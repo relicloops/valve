@@ -42,7 +42,7 @@ valve-demo/
 Declare the accepted options, give the schema to Valve, and parse:
 
 ```c
-#include "valve.h"
+#include "valve/valve.h"
 
 #include <stdio.h>
 
@@ -158,7 +158,7 @@ meson compile -C build
 meson install -C build
 ```
 
-This installs `libvalve`, the public headers under `include/valve`, and `valve.pc`, whose `--cflags` point at that directory so consumers include `"valve.h"` directly. Meson can then consume the installed Valve directly:
+This installs `libvalve`, the public headers under `include/valve`, and `valve.pc`; consumers include `"valve/valve.h"`. Meson can then consume the installed Valve directly:
 
 ```meson
 valve_dep = dependency('valve')

@@ -49,7 +49,7 @@
           Experimental <code>1.1.0-001</code> adds schema-owned command tails after
           <code>--</code>. The signed tag and experimental prerelease are published,
           tag CI is green, and the public docs remain live at <code>valve.relicloops.org</code>.
-          Lines <strong>100.0%</strong> on <code>src</code> (3187/3187 via Ceedling gcov); Functions <strong>100.0%</strong> — 210/210; Branches <strong>100.0%</strong> — 1851/1851.
+          Lines <strong>100.0%</strong> on <code>src/valve</code> (3187/3187 via Ceedling gcov); Functions <strong>100.0%</strong> — 210/210; Branches <strong>100.0%</strong> — 1851/1851.
         </p>
       </div>
       <div class="card">
@@ -69,7 +69,7 @@
           <h3>Version <code>1.1.0-001</code> · experimental <code>1.x</code></h3>
           <p>
             Installable <code>libvalve</code> / <code>valve.pc</code> / <code>valve_dep</code>.
-            Headers under <code>include/</code>. Ceedling tests in <code>test/</code> (31 files).
+            Headers under <code>include/valve/</code>. Ceedling tests in <code>test/</code> (31 files).
             Docs: README + <code>docs/example/</code> + <code>docs/reference/</code>.
             Durations, requires, conflicts, color probes, and schema-owned command tails are shipped. Operands remain unimplemented.
             CI is Meson-first: configure writes the Ceedling toolchain; <code>meson test</code> runs
@@ -117,7 +117,7 @@
             </div>
           </div>
           <div class="readiness__card reveal">
-            <span class="card__index">line coverage · src</span>
+            <span class="card__index">line coverage · src/valve</span>
             <h3>100% · 99.9% ✓</h3>
             <p class="readiness__note">
               Measured Ceedling gcov: Lines <strong>100.0%</strong> — 3187/3187;
@@ -407,7 +407,7 @@
           <ul class="checklist">
             <li>Stable status</li>
             <li>Operands implementation</li>
-            <li class="is-done">99.9% line coverage (met at <strong>100%</strong> on <code>src</code>)</li>
+            <li class="is-done">99.9% line coverage (met at <strong>100%</strong> on <code>src/valve</code>)</li>
             <li class="is-done">Live <code>valve.relicloops.org</code> docs site (shipped after the tag)</li>
             <li>Distro packages</li>
           </ul>

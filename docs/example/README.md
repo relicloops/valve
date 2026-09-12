@@ -11,7 +11,7 @@ Both programs define global options, a `network` verb, and a nested `page add` c
 
 ## Link Valve
 
-The local [`meson.build`](meson.build) resolves Valve with `dependency('valve')` and passes the resulting dependency to both executables. Meson reads the installed `valve.pc`, adds the public `include/valve` path so `#include "valve.h"` resolves, and links the platform-standard `libvalve` library name. The wrap fallback exposes the same flat `include/` layout.
+The local [`meson.build`](meson.build) resolves Valve with `dependency('valve')` and passes the resulting dependency to both executables. Meson reads the installed `valve.pc`, adds the public include path so `#include "valve/valve.h"` resolves, and links the platform-standard `libvalve` library name. The wrap fallback exposes the same `include/` root.
 
 Install Valve from the repository root before configuring the examples:
 

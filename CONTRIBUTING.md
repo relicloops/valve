@@ -64,13 +64,13 @@ meson devenv -C build
 valve-ceedling test:all
 ```
 
-Static project layout lives in [`project.yml`](project.yml). Coverage plugin and report settings live in [`test/ceedling-gcov.yml`](test/ceedling-gcov.yml). Tool executables and argument tables are generated only by Meson. Each `test/test_*.c` lists Valve units via `TEST_SOURCE_FILE`. Keep unit basenames unique under `src/unit/` so object files do not collide. CMock is disabled; OOM paths use custom alloc fault injection in `test/support/` when needed.
+Static project layout lives in [`project.yml`](project.yml). Coverage plugin and report settings live in [`test/ceedling-gcov.yml`](test/ceedling-gcov.yml). Tool executables and argument tables are generated only by Meson. Each `test/test_*.c` lists Valve units via `TEST_SOURCE_FILE`. Keep unit basenames unique under `src/valve/tu/` so object files do not collide. CMock is disabled; OOM paths use custom alloc fault injection in `test/support/` when needed.
 
 ## CI
 
 GitHub Actions runs the Meson-to-Ceedling workflow with GCC and Clang on **Ubuntu** plus Clang on **macOS**. Every runner requires the tests and gcovr HTML report to succeed, then uploads its report as a workflow artifact. The workflow runs on version tags matching `v[0-9]+.[0-9]+.[0-9]+-[0-9]+` (for example, `v1.0.0-000`; bare `v1.0.0` is not a release tag) and through manual `workflow_dispatch`; see [the CI workflow](.github/workflows/ci.yml).
 
-Valve’s own version string is always `MAJOR.MINOR.PATCH-BUILD`. `VERSION` is the authoritative release value; after reserving it, run `scripts/sync-version.py` to update the build and test mirrors in `meson.build`, `project.yml`, `test/ceedling-gcov.yml`, and `src/private.h`. The build refuses a mismatch between `VERSION` and `meson.build`, and `vl_version_get()` reports that synchronized value. Public README tag references move only when that tag is actually published.
+Valve’s own version string is always `MAJOR.MINOR.PATCH-BUILD`. `VERSION` is the authoritative release value; after reserving it, run `scripts/sync-version.py` to update the build and test mirrors in `meson.build`, `project.yml`, `test/ceedling-gcov.yml`, and `src/valve/private.h`. The build refuses a mismatch between `VERSION` and `meson.build`, and `vl_version_get()` reports that synchronized value. Public README tag references move only when that tag is actually published.
 
 Before opening a PR, run the same build and test entry points locally:
 
@@ -82,6 +82,6 @@ meson test -C build --print-errorlogs
 
 ## Code expectations
 
-- Match existing style under `include/` and `src/unit/`.
+- Match existing style under `include/valve/` and `src/valve/tu/`.
 - Prefer Ceedling tests for new public helpers.
 - Keep experimental honesty: document breaking or unfinished behaviour in the PR summary.

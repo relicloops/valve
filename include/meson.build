@@ -1,7 +1,7 @@
 inc = include_directories('.')
 
 install_headers(
-  'color.h',
-  'valve.h',
+  'valve/color.h',
+  'valve/valve.h',
   subdir: 'valve',
 )

@@ -27,20 +27,20 @@
     - +:test/**
     - -:test/support
   :source:
-    - src/unit
-    - src/unit/action
-    - src/unit/argv
-    - src/unit/option
-    - src/unit/conflict
-    - src/unit/requirement
-    - src/unit/result
-    - src/unit/schema
-    - src/unit/value
-    - src/unit/verb
+    - src/valve/tu
+    - src/valve/tu/action
+    - src/valve/tu/argv
+    - src/valve/tu/option
+    - src/valve/tu/conflict
+    - src/valve/tu/requirement
+    - src/valve/tu/result
+    - src/valve/tu/schema
+    - src/valve/tu/value
+    - src/valve/tu/verb
     - test/support
   :include:
     - include
-    - src
+    - src/valve
     - test/support
   :support: []
   :libraries: []

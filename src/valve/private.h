@@ -8,7 +8,7 @@
 #define PROGRAM_VERSION "2.0.0-011"
 #define PROGRAM_NAME "program"
 
-#include "valve.h"
+#include "valve/valve.h"
 
 #include <locale.h>
 

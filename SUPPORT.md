@@ -19,7 +19,7 @@ the community.
 * [README](README.md)
 * [Reference](docs/reference/README.md)
 * [Examples](docs/example/README.md)
-* Public headers under `include/`
+* Public headers under `include/valve/`
 
 ## What we do not offer
 
