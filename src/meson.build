@@ -1,7 +1,4 @@
 valve_c_args = ['-DVALVE_VERSION="' + valve_version + '"']
-if host_machine.system() == 'linux'
-  valve_c_args += '-D_GNU_SOURCE'
-endif
 
 valve_sources = files(
   'valve/tu/action/action_count_.c',
