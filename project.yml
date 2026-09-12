@@ -70,7 +70,7 @@
         - -Drealloc=vl_test_realloc
         - -Dstrdup=vl_test_strdup
         - -Dstrndup=vl_test_strndup
-        - -DVALVE_VERSION=\"2.0.0-011\"
+        - -DVALVE_VERSION=\"2.0.1-014\"
     :link:
       # openpty (color TTY probes) lives in libutil on Linux and macOS.
       - -lutil

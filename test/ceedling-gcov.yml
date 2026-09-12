@@ -22,7 +22,7 @@
       - -Dstrdup=vl_test_strdup
       - -Dstrndup=vl_test_strndup
       - --coverage
-      - -DVALVE_VERSION=\"2.0.0-011\"
+      - -DVALVE_VERSION=\"2.0.1-014\"
     :link:
       - --coverage
       # openpty (color TTY probes) lives in libutil on Linux and macOS.

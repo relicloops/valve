@@ -5,7 +5,7 @@
 [![CI](https://github.com/relicloops/valve/actions/workflows/ci.yml/badge.svg)](https://github.com/relicloops/valve/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Status](https://img.shields.io/badge/status-experimental-orange.svg)](#valve)
-[![Version](https://img.shields.io/badge/version-2.0.0--011-lightgrey.svg)](meson.build)
+[![Version](https://img.shields.io/badge/version-2.0.1--014-lightgrey.svg)](meson.build)
 [![Linux](https://img.shields.io/badge/Linux-supported-FCC624?logo=linux&logoColor=black)](.github/workflows/ci.yml)
 [![macOS](https://img.shields.io/badge/macOS-supported-000000?logo=apple&logoColor=white)](.github/workflows/ci.yml)
 
@@ -96,10 +96,10 @@ Valve consumers pin a version tag rather than tracking `main`:
 [wrap-git]
 directory = valve
 url = https://github.com/relicloops/valve.git
-revision = v2.0.0-011
+revision = v2.0.1-014
 ```
 
-`v2.0.0-011` is the current published tag. When upgrading, change `revision` to the latest published Valve version tag.
+`v2.0.1-014` is the current published tag. When upgrading, change `revision` to the latest published Valve version tag.
 
 ### `meson.build`
 
