@@ -110,8 +110,8 @@ static void print_subverb_card_(const valve_t *v, const valve_verb_t *verb,
 
 static void print_option_card_(const valve_t *v,
                                const vl_help_internal_t *res) {
-  const char *verb = res->verb ? res->verb->name : NULL;
-  const char *sub = res->subverb ? res->subverb->name : NULL;
+  const char *verb = res->verb ? res->verb->name : nullptr;
+  const char *sub = res->subverb ? res->subverb->name : nullptr;
   char owner[96];
 
   if (verb && sub)

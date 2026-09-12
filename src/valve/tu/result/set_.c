@@ -22,7 +22,7 @@ static int value_clone_(vl_value_t *dst, const vl_value_t *src) {
   } else if (src->kind == VL_VALUE_COMMAND) {
     dst->as.command = src->as.command;
   } else if (src->kind == VL_VALUE_KV) {
-    vl_kv_pair_t *pairs = NULL;
+    vl_kv_pair_t *pairs = nullptr;
 
     if (src->as.kv.count > 0) {
       pairs = calloc(src->as.kv.count, sizeof(vl_kv_pair_t));
@@ -41,7 +41,7 @@ static int value_clone_(vl_value_t *dst, const vl_value_t *src) {
         goto fail;
     }
   } else if (src->kind == VL_VALUE_ARRAY) {
-    vl_value_t *items = NULL;
+    vl_value_t *items = nullptr;
 
     if (src->as.array.count > 0) {
       items = calloc(src->as.array.count, sizeof(vl_value_t));
@@ -67,7 +67,7 @@ fail:
 
 static void *target_ptr_(const vl_option_t *opt) {
   if (!opt->data || opt->target == VL_TARGET_NONE)
-    return NULL;
+    return nullptr;
 
   return (char *)opt->data + opt->offset;
 }
@@ -203,7 +203,7 @@ int vl_result_set_(valve_t *v, const vl_option_t *opt, vl_value_t *value,
         }
 
         bool is_wrapped_list = v->results_[i].value.kind == VL_VALUE_ARRAY &&
-                               v->results_[i].value.raw == NULL;
+                               v->results_[i].value.raw == nullptr;
         if (is_wrapped_list)
           return append_array_(&v->results_[i], value, argv_index) == 0
                      ? target_set_(v, opt, &v->results_[i].value, argv_index)

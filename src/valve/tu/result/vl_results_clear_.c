@@ -11,7 +11,7 @@ void vl_results_clear_(valve_t *v) {
     vl_value_clear(&v->results_[i].value);
   }
   free(v->results_);
-  v->results_ = NULL;
+  v->results_ = nullptr;
   v->result_count_ = 0;
   v->result_cap_ = 0;
 }

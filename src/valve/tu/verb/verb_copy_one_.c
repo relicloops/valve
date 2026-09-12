@@ -35,9 +35,9 @@ static int verb_copy_one_(const vl_verb_t *src, valve_verb_t *dst) {
 
 int verbs_copy_(const vl_verb_t *const *src, size_t count, valve_verb_t **dst,
                 size_t *dst_count) {
-  valve_verb_t *verbs = NULL;
+  valve_verb_t *verbs = nullptr;
 
-  *dst = NULL;
+  *dst = nullptr;
   *dst_count = 0;
 
   if (count == 0)

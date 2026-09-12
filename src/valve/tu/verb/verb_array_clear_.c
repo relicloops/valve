@@ -30,8 +30,8 @@ void vl_verbs_clear_(valve_t *v) {
 
   verb_array_clear_(v->verbs_, v->verb_count_);
   free(v->verbs_);
-  v->verbs_ = NULL;
+  v->verbs_ = nullptr;
   v->verb_count_ = 0;
-  v->active_verb_ = NULL;
-  v->active_subverb_ = NULL;
+  v->active_verb_ = nullptr;
+  v->active_subverb_ = nullptr;
 }

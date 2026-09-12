@@ -3,7 +3,6 @@
 #include <ctype.h>
 #include <errno.h>
 #include <math.h>
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -135,7 +134,7 @@ static int bool_value_(valve_t *v, const vl_option_t *opt, bool enabled,
 
 static const vl_option_t *find_toggle_ref_(const valve_t *v, const char *ref) {
   if (!v || !ref) /* GCOVR_EXCL_BR_LINE: null guard */
-    return NULL; /* GCOVR_EXCL_LINE */
+    return nullptr; /* GCOVR_EXCL_LINE */
 
   if (v->active_action_) {
     /* GCOVR_EXCL_BR_START — action matched by toggle_ref, so this holds */
@@ -143,7 +142,7 @@ static const vl_option_t *find_toggle_ref_(const valve_t *v, const char *ref) {
         strcmp(v->active_action_->toggle_ref, ref) == 0)
       return v->active_action_;
     /* GCOVR_EXCL_BR_STOP */
-    return NULL; /* GCOVR_EXCL_LINE */
+    return nullptr; /* GCOVR_EXCL_LINE */
   }
 
   if (v->active_subverb_) {
@@ -170,11 +169,11 @@ static const vl_option_t *find_toggle_ref_(const valve_t *v, const char *ref) {
     /* GCOVR_EXCL_BR_STOP */
   }
 
-  return NULL;
+  return nullptr;
 }
 
 static int parse_enable_disable_(valve_t *v, const char *arg, int argv_index) {
-  const char *ref = NULL;
+  const char *ref = nullptr;
   bool enabled = false;
 
   if (!is_enable_disable_(arg, &ref, &enabled))
@@ -204,7 +203,7 @@ static bool token_has_double_mark_(const char *raw) {
 }
 
 static bool parse_int_(const char *raw, int64_t *out) {
-  char *end = NULL;
+  char *end = nullptr;
   long long value = 0;
 
   if (!raw || raw[0] == '\0' || isspace((unsigned char)raw[0])) /* GCOVR_EXCL_BR_LINE: null raw unreachable via assign */
@@ -220,7 +219,7 @@ static bool parse_int_(const char *raw, int64_t *out) {
 }
 
 static bool parse_double_(const char *raw, double *out) {
-  char *end = NULL;
+  char *end = nullptr;
   double value = 0.0;
 
   if (!raw || raw[0] == '\0' || isspace((unsigned char)raw[0])) /* GCOVR_EXCL_BR_LINE: null raw unreachable via assign */
@@ -411,7 +410,7 @@ static int parse_array_element_(const char **cursor, vl_value_t *value,
   const char *start = *cursor;
   const char *p = start;
 
-  *message = NULL;
+  *message = nullptr;
 
   if (*p == '"') {
     start = ++p;
@@ -491,7 +490,7 @@ static int array_value_(valve_t *v, const vl_option_t *opt, const char *raw,
   const char *cursor = raw;
   while (*cursor) {
     vl_value_t element = {0};
-    const char *message = NULL;
+    const char *message = nullptr;
     int rc = parse_array_element_(&cursor, &element, &message);
 
     if (rc == -2) {
@@ -549,7 +548,7 @@ static int parse_long_(valve_t *v, int argc, char **argv, int *index) {
   const char *arg = argv[*index];
   const char *name = arg + 2;
   const char *eq = strchr(name, '=');
-  const vl_option_t *opt = NULL;
+  const vl_option_t *opt = nullptr;
   int flag_index = *index;
 
   if (eq) {
@@ -696,7 +695,7 @@ static vl_reserved_kind_t parse_reserved_token_(const char *token,
                                                 reserved_token_form_t *form,
                                                 const char **target) {
   *form = RESERVED_TOKEN_BARE;
-  *target = NULL;
+  *target = nullptr;
   if (!token) /* GCOVR_EXCL_BR_LINE: null guard */
     return VL_RESERVED_NONE; /* GCOVR_EXCL_LINE */
 
@@ -817,7 +816,7 @@ static int dispatch_reserved_with_target_(valve_t *v, vl_reserved_kind_t kind,
     v->help_target_ = strdup(target);
   } else {
     free(v->help_target_);
-    v->help_target_ = NULL;
+    v->help_target_ = nullptr;
   }
   (void)argv_index;
   dispatch_reserved_(v, kind);
@@ -832,11 +831,11 @@ static int extract_reserved_target_(valve_t *v, vl_reserved_kind_t kind,
                                     char **argv, int i, const char *target_in,
                                     const char **target_out,
                                     bool *consumed_extra) {
-  *target_out = NULL;
+  *target_out = nullptr;
   *consumed_extra = false;
 
   if (kind != VL_RESERVED_HELP) {
-    if (target_in != NULL) {
+    if (target_in != nullptr) {
       (void)vl_error_add_(v, VL_ERROR_UNEXPECTED_ARGUMENT, i, argv[i],
                           "reserved token does not accept a value");
       return -1;
@@ -895,10 +894,10 @@ static int parse_action_(valve_t *v, int argc, char **argv) {
   } else {
     rc = parse_short_(v, argc, argv, &i);
   }
-  v->active_action_ = NULL;
+  v->active_action_ = nullptr;
 
   if (rc < 0) {
-    (void)vl_error_add_(v, VL_ERROR_OUT_OF_MEMORY, i, NULL, "out of memory");
+    (void)vl_error_add_(v, VL_ERROR_OUT_OF_MEMORY, i, nullptr, "out of memory");
     return -1;
   }
   if (v->error_count_)
@@ -923,11 +922,11 @@ int vl_parse(valve_t *v, int argc, char **argv) {
 
   vl_results_clear_(v);
   vl_errors_clear_(v);
-  v->active_verb_ = NULL;
-  v->active_subverb_ = NULL;
+  v->active_verb_ = nullptr;
+  v->active_subverb_ = nullptr;
   v->reserved_fired_ = false;
-  v->active_action_ = NULL;
-  v->action_fired_ = NULL;
+  v->active_action_ = nullptr;
+  v->action_fired_ = nullptr;
   v->parsed_ = true;
 
   if (argc <= 1) {
@@ -942,20 +941,20 @@ int vl_parse(valve_t *v, int argc, char **argv) {
   }
 
   if (v->verb_count_ > 0) {
-    const char *command_name = argc > 1 ? argv[1] : NULL; /* GCOVR_EXCL_BR_LINE: argc>1 always here */
+    const char *command_name = argc > 1 ? argv[1] : nullptr; /* GCOVR_EXCL_BR_LINE: argc>1 always here */
 
     /* GCOVR_EXCL_BR_START — null argv[1] / empty-command short-circuit */
     if (!command_name || command_name[0] == '\0' ||
         looks_like_option_(command_name)) {
       if (command_name) { /* GCOVR_EXCL_BR_LINE: null command_name */
         reserved_token_form_t form = RESERVED_TOKEN_BARE;
-        const char *target_in = NULL;
+        const char *target_in = nullptr;
         vl_reserved_kind_t k =
             parse_reserved_token_(command_name, &form, &target_in);
         /* GCOVR_EXCL_BR_START — reserved vs user-option race */
         if (k != VL_RESERVED_NONE &&
             !user_has_option_for_token_(v, command_name)) {
-          const char *target = NULL;
+          const char *target = nullptr;
           bool consumed = false;
           if (extract_reserved_target_(v, k, form, argc, argv, 1, target_in,
                                        &target, &consumed) != 0)
@@ -966,7 +965,7 @@ int vl_parse(valve_t *v, int argc, char **argv) {
         }
         /* GCOVR_EXCL_BR_STOP */
       }
-      (void)vl_error_add_(v, VL_ERROR_MISSING_COMMAND, 1, NULL,
+      (void)vl_error_add_(v, VL_ERROR_MISSING_COMMAND, 1, nullptr,
                           "missing verb");
       return -1;
     }
@@ -975,11 +974,11 @@ int vl_parse(valve_t *v, int argc, char **argv) {
     v->active_verb_ = vl_verb_find_(v, command_name);
     if (!v->active_verb_) {
       reserved_token_form_t form = RESERVED_TOKEN_BARE;
-      const char *target_in = NULL;
+      const char *target_in = nullptr;
       vl_reserved_kind_t k =
           parse_reserved_token_(command_name, &form, &target_in);
       if (k != VL_RESERVED_NONE) {
-        const char *target = NULL;
+        const char *target = nullptr;
         bool consumed = false;
         if (extract_reserved_target_(v, k, form, argc, argv, 1, target_in,
                                      &target, &consumed) != 0)
@@ -996,19 +995,19 @@ int vl_parse(valve_t *v, int argc, char **argv) {
     start = 2;
 
     if (v->active_verb_->verb_count > 0) {
-      const char *subverb_name = argc > 2 ? argv[2] : NULL;
+      const char *subverb_name = argc > 2 ? argv[2] : nullptr;
 
       if (!subverb_name || subverb_name[0] == '\0' ||
           looks_like_option_(subverb_name)) {
         if (subverb_name) {
           reserved_token_form_t form = RESERVED_TOKEN_BARE;
-          const char *target_in = NULL;
+          const char *target_in = nullptr;
           vl_reserved_kind_t k =
               parse_reserved_token_(subverb_name, &form, &target_in);
           /* GCOVR_EXCL_BR_START — reserved vs user-option race on subverb */
           if (k != VL_RESERVED_NONE &&
               !user_has_option_for_token_(v, subverb_name)) {
-            const char *target = NULL;
+            const char *target = nullptr;
             bool consumed = false;
             if (extract_reserved_target_(v, k, form, argc, argv, 2, target_in,
                                          &target, &consumed) != 0)
@@ -1041,22 +1040,22 @@ int vl_parse(valve_t *v, int argc, char **argv) {
     int rc = 0;
 
     if (!arg || arg[0] == '\0') {
-      rc = vl_error_add_(v, VL_ERROR_UNEXPECTED_ARGUMENT, i, NULL,
+      rc = vl_error_add_(v, VL_ERROR_UNEXPECTED_ARGUMENT, i, nullptr,
                          "empty argument");
     } else if (strcmp(arg, "--") == 0) {
       rc = vl_parse_command_(v, argc, argv, i);
       if (rc < 0) {
-        (void)vl_error_add_(v, VL_ERROR_OUT_OF_MEMORY, i, NULL,
+        (void)vl_error_add_(v, VL_ERROR_OUT_OF_MEMORY, i, nullptr,
                             "out of memory");
         return -1;
       }
       break;
     } else {
       reserved_token_form_t form = RESERVED_TOKEN_BARE;
-      const char *target_in = NULL;
+      const char *target_in = nullptr;
       vl_reserved_kind_t k = parse_reserved_token_(arg, &form, &target_in);
       if (k != VL_RESERVED_NONE && !user_has_option_for_token_(v, arg)) {
-        const char *target = NULL;
+        const char *target = nullptr;
         bool consumed = false;
         if (extract_reserved_target_(v, k, form, argc, argv, i, target_in,
                                      &target, &consumed) != 0)
@@ -1073,13 +1072,13 @@ int vl_parse(valve_t *v, int argc, char **argv) {
       } else if (arg[0] == '-' && arg[1] != '\0') {
         rc = parse_short_(v, argc, argv, &i);
       } else {
-        rc = vl_error_add_(v, VL_ERROR_UNEXPECTED_ARGUMENT, i, NULL,
+        rc = vl_error_add_(v, VL_ERROR_UNEXPECTED_ARGUMENT, i, nullptr,
                            "unexpected positional argument");
       }
     }
 
     if (rc < 0) {
-      (void)vl_error_add_(v, VL_ERROR_OUT_OF_MEMORY, i, NULL, "out of memory");
+      (void)vl_error_add_(v, VL_ERROR_OUT_OF_MEMORY, i, nullptr, "out of memory");
       return -1;
     }
   }
@@ -1088,17 +1087,17 @@ int vl_parse(valve_t *v, int argc, char **argv) {
     return -1;
 
   if (vl_required_check_(v) != 0) {
-    (void)vl_error_add_(v, VL_ERROR_OUT_OF_MEMORY, 0, NULL, "out of memory");
+    (void)vl_error_add_(v, VL_ERROR_OUT_OF_MEMORY, 0, nullptr, "out of memory");
     return -1;
   }
 
   if (vl_requirements_check_(v) != 0) {
-    (void)vl_error_add_(v, VL_ERROR_OUT_OF_MEMORY, 0, NULL, "out of memory");
+    (void)vl_error_add_(v, VL_ERROR_OUT_OF_MEMORY, 0, nullptr, "out of memory");
     return -1;
   }
 
   if (vl_conflicts_check_(v) != 0) {
-    (void)vl_error_add_(v, VL_ERROR_OUT_OF_MEMORY, 0, NULL, "out of memory");
+    (void)vl_error_add_(v, VL_ERROR_OUT_OF_MEMORY, 0, nullptr, "out of memory");
     return -1;
   }
 

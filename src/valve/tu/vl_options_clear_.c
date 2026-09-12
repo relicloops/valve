@@ -12,7 +12,7 @@ void vl_options_clear_(valve_t *v) {
     free((char *)v->options_[i].usage);
   }
   free(v->options_);
-  v->options_ = NULL;
+  v->options_ = nullptr;
   v->option_count_ = 0;
 }
 
@@ -28,16 +28,16 @@ void vl_settings_meta_clear_(valve_t *v) {
   free(v->usage_);
   free(v->logo_);
   free(v->help_target_);
-  v->program_name_ = NULL;
-  v->program_version_ = NULL;
-  v->description_ = NULL;
-  v->usage_ = NULL;
-  v->logo_ = NULL;
-  v->help_target_ = NULL;
+  v->program_name_ = nullptr;
+  v->program_version_ = nullptr;
+  v->description_ = nullptr;
+  v->usage_ = nullptr;
+  v->logo_ = nullptr;
+  v->help_target_ = nullptr;
   v->behavior_ = 0;
-  v->on_help_ = NULL;
-  v->on_version_ = NULL;
-  v->on_valve_ = NULL;
+  v->on_help_ = nullptr;
+  v->on_version_ = nullptr;
+  v->on_valve_ = nullptr;
 }
 
 void vl_errors_clear_(valve_t *v) {
@@ -49,7 +49,7 @@ void vl_errors_clear_(valve_t *v) {
     free((char *)v->errors_[i].message);
   }
   free(v->errors_);
-  v->errors_ = NULL;
+  v->errors_ = nullptr;
   v->error_count_ = 0;
   v->error_cap_ = 0;
 }

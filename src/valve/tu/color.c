@@ -46,7 +46,7 @@ static bool str_eq_(const char *a, const char *b) {
 
 static bool str_contains_(const char *hay, const char *needle) {
   /* GCOVR_EXCL_BR_START — callers pass env_ "" / string literals, never NULL */
-  return hay && needle && strstr(hay, needle) != NULL;
+  return hay && needle && strstr(hay, needle) != nullptr;
   /* GCOVR_EXCL_BR_STOP */
 }
 
@@ -56,7 +56,7 @@ static void probe_tty_(void) {
 }
 
 static void probe_utf8_(void) {
-  const char *codeset = NULL;
+  const char *codeset = nullptr;
 
   setlocale(LC_CTYPE, "");
   codeset = nl_langinfo(CODESET);
@@ -135,7 +135,7 @@ static vl_color_support_t detect_color_env_(vl_color_mode_t mode,
 
   const char *term_program = env_("TERM_PROGRAM");
   static const char *const truecolor_programs[] = {
-      "iTerm.app", "Apple_Terminal", "Hyper", "vscode", NULL};
+      "iTerm.app", "Apple_Terminal", "Hyper", "vscode", nullptr};
   for (size_t i = 0; truecolor_programs[i]; ++i) {
     if (str_eq_(term_program, truecolor_programs[i]))
       return VL_COLOR_SUPPORT_TRUECOLOR;
@@ -160,7 +160,7 @@ static vl_color_support_t detect_color_env_(vl_color_mode_t mode,
 
   static const char *const color256_terms[] = {
       "xterm", "screen", "tmux", "rxvt", "linux", "ansi", "vt100", "vt220",
-      NULL};
+      nullptr};
   for (size_t i = 0; color256_terms[i]; ++i) {
     if (str_contains_(term, color256_terms[i]))
       return VL_COLOR_SUPPORT_256;
@@ -173,7 +173,7 @@ static vl_color_support_t detect_color_env_(vl_color_mode_t mode,
 static bool detect_hyperlinks_(void) {
   const char *term_program = env_("TERM_PROGRAM");
   static const char *const hyperlink_programs[] = {"iTerm.app", "Hyper",
-                                                   "vscode", NULL};
+                                                   "vscode", nullptr};
   for (size_t i = 0; hyperlink_programs[i]; ++i) {
     if (str_eq_(term_program, hyperlink_programs[i]))
       return true;

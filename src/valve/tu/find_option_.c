@@ -5,7 +5,7 @@
 static const vl_option_t *option_find_in_(const vl_option_t *options,
                                           size_t count, const char *name) {
   if (!options || !name) /* GCOVR_EXCL_BR_LINE: callers never pass null name; null options only with count 0 */
-    return NULL;
+    return nullptr;
 
   for (size_t i = 0; i < count; ++i) {
     if (strcmp(options[i].name, name) == 0) {
@@ -13,14 +13,14 @@ static const vl_option_t *option_find_in_(const vl_option_t *options,
     }
   }
 
-  return NULL;
+  return nullptr;
 }
 
 static const vl_option_t *option_find_n_in_(const vl_option_t *options,
                                             size_t count, const char *name,
                                             size_t len) {
   if (!options || !name) /* GCOVR_EXCL_BR_LINE: callers never pass null name */
-    return NULL;
+    return nullptr;
 
   for (size_t i = 0; i < count; ++i) {
     if (strlen(options[i].name) == len &&
@@ -29,13 +29,13 @@ static const vl_option_t *option_find_n_in_(const vl_option_t *options,
     }
   }
 
-  return NULL;
+  return nullptr;
 }
 
 static const vl_option_t *option_find_short_in_(const vl_option_t *options,
                                                 size_t count, char short_name) {
   if (!options || short_name == '\0') /* GCOVR_EXCL_BR_LINE: null options only with count 0 */
-    return NULL;
+    return nullptr;
 
   for (size_t i = 0; i < count; ++i) {
     if (options[i].short_name == short_name) {
@@ -43,14 +43,14 @@ static const vl_option_t *option_find_short_in_(const vl_option_t *options,
     }
   }
 
-  return NULL;
+  return nullptr;
 }
 
 const vl_option_t *vl_option_find_(const valve_t *v, const char *name) {
-  const vl_option_t *opt = NULL;
+  const vl_option_t *opt = nullptr;
 
   if (!v || !name)
-    return NULL;
+    return nullptr;
 
   if (v->active_action_)
     return option_find_in_(v->active_action_, 1, name);
@@ -74,10 +74,10 @@ const vl_option_t *vl_option_find_(const valve_t *v, const char *name) {
 
 const vl_option_t *vl_option_find_n_(const valve_t *v, const char *name,
                                      size_t len) {
-  const vl_option_t *opt = NULL;
+  const vl_option_t *opt = nullptr;
 
   if (!v || !name)
-    return NULL;
+    return nullptr;
 
   if (v->active_action_)
     return option_find_n_in_(v->active_action_, 1, name, len);
@@ -100,10 +100,10 @@ const vl_option_t *vl_option_find_n_(const valve_t *v, const char *name,
 }
 
 const vl_option_t *vl_option_find_short_(const valve_t *v, char short_name) {
-  const vl_option_t *opt = NULL;
+  const vl_option_t *opt = nullptr;
 
   if (!v || short_name == '\0')
-    return NULL;
+    return nullptr;
 
   if (v->active_action_)
     return option_find_short_in_(v->active_action_, 1, short_name);
@@ -130,7 +130,7 @@ const vl_option_t *vl_option_find_short_(const valve_t *v, char short_name) {
 const valve_verb_t *verb_find_in_(const valve_verb_t *verbs, size_t count,
                                   const char *name) {
   if (!verbs || !name) /* GCOVR_EXCL_BR_LINE: null name not passed by callers */
-    return NULL;
+    return nullptr;
 
   for (size_t i = 0; i < count; ++i) {
     if (strcmp(verbs[i].name, name) == 0) {
@@ -138,12 +138,12 @@ const valve_verb_t *verb_find_in_(const valve_verb_t *verbs, size_t count,
     }
   }
 
-  return NULL;
+  return nullptr;
 }
 
 const valve_verb_t *vl_verb_find_(const valve_t *v, const char *name) {
   if (!v || !name)
-    return NULL;
+    return nullptr;
 
   return verb_find_in_(v->verbs_, v->verb_count_, name);
 }

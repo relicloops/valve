@@ -5,10 +5,10 @@
 
 int options_copy_(const vl_option_t *const *src, size_t count,
                          vl_option_t **dst, size_t *dst_count) {
-  vl_option_t *options = NULL;
+  vl_option_t *options = nullptr;
   size_t copied = 0;
 
-  *dst = NULL;
+  *dst = nullptr;
   *dst_count = 0;
 
   if (count == 0)
@@ -21,8 +21,8 @@ int options_copy_(const vl_option_t *const *src, size_t count,
   for (size_t i = 0; i < count; ++i) {
     options[i] = *src[i];
     options[i].name = strdup(src[i]->name);
-    options[i].description = NULL;
-    options[i].usage = NULL;
+    options[i].description = nullptr;
+    options[i].usage = nullptr;
     options[i].conflicts = nullptr;
     options[i].conflict_count = 0;
     options[i].requires = nullptr;

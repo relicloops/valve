@@ -4,7 +4,7 @@
 
 static const char *strip_dashes_(const char *token) {
   if (!token)
-    return NULL;
+    return nullptr;
   if (token[0] == '-' && token[1] == '-')
     return token + 2;
   if (token[0] == '-')

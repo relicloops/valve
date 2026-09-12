@@ -15,7 +15,6 @@
 #ifndef VALVE_COLOR_H
 #define VALVE_COLOR_H
 
-#include <stdbool.h>
 #include <stdio.h>
 
 /* ---- ANSI SGR escape codes ---- */

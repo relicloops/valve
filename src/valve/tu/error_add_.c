@@ -42,7 +42,7 @@ int vl_error_add_(valve_t *v, vl_error_code_t code, int argv_index,
     err->message = strdup(message);
     if (!err->message) {
       free((char *)err->key);
-      err->key = NULL;
+      err->key = nullptr;
       return -1;
     }
   }

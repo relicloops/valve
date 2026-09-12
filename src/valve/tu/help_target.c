@@ -2,6 +2,6 @@
 
 const char *vl_help_target(const valve_t *v) {
   if (!v)
-    return NULL;
+    return nullptr;
   return v->help_target_;
 }

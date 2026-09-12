@@ -64,7 +64,7 @@ bool assign_valid_(vl_assign_t assign) {
 
 valve_t *vl_create(const vl_executable_t *settings) {
   if (!vl_schema_validate_(settings))
-    return NULL;
+    return nullptr;
 
   valve_t *v = calloc(1, sizeof(valve_t));
 
@@ -73,28 +73,28 @@ valve_t *vl_create(const vl_executable_t *settings) {
   size_t verb_count = verb_count_(settings);
 
   if (!v)
-    return NULL;
+    return nullptr;
 
   v->assign_ = settings ? settings->assign : VL_ASSIGN_INLINE;
 
   if (settings && settings_meta_copy_(v, settings) != 0) {
     vl_settings_meta_clear_(v);
     free(v);
-    return NULL;
+    return nullptr;
   }
 
-  if (options_copy_(settings ? settings->options : NULL, option_count,
+  if (options_copy_(settings ? settings->options : nullptr, option_count,
                     &v->options_, &v->option_count_) != 0) {
     vl_settings_meta_clear_(v);
     free(v);
-    return NULL;
+    return nullptr;
   }
 
   if (settings && vl_actions_copy_(v, settings) != 0) {
     vl_options_clear_(v);
     vl_settings_meta_clear_(v);
     free(v);
-    return NULL;
+    return nullptr;
   }
 
   if (verb_count > 0 &&
@@ -104,7 +104,7 @@ valve_t *vl_create(const vl_executable_t *settings) {
     vl_options_clear_(v);
     vl_settings_meta_clear_(v);
     free(v);
-    return NULL;
+    return nullptr;
   }
 
   if (settings && vl_conflicts_copy_(v, settings) != 0) {
@@ -114,7 +114,7 @@ valve_t *vl_create(const vl_executable_t *settings) {
     vl_options_clear_(v);
     vl_settings_meta_clear_(v);
     free(v);
-    return NULL;
+    return nullptr;
   }
 
   if (settings && vl_requirements_copy_(v, settings) != 0) {
@@ -125,7 +125,7 @@ valve_t *vl_create(const vl_executable_t *settings) {
     vl_options_clear_(v);
     vl_settings_meta_clear_(v);
     free(v);
-    return NULL;
+    return nullptr;
   }
 
   vl_color_init(settings ? settings->color : VAL_COLOR_AUTO);

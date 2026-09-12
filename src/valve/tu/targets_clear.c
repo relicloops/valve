@@ -4,7 +4,7 @@
 
 static void *target_ptr_(const vl_option_t *opt) {
   if (!opt || !opt->data || opt->target == VL_TARGET_NONE) /* GCOVR_EXCL_BR_LINE: null opt / NONE short-circuit */
-    return NULL;
+    return nullptr;
   return (char *)opt->data + opt->offset;
 }
 
@@ -19,7 +19,7 @@ static void clear_option_(const vl_option_t *opt) {
     return; /* GCOVR_EXCL_LINE */
   case VL_TARGET_STRING:
     free(*(char **)target);
-    *(char **)target = NULL;
+    *(char **)target = nullptr;
     return;
   case VL_TARGET_INT:
     *(int *)target = 0;

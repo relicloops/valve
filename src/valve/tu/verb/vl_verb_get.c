@@ -2,7 +2,7 @@
 
 const char *vl_verb_get(const valve_t *v) {
   if (!v || !v->active_verb_)
-    return NULL;
+    return nullptr;
 
   return v->active_verb_->name;
 }
