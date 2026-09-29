@@ -1,4 +1,9 @@
 valve_c_args = ['-DVALVE_VERSION="' + valve_version + '"']
+# newlocale/uselocale and locale_t are POSIX.1-2008; glibc hides them under a
+# strict -std=c23 unless asked. POSIX only, not _GNU_SOURCE (9aae33e).
+if host_machine.system() == 'linux'
+  valve_c_args += '-D_POSIX_C_SOURCE=200809L'
+endif
 
 valve_sources = files(
   'valve/tu/action/action_count_.c',
