@@ -142,25 +142,9 @@ static int target_set_(valve_t *v, const vl_option_t *opt,
 
 static int append_array_(vl_result_t *result, vl_value_t *value,
                          int argv_index) {
-  vl_value_t *items = (vl_value_t *)result->value.as.array.items;
-  size_t count = result->value.as.array.count;
-  size_t next_count, bytes;
-  /* GCOVR_EXCL_BR_START — size_t wrap */
-  if (__builtin_add_overflow(count, (size_t)1, &next_count) ||
-      __builtin_mul_overflow(next_count, sizeof(vl_value_t), &bytes))
-    return -1; /* GCOVR_EXCL_LINE */
-  /* GCOVR_EXCL_BR_STOP */
-
-  vl_value_t *next = realloc(items, bytes);
-
-  if (!next)
+  if (vl_value_array_push_(&result->value.as.array, value) != 0)
     return -1;
-
-  next[count] = *value;
-  result->value.as.array.items = next;
-  result->value.as.array.count = count + 1;
   result->argv_index = argv_index;
-  *value = (vl_value_t){0};
   return 0;
 }
 

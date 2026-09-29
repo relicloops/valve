@@ -31,6 +31,7 @@ valve_sources = files(
   'valve/tu/help_target.c',
   'valve/tu/option/annotations_print_.c',
   'valve/tu/option/array_free_.c',
+  'valve/tu/option/bool_literal_.c',
   'valve/tu/option/c_locale_.c',
   'valve/tu/option/collides_with_globals_.c',
   'valve/tu/option/command_valid_.c',
@@ -61,8 +62,6 @@ valve_sources = files(
   'valve/tu/option/value_label_.c',
   'valve/tu/option/value_valid_.c',
   'valve/tu/option/visible_.c',
-  'valve/tu/parse.c',
-  'valve/tu/parse_command_.c',
   'valve/tu/path_split.c',
   'valve/tu/required_check_.c',
   'valve/tu/requirement/forward_seen_.c',
@@ -84,6 +83,7 @@ valve_sources = files(
   'valve/tu/result/vl_results_clear_.c',
   'valve/tu/schema/validate_.c',
   'valve/tu/targets_clear.c',
+  'valve/tu/value/array_push_.c',
   'valve/tu/value/clear.c',
   'valve/tu/value/has.c',
   'valve/tu/value/vl_get.c',
@@ -104,6 +104,9 @@ valve_sources = files(
   'valve/tu/version_string.c',
   'valve/tu/vl_options_clear_.c',
 )
+
+subdir('valve/tu/parse')
+valve_sources += valve_parse_sources
 
 valve_lib = library(
   'valve',

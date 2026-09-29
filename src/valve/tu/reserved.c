@@ -2,7 +2,7 @@
 
 #include <string.h>
 
-static const char *strip_dashes_(const char *token) {
+const char *vl_reserved_strip_dashes_(const char *token) {
   if (!token)
     return nullptr;
   if (token[0] == '-' && token[1] == '-')
@@ -36,7 +36,7 @@ vl_reserved_kind_t vl_reserved_short_(char c) {
 }
 
 vl_reserved_kind_t vl_reserved_kind_(const char *token) {
-  const char *name = strip_dashes_(token);
+  const char *name = vl_reserved_strip_dashes_(token);
   if (!name || name[0] == '\0')
     return VL_RESERVED_NONE;
   return vl_reserved_name_(name);

@@ -37,6 +37,7 @@
     - src/valve/tu/schema
     - src/valve/tu/value
     - src/valve/tu/verb
+    - src/valve/tu/parse/tu
     - test/support
   :include:
     - include

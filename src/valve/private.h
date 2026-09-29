@@ -173,6 +173,7 @@ typedef enum option_scalar_status {
   OPTION_SCALAR_DOUBLE_RANGE,
 } option_scalar_status_t;
 option_scalar_status_t option_scalar_auto_(vl_value_t *value);
+bool option_bool_literal_(const char *raw, bool *out);
 const char *option_scalar_message_(option_scalar_status_t status);
 locale_t option_c_locale_(void);
 double option_strtod_c_(const char *raw, char **end);
@@ -304,12 +305,13 @@ const vl_option_t *vl_option_find_n_(const valve_t *v, const char *name,
                                      size_t len);
 const vl_option_t *vl_option_find_short_(const valve_t *v, char short_name);
 const vl_option_t *vl_option_find_command_(const valve_t *v);
-
-int vl_parse_command_(valve_t *v, int argc, char **argv, int argv_index);
+const vl_option_t *vl_option_find_toggle_ref_(const valve_t *v,
+                                              const char *ref);
 
 int vl_result_set_(valve_t *v, const vl_option_t *opt, vl_value_t *value,
                    int argv_index);
 const vl_result_t *vl_result_find_(const valve_t *v, const char *name);
+int vl_value_array_push_(vl_array_t *list, vl_value_t *value);
 
 int vl_required_check_(valve_t *v);
 
@@ -324,6 +326,7 @@ const vl_option_t *vl_action_find_(const valve_t *v, const char *token);
 vl_reserved_kind_t vl_reserved_kind_(const char *token);
 vl_reserved_kind_t vl_reserved_name_(const char *name);
 vl_reserved_kind_t vl_reserved_short_(char c);
+const char *vl_reserved_strip_dashes_(const char *token);
 
 /** Internal counterpart of vl_help_resolution_t over the parser's copied
  *  verb tree (valve_verb_t). Used by parse.c validation and the default

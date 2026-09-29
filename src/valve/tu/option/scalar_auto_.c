@@ -63,9 +63,10 @@ option_scalar_status_t option_scalar_auto_(vl_value_t *value) {
 
   value->kind = VL_VALUE_STRING;
 
-  if (strcmp(raw, "true") == 0 || strcmp(raw, "false") == 0) {
+  bool boolean = false;
+  if (option_bool_literal_(raw, &boolean)) {
     value->kind = VL_VALUE_BOOL;
-    value->as.boolean = raw[0] == 't';
+    value->as.boolean = boolean;
     return OPTION_SCALAR_OK;
   }
 

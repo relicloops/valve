@@ -147,3 +147,44 @@ const valve_verb_t *vl_verb_find_(const valve_t *v, const char *name) {
 
   return verb_find_in_(v->verbs_, v->verb_count_, name);
 }
+
+const vl_option_t *vl_option_find_toggle_ref_(const valve_t *v,
+                                              const char *ref) {
+  if (!v || !ref) /* GCOVR_EXCL_BR_LINE: null guard */
+    return nullptr; /* GCOVR_EXCL_LINE */
+
+  if (v->active_action_) {
+    /* GCOVR_EXCL_BR_START — action matched by toggle_ref, so this holds */
+    if (v->active_action_->toggle_ref &&
+        strcmp(v->active_action_->toggle_ref, ref) == 0)
+      return v->active_action_;
+    /* GCOVR_EXCL_BR_STOP */
+    return nullptr; /* GCOVR_EXCL_LINE */
+  }
+
+  if (v->active_subverb_) {
+    for (size_t i = 0; i < v->active_subverb_->option_count; ++i) {
+      const vl_option_t *opt = &v->active_subverb_->options[i];
+      if (opt->toggle_ref && strcmp(opt->toggle_ref, ref) == 0) /* GCOVR_EXCL_BR_LINE: null toggle_ref short-circuit */
+        return opt;
+    }
+  }
+
+  if (v->active_verb_) {
+    for (size_t i = 0; i < v->active_verb_->option_count; ++i) {
+      const vl_option_t *opt = &v->active_verb_->options[i];
+      if (opt->toggle_ref && strcmp(opt->toggle_ref, ref) == 0) /* GCOVR_EXCL_BR_LINE: null toggle_ref short-circuit */
+        return opt;
+    }
+  }
+
+  for (size_t i = 0; i < v->option_count_; ++i) {
+    /* GCOVR_EXCL_BR_START — null toggle_ref short-circuit */
+    if (v->options_[i].toggle_ref &&
+        strcmp(v->options_[i].toggle_ref, ref) == 0)
+      return &v->options_[i];
+    /* GCOVR_EXCL_BR_STOP */
+  }
+
+  return nullptr;
+}
