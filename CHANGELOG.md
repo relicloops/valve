@@ -4,6 +4,11 @@ All notable changes to this project are documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project uses [Conventional Commits](https://www.conventionalcommits.org/).
 
+## [2.0.2-016] - 2026-09-29
+
+### Fixed
+
+- **meson**: Declare POSIX.1-2008 on Linux for the C locale
 ## [2.0.2-015] - 2026-09-29
 
 ### Fixed

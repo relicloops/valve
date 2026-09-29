@@ -96,10 +96,10 @@ Valve consumers pin a version tag rather than tracking `main`:
 [wrap-git]
 directory = valve
 url = https://github.com/relicloops/valve.git
-revision = v2.0.2-015
+revision = v2.0.2-016
 ```
 
-`v2.0.2-015` is the current published tag. When upgrading, change `revision` to the latest published Valve version tag.
+`v2.0.2-016` is the current published tag. When upgrading, change `revision` to the latest published Valve version tag.
 
 ### `meson.build`
 
