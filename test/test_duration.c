@@ -138,10 +138,11 @@ TEST_SOURCE_FILE("vl_requirements_copy_.c")
 TEST_SOURCE_FILE("vl_requirements_copy_table_.c")
 TEST_SOURCE_FILE("vl_results_clear_.c")
 TEST_SOURCE_FILE("vl_verb_get.c")
+
 /* === end ceedling valve sources === */
 
-
 void setUp(void) {}
+
 void tearDown(void) {}
 
 /* Parses `--wait=<literal>` and reports the stored seconds, or -1 when the
@@ -149,9 +150,8 @@ void tearDown(void) {}
    here instead of in each of them. */
 static int64_t duration_seconds_(const char *literal) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "wait", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_TIME, ),
-      NULL,
+    VL_OPT(.name = "wait", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_TIME, ),
+    NULL,
   };
   char arg[64];
   snprintf(arg, sizeof arg, "--wait=%s", literal);
@@ -176,9 +176,8 @@ static int64_t duration_seconds_(const char *literal) {
    literal unexpectedly parsed. */
 static int duration_error_code_(const char *literal) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "wait", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_TIME, ),
-      NULL,
+    VL_OPT(.name = "wait", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_TIME, ),
+    NULL,
   };
   char arg[64];
   snprintf(arg, sizeof arg, "--wait=%s", literal);
@@ -200,8 +199,7 @@ static int duration_error_code_(const char *literal) {
 }
 
 void test_duration_bare_integer_is_seconds(void) {
-  EXPECT(duration_seconds_("30") == 30,
-         "bare integer duration means seconds");
+  EXPECT(duration_seconds_("30") == 30, "bare integer duration means seconds");
   EXPECT(duration_seconds_("0") == 0, "zero duration is accepted");
 }
 
@@ -215,33 +213,24 @@ void test_duration_single_units(void) {
 void test_duration_compound(void) {
   EXPECT(duration_seconds_("1h30m") == 5400, "compound h+m duration sums");
   EXPECT(duration_seconds_("2h30m") == 9000, "compound 2h30m duration sums");
-  EXPECT(duration_seconds_("1d2h3m4s") == 93784,
-         "compound d+h+m+s duration sums");
+  EXPECT(duration_seconds_("1d2h3m4s") == 93784, "compound d+h+m+s duration sums");
 }
 
 void test_duration_rejects_bad_literals(void) {
-  EXPECT(duration_error_code_("") == VL_ERROR_INVALID_VALUE,
-         "empty duration is rejected");
-  EXPECT(duration_error_code_("-5") == VL_ERROR_INVALID_VALUE,
-         "negative duration is rejected");
-  EXPECT(duration_error_code_("10x") == VL_ERROR_INVALID_VALUE,
-         "unknown duration suffix is rejected");
-  EXPECT(duration_error_code_("abc") == VL_ERROR_INVALID_VALUE,
-         "non-numeric duration is rejected");
+  EXPECT(duration_error_code_("") == VL_ERROR_INVALID_VALUE, "empty duration is rejected");
+  EXPECT(duration_error_code_("-5") == VL_ERROR_INVALID_VALUE, "negative duration is rejected");
+  EXPECT(duration_error_code_("10x") == VL_ERROR_INVALID_VALUE, "unknown duration suffix is rejected");
+  EXPECT(duration_error_code_("abc") == VL_ERROR_INVALID_VALUE, "non-numeric duration is rejected");
   EXPECT(duration_error_code_("1h30") == VL_ERROR_INVALID_VALUE,
          "trailing suffix-less segment is rejected, not guessed at");
-  EXPECT(duration_error_code_("5m3") == VL_ERROR_INVALID_VALUE,
-         "suffix-less segment after a unit is rejected");
-  EXPECT(duration_error_code_("99999999999999999999d") ==
-             VL_ERROR_INVALID_VALUE,
-         "overflowing duration is rejected");
+  EXPECT(duration_error_code_("5m3") == VL_ERROR_INVALID_VALUE, "suffix-less segment after a unit is rejected");
+  EXPECT(duration_error_code_("99999999999999999999d") == VL_ERROR_INVALID_VALUE, "overflowing duration is rejected");
 }
 
 void test_duration_error_names_the_token(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "wait", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_TIME, ),
-      NULL,
+    VL_OPT(.name = "wait", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_TIME, ),
+    NULL,
   };
   char *argv[] = {(char *)"valve", (char *)"--wait=10x"};
   valve_t *v = parser_(options, 1);
@@ -250,19 +239,21 @@ void test_duration_error_names_the_token(void) {
   EXPECT(v != NULL, "parser for duration error message");
   EXPECT(vl_parse(v, 2, argv) == -1, "bad duration fails the parse");
   err = vl_error_at(v, 0);
-  EXPECT(err && err->message && strstr(err->message, "10x") != NULL,
-         "duration error message names the bad token");
-  EXPECT(err && err->key && strcmp(err->key, "wait") == 0,
-         "duration error is attributed to its option");
+  EXPECT(err && err->message && strstr(err->message, "10x") != NULL, "duration error message names the bad token");
+  EXPECT(err && err->key && strcmp(err->key, "wait") == 0, "duration error is attributed to its option");
   vl_destroy(v);
 }
 
 void test_duration_bounds_apply_to_seconds(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "wait", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_TIME, .has_int_min = true,
-             .int_min = 5, .has_int_max = true, .int_max = 3600, ),
-      NULL,
+    VL_OPT(.name = "wait",
+           .type = VL_OPT_TYPE_LONG,
+           .value = VL_OPTION_VALUE_TIME,
+           .has_int_min = true,
+           .int_min = 5,
+           .has_int_max = true,
+           .int_max = 3600, ),
+    NULL,
   };
   /* 2s is below the 5s floor even though "2" alone would be a fine integer,
      and 2h is above the 3600s ceiling even though "2" would be well inside
@@ -276,8 +267,7 @@ void test_duration_bounds_apply_to_seconds(void) {
   EXPECT(v != NULL, "parser for duration below minimum");
   EXPECT(vl_parse(v, 2, below) == -1, "duration below minimum is rejected");
   err = vl_error_at(v, 0);
-  EXPECT(err && err->message &&
-             strcmp(err->message, "duration value is below minimum") == 0,
+  EXPECT(err && err->message && strcmp(err->message, "duration value is below minimum") == 0,
          "below-minimum message says duration, not integer");
   vl_destroy(v);
 
@@ -285,8 +275,7 @@ void test_duration_bounds_apply_to_seconds(void) {
   EXPECT(v != NULL, "parser for duration above maximum");
   EXPECT(vl_parse(v, 2, above) == -1, "duration above maximum is rejected");
   err = vl_error_at(v, 0);
-  EXPECT(err && err->message &&
-             strcmp(err->message, "duration value is above maximum") == 0,
+  EXPECT(err && err->message && strcmp(err->message, "duration value is above maximum") == 0,
          "above-maximum message says duration, not integer");
   vl_destroy(v);
 
@@ -294,8 +283,7 @@ void test_duration_bounds_apply_to_seconds(void) {
   EXPECT(v != NULL, "parser for duration inside bounds");
   EXPECT(vl_parse(v, 2, inside) == 0, "duration inside bounds is accepted");
   const vl_value_t *value = vl_get(v, "wait");
-  EXPECT(value && value->kind == VL_VALUE_INT && value->as.integer == 300,
-         "bounded duration stores converted seconds");
+  EXPECT(value && value->kind == VL_VALUE_INT && value->as.integer == 300, "bounded duration stores converted seconds");
   vl_destroy(v);
 }
 
@@ -303,16 +291,19 @@ void test_duration_writes_int_targets(void) {
   int seconds_int = 0;
   int64_t seconds_int64 = 0;
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "wait", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_TIME, .data = &seconds_int,
-             .target = VL_TARGET_INT, ),
-      VL_OPT(.name = "linger", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_TIME, .data = &seconds_int64,
-             .target = VL_TARGET_INT64, ),
-      NULL,
+    VL_OPT(.name = "wait",
+           .type = VL_OPT_TYPE_LONG,
+           .value = VL_OPTION_VALUE_TIME,
+           .data = &seconds_int,
+           .target = VL_TARGET_INT, ),
+    VL_OPT(.name = "linger",
+           .type = VL_OPT_TYPE_LONG,
+           .value = VL_OPTION_VALUE_TIME,
+           .data = &seconds_int64,
+           .target = VL_TARGET_INT64, ),
+    NULL,
   };
-  char *argv[] = {(char *)"valve", (char *)"--wait=1h30m",
-                  (char *)"--linger=2d"};
+  char *argv[] = {(char *)"valve", (char *)"--wait=1h30m", (char *)"--linger=2d"};
   valve_t *v = parser_(options, 2);
 
   EXPECT(v != NULL, "parser for duration targets");
@@ -320,15 +311,13 @@ void test_duration_writes_int_targets(void) {
   vl_destroy(v);
 
   EXPECT(seconds_int == 5400, "duration writes seconds into an int target");
-  EXPECT(seconds_int64 == 172800,
-         "duration writes seconds into an int64 target");
+  EXPECT(seconds_int64 == 172800, "duration writes seconds into an int64 target");
 }
 
 void test_duration_separate_assign_form(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "wait", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_TIME, ),
-      NULL,
+    VL_OPT(.name = "wait", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_TIME, ),
+    NULL,
   };
   char *argv[] = {(char *)"valve", (char *)"--wait", (char *)"5m"};
   valve_t *v = parser_with_form_(options, 1, VL_ASSIGN_SEPARATE);
@@ -340,4 +329,3 @@ void test_duration_separate_assign_form(void) {
          "separate-form duration stores converted seconds");
   vl_destroy(v);
 }
-

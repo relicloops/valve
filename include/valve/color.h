@@ -20,30 +20,30 @@
 /* ---- ANSI SGR escape codes ---- */
 
 /** Reset every SGR attribute (colors, bold, dim, italic, underline). */
-#define VAL_RESET      "\033[0m"
+#define VAL_RESET "\033[0m"
 
-#define VAL_BOLD       "\033[1m" /**< SGR 1: bold / increased intensity */
-#define VAL_DIM        "\033[2m" /**< SGR 2: faint / decreased intensity */
-#define VAL_ITALIC     "\033[3m" /**< SGR 3: italic (not universally supported) */
-#define VAL_UNDERLINE  "\033[4m" /**< SGR 4: single underline */
+#define VAL_BOLD "\033[1m"      /**< SGR 1: bold / increased intensity */
+#define VAL_DIM "\033[2m"       /**< SGR 2: faint / decreased intensity */
+#define VAL_ITALIC "\033[3m"    /**< SGR 3: italic (not universally supported) */
+#define VAL_UNDERLINE "\033[4m" /**< SGR 4: single underline */
 
-#define VAL_FG_BLACK   "\033[30m" /**< SGR 30: foreground black */
-#define VAL_FG_RED     "\033[31m" /**< SGR 31: foreground red */
-#define VAL_FG_GREEN   "\033[32m" /**< SGR 32: foreground green */
-#define VAL_FG_YELLOW  "\033[33m" /**< SGR 33: foreground yellow */
-#define VAL_FG_BLUE    "\033[34m" /**< SGR 34: foreground blue */
+#define VAL_FG_BLACK "\033[30m"   /**< SGR 30: foreground black */
+#define VAL_FG_RED "\033[31m"     /**< SGR 31: foreground red */
+#define VAL_FG_GREEN "\033[32m"   /**< SGR 32: foreground green */
+#define VAL_FG_YELLOW "\033[33m"  /**< SGR 33: foreground yellow */
+#define VAL_FG_BLUE "\033[34m"    /**< SGR 34: foreground blue */
 #define VAL_FG_MAGENTA "\033[35m" /**< SGR 35: foreground magenta */
-#define VAL_FG_CYAN    "\033[36m" /**< SGR 36: foreground cyan */
-#define VAL_FG_WHITE   "\033[37m" /**< SGR 37: foreground white */
+#define VAL_FG_CYAN "\033[36m"    /**< SGR 36: foreground cyan */
+#define VAL_FG_WHITE "\033[37m"   /**< SGR 37: foreground white */
 
-#define VAL_FG_BRIGHT_BLACK   "\033[90m" /**< SGR 90: bright black (grey) */
-#define VAL_FG_BRIGHT_RED     "\033[91m" /**< SGR 91: bright red */
-#define VAL_FG_BRIGHT_GREEN   "\033[92m" /**< SGR 92: bright green */
-#define VAL_FG_BRIGHT_YELLOW  "\033[93m" /**< SGR 93: bright yellow */
-#define VAL_FG_BRIGHT_BLUE    "\033[94m" /**< SGR 94: bright blue */
+#define VAL_FG_BRIGHT_BLACK "\033[90m"   /**< SGR 90: bright black (grey) */
+#define VAL_FG_BRIGHT_RED "\033[91m"     /**< SGR 91: bright red */
+#define VAL_FG_BRIGHT_GREEN "\033[92m"   /**< SGR 92: bright green */
+#define VAL_FG_BRIGHT_YELLOW "\033[93m"  /**< SGR 93: bright yellow */
+#define VAL_FG_BRIGHT_BLUE "\033[94m"    /**< SGR 94: bright blue */
 #define VAL_FG_BRIGHT_MAGENTA "\033[95m" /**< SGR 95: bright magenta */
-#define VAL_FG_BRIGHT_CYAN    "\033[96m" /**< SGR 96: bright cyan */
-#define VAL_FG_BRIGHT_WHITE   "\033[97m" /**< SGR 97: bright white */
+#define VAL_FG_BRIGHT_CYAN "\033[96m"    /**< SGR 96: bright cyan */
+#define VAL_FG_BRIGHT_WHITE "\033[97m"   /**< SGR 97: bright white */
 
 /* ---- runtime color control ---- */
 
@@ -69,12 +69,12 @@ typedef enum vl_color_support {
  *  vl_term_caps(); the fields mirror the module's internal state at the
  *  time of the call and are not updated afterwards. */
 typedef struct vl_term_caps {
-  bool stdout_tty;  /**< isatty(STDOUT_FILENO) */
-  bool stderr_tty;  /**< isatty(STDERR_FILENO) */
-  bool utf8;        /**< locale codeset (or LC_ALL / LC_CTYPE / LANG) is UTF-8 */
-  bool hyperlinks;  /**< OSC 8 hyperlinks are likely supported */
-  unsigned columns; /**< terminal width; 0 → treat as 80 */
-  unsigned rows;    /**< terminal height; 0 → treat as 24 */
+  bool stdout_tty;          /**< isatty(STDOUT_FILENO) */
+  bool stderr_tty;          /**< isatty(STDERR_FILENO) */
+  bool utf8;                /**< locale codeset (or LC_ALL / LC_CTYPE / LANG) is UTF-8 */
+  bool hyperlinks;          /**< OSC 8 hyperlinks are likely supported */
+  unsigned columns;         /**< terminal width; 0 → treat as 80 */
+  unsigned rows;            /**< terminal height; 0 → treat as 24 */
   vl_color_support_t color; /**< detected (or forced) color level */
 } vl_term_caps_t;
 

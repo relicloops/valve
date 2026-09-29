@@ -3,8 +3,10 @@
 #include <stdlib.h>
 
 void vl_actions_clear_(valve_t *v) {
-  if (!v)
+
+  if (!v) {
     return;
+  }
 
   option_array_free_(v->actions_, v->action_count_);
   free(v->action_run_);

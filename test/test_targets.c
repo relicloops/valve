@@ -138,10 +138,11 @@ TEST_SOURCE_FILE("vl_requirements_copy_.c")
 TEST_SOURCE_FILE("vl_requirements_copy_table_.c")
 TEST_SOURCE_FILE("vl_results_clear_.c")
 TEST_SOURCE_FILE("vl_verb_get.c")
+
 /* === end ceedling valve sources === */
 
-
 void setUp(void) {}
+
 void tearDown(void) {}
 
 typedef struct target_proxy {
@@ -158,29 +159,43 @@ typedef struct target_config {
 void test_targets_survive_parser_destroy(void) {
   target_config_t config = {0};
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "proxy.lane", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_STRING, .data = &config.proxy,
-             .offset = offsetof(target_proxy_t, lane),
-             .target = VL_TARGET_STRING, ),
-      VL_OPT(.name = "proxy.cpus", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_INT, .data = &config.proxy,
-             .offset = offsetof(target_proxy_t, cpus), .target = VL_TARGET_INT,
-             .has_int_max = true, .int_max = 4, ),
-      VL_OPT(.name = "enable-feature", .toggle_ref = "feature",
-             .type = VL_OPT_TYPE_TOGGLE,
-             .value = VL_OPTION_VALUE_TOGGLE, .data = &config,
-             .offset = offsetof(target_config_t, feature),
-             .target = VL_TARGET_BOOL, ),
-      VL_OPT(.name = "mode", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_STRING, .repeat = VL_OPTION_REPEAT_ARRAY,
-             .data = &config, .offset = offsetof(target_config_t, mode),
-             .target = VL_TARGET_VALUE, ),
-      NULL,
+    VL_OPT(.name = "proxy.lane",
+           .type = VL_OPT_TYPE_LONG,
+           .value = VL_OPTION_VALUE_STRING,
+           .data = &config.proxy,
+           .offset = offsetof(target_proxy_t, lane),
+           .target = VL_TARGET_STRING, ),
+    VL_OPT(.name = "proxy.cpus",
+           .type = VL_OPT_TYPE_LONG,
+           .value = VL_OPTION_VALUE_INT,
+           .data = &config.proxy,
+           .offset = offsetof(target_proxy_t, cpus),
+           .target = VL_TARGET_INT,
+           .has_int_max = true,
+           .int_max = 4, ),
+    VL_OPT(.name = "enable-feature",
+           .toggle_ref = "feature",
+           .type = VL_OPT_TYPE_TOGGLE,
+           .value = VL_OPTION_VALUE_TOGGLE,
+           .data = &config,
+           .offset = offsetof(target_config_t, feature),
+           .target = VL_TARGET_BOOL, ),
+    VL_OPT(.name = "mode",
+           .type = VL_OPT_TYPE_LONG,
+           .value = VL_OPTION_VALUE_STRING,
+           .repeat = VL_OPTION_REPEAT_ARRAY,
+           .data = &config,
+           .offset = offsetof(target_config_t, mode),
+           .target = VL_TARGET_VALUE, ),
+    NULL,
   };
   char *argv[] = {
-      (char *)"valve",           (char *)"--proxy.lane=api.xxx.loop",
-      (char *)"--proxy.cpus=2",  (char *)"--enable-feature",
-      (char *)"--mode=accident", (char *)"--mode=hello",
+    (char *)"valve",
+    (char *)"--proxy.lane=api.xxx.loop",
+    (char *)"--proxy.cpus=2",
+    (char *)"--enable-feature",
+    (char *)"--mode=accident",
+    (char *)"--mode=hello",
   };
   valve_t *v = parser_(options, 4);
 
@@ -188,14 +203,13 @@ void test_targets_survive_parser_destroy(void) {
   EXPECT(vl_parse(v, 6, argv) == 0, "parse and populate caller targets");
   vl_destroy(v);
 
-  EXPECT(config.proxy.lane && strcmp(config.proxy.lane, "api.xxx.loop") == 0,
-         "target string survives vl_destroy");
+  EXPECT(config.proxy.lane && strcmp(config.proxy.lane, "api.xxx.loop") == 0, "target string survives vl_destroy");
   EXPECT(config.proxy.cpus == 2, "target int survives vl_destroy");
   EXPECT(config.feature == true, "target bool survives vl_destroy");
   EXPECT(config.mode.kind == VL_VALUE_ARRAY && config.mode.as.array.count == 2,
          "target value array survives vl_destroy");
   EXPECT(strcmp(config.mode.as.array.items[0].raw, "accident") == 0 &&
-             strcmp(config.mode.as.array.items[1].raw, "hello") == 0,
+           strcmp(config.mode.as.array.items[1].raw, "hello") == 0,
          "target value array keeps strings");
 
   free(config.proxy.lane);
@@ -205,23 +219,23 @@ void test_targets_survive_parser_destroy(void) {
 void test_target_survives_partial_parse_failure(void) {
   char *lane = NULL;
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "lane", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_STRING, .data = &lane,
-             .target = VL_TARGET_STRING, ),
-      NULL,
+    VL_OPT(.name = "lane",
+           .type = VL_OPT_TYPE_LONG,
+           .value = VL_OPTION_VALUE_STRING,
+           .data = &lane,
+           .target = VL_TARGET_STRING, ),
+    NULL,
   };
   char *argv[] = {
-      (char *)"valve",
-      (char *)"--lane=production",
-      (char *)"--unknown=1",
+    (char *)"valve",
+    (char *)"--lane=production",
+    (char *)"--unknown=1",
   };
   valve_t *v = parser_(options, 1);
 
   EXPECT(v != NULL, "parser for partial parse target");
   EXPECT(vl_parse(v, 3, argv) == -1, "unknown option causes parse failure");
-  EXPECT(lane != NULL && strcmp(lane, "production") == 0,
-         "successfully populated target survives parse failure");
+  EXPECT(lane != NULL && strcmp(lane, "production") == 0, "successfully populated target survives parse failure");
   vl_destroy(v);
   free(lane);
 }
-

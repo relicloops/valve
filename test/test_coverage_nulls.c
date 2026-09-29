@@ -144,10 +144,16 @@ TEST_SOURCE_FILE("vl_requirements_copy_.c")
 TEST_SOURCE_FILE("vl_requirements_copy_table_.c")
 TEST_SOURCE_FILE("vl_results_clear_.c")
 TEST_SOURCE_FILE("vl_verb_get.c")
+
 /* === end ceedling valve sources === */
 
-void setUp(void) { vl_test_alloc_reset(); }
-void tearDown(void) { vl_test_alloc_reset(); }
+void setUp(void) {
+  vl_test_alloc_reset();
+}
+
+void tearDown(void) {
+  vl_test_alloc_reset();
+}
 
 void test_public_null_guards(void) {
   EXPECT(vl_error_at(NULL, 0) == NULL, "error_at null");
@@ -173,8 +179,7 @@ void test_private_clear_null_guards(void) {
 
 void test_type_valid_rejects_junk(void) {
   EXPECT(!option_type_valid_((vl_opt_type_t)0xF0), "junk bits");
-  EXPECT(!option_type_valid_(VL_OPT_TYPE_TOGGLE | VL_OPT_TYPE_LONG),
-         "toggle+long");
+  EXPECT(!option_type_valid_(VL_OPT_TYPE_TOGGLE | VL_OPT_TYPE_LONG), "toggle+long");
 }
 
 void test_options_tables_null_slots(void) {
@@ -189,16 +194,18 @@ void test_options_tables_null_slots(void) {
 
 void test_collides_short_name(void) {
   const vl_option_t *const globals[] = {
-      VL_OPT(.name = "port", .short_name = 'p',
-             .type = VL_OPT_TYPE_LONG | VL_OPT_TYPE_SHORT,
-             .value = VL_OPTION_VALUE_INT),
-      NULL,
+    VL_OPT(.name = "port",
+           .short_name = 'p',
+           .type = VL_OPT_TYPE_LONG | VL_OPT_TYPE_SHORT,
+           .value = VL_OPTION_VALUE_INT),
+    NULL,
   };
   const vl_option_t *const locals[] = {
-      VL_OPT(.name = "quiet", .short_name = 'p',
-             .type = VL_OPT_TYPE_LONG | VL_OPT_TYPE_SHORT,
-             .value = VL_OPTION_VALUE_BOOL),
-      NULL,
+    VL_OPT(.name = "quiet",
+           .short_name = 'p',
+           .type = VL_OPT_TYPE_LONG | VL_OPT_TYPE_SHORT,
+           .value = VL_OPTION_VALUE_BOOL),
+    NULL,
   };
   EXPECT(option_collides_with_globals_(globals, 1, locals, 1), "short collide");
 }
@@ -225,7 +232,7 @@ void test_conflict_exists_scope_continue(void) {
   vl_option_t b = {.name = "b"};
   valve_verb_t verb = {.name = "run"};
   valve_conflict_t conflicts[1] = {
-      {.first = &a, .second = &b, .verb = &verb},
+    {.first = &a, .second = &b, .verb = &verb},
   };
   valve_t v = {.conflicts_ = conflicts, .conflict_count_ = 1};
   EXPECT(!vl_conflict_exists_(&v, &a, &b, NULL, NULL), "scope continue");
@@ -241,8 +248,7 @@ void test_requirement_exists_hit(void) {
 }
 
 void test_label_malloc_oom(void) {
-  vl_option_t opt = {
-      .name = "x", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
+  vl_option_t opt = {.name = "x", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
   vl_test_alloc_fail_after(1);
   char *label = option_label_(&opt);
   vl_test_alloc_reset();
@@ -252,53 +258,44 @@ void test_label_malloc_oom(void) {
 void test_schema_subverb_collides_with_verb(void) {
   /* sub-verb option short/name collides with parent verb options → line 54 */
   const vl_option_t *const verb_opts[] = {
-      VL_OPT(.name = "shared", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_BOOL),
-      NULL,
+    VL_OPT(.name = "shared", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL),
+    NULL,
   };
   const vl_option_t *const sub_opts[] = {
-      VL_OPT(.name = "shared", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_BOOL),
-      NULL,
+    VL_OPT(.name = "shared", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL),
+    NULL,
   };
-  const vl_verb_t *const subs[] = {
-      VL_CMD(.name = "go", .options = sub_opts), NULL};
-  const vl_verb_t *const verbs[] = {
-      VL_CMD(.name = "run", .options = verb_opts, .verbs = subs), NULL};
+  const vl_verb_t *const subs[] = {VL_CMD(.name = "go", .options = sub_opts), NULL};
+  const vl_verb_t *const verbs[] = {VL_CMD(.name = "run", .options = verb_opts, .verbs = subs), NULL};
   vl_executable_t settings = {.verbs = verbs, .color = VAL_COLOR_NEVER};
   EXPECT(vl_create(&settings) == NULL, "sub collides with verb opts");
 }
 
 void test_conflicts_requirements_valid_false(void) {
   /* dangling conflict pointer not in any table */
-  static vl_option_t orphan = {
-      .name = "orphan", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
-  static vl_option_t a = {
-      .name = "a", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
+  static vl_option_t orphan = {.name = "orphan", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
+  static vl_option_t a = {.name = "a", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
   static const vl_option_t *const a_c[] = {&orphan, NULL};
   a.conflicts = a_c;
   const vl_option_t *const opts[] = {&a, NULL};
-  EXPECT(!options_conflicts_valid_(NULL, 0, NULL, 0, opts, 1),
-         "conflict target missing");
+  EXPECT(!options_conflicts_valid_(NULL, 0, NULL, 0, opts, 1), "conflict target missing");
 
-  static vl_option_t b = {
-      .name = "b", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
+  static vl_option_t b = {.name = "b", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
   static const vl_option_t *const b_r[] = {&orphan, NULL};
-  b.requires = b_r;
+  b.
+    requires
+  = b_r;
   const vl_option_t *const opts2[] = {&b, NULL};
-  EXPECT(!options_requirements_valid_(NULL, 0, NULL, 0, opts2, 1),
-         "require target missing");
+  EXPECT(!options_requirements_valid_(NULL, 0, NULL, 0, opts2, 1), "require target missing");
 }
 
 void test_parse_missing_subverb_after_optionish(void) {
   const vl_option_t *const sub_opts[] = {
-      VL_OPT(.name = "q", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL),
-      NULL,
+    VL_OPT(.name = "q", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL),
+    NULL,
   };
-  const vl_verb_t *const subs[] = {VL_CMD(.name = "go", .options = sub_opts),
-                                   NULL};
-  const vl_verb_t *const verbs[] = {
-      VL_CMD(.name = "run", .verbs = subs), NULL};
+  const vl_verb_t *const subs[] = {VL_CMD(.name = "go", .options = sub_opts), NULL};
+  const vl_verb_t *const verbs[] = {VL_CMD(.name = "run", .verbs = subs), NULL};
   vl_executable_t settings = {.verbs = verbs, .color = VAL_COLOR_NEVER};
   valve_t *v = vl_create(&settings);
   char *argv[] = {(char *)"valve", (char *)"run", (char *)"--not-reserved"};
@@ -322,21 +319,19 @@ void test_parse_unknown_verb_reserved_dispatch_fail(void) {
 
 void test_requirements_check_inactive_continue(void) {
   /* requirement scoped to verb while parsing globals only → continue */
-  static vl_option_t a = {
-      .name = "a", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
-  static vl_option_t b = {
-      .name = "b", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
+  static vl_option_t a = {.name = "a", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
+  static vl_option_t b = {.name = "b", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
   static const vl_option_t *const a_r[] = {&b, NULL};
-  a.requires = a_r;
+  a.
+    requires
+  = a_r;
   const vl_option_t *const vopts[] = {&a, &b, NULL};
-  const vl_verb_t *const verbs[] = {
-      VL_CMD(.name = "run", .options = vopts), NULL};
+  const vl_verb_t *const verbs[] = {VL_CMD(.name = "run", .options = vopts), NULL};
   const vl_option_t *const globals[] = {
-      VL_OPT(.name = "g", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL),
-      NULL,
+    VL_OPT(.name = "g", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL),
+    NULL,
   };
-  vl_executable_t settings = {
-      .options = globals, .verbs = verbs, .color = VAL_COLOR_NEVER};
+  vl_executable_t settings = {.options = globals, .verbs = verbs, .color = VAL_COLOR_NEVER};
   valve_t *v = vl_create(&settings);
   char *argv[] = {(char *)"valve", (char *)"--g"};
   /* missing verb */
@@ -351,14 +346,11 @@ void test_requirements_check_inactive_continue(void) {
 
 void test_required_check_subverb_oom(void) {
   const vl_option_t *const sub_opts[] = {
-      VL_OPT(.name = "need", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL,
-             .required = true),
-      NULL,
+    VL_OPT(.name = "need", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL, .required = true),
+    NULL,
   };
-  const vl_verb_t *const subs[] = {VL_CMD(.name = "go", .options = sub_opts),
-                                   NULL};
-  const vl_verb_t *const verbs[] = {
-      VL_CMD(.name = "run", .verbs = subs), NULL};
+  const vl_verb_t *const subs[] = {VL_CMD(.name = "go", .options = sub_opts), NULL};
+  const vl_verb_t *const verbs[] = {VL_CMD(.name = "run", .verbs = subs), NULL};
   vl_executable_t settings = {.verbs = verbs, .color = VAL_COLOR_NEVER};
   valve_t *v = vl_create(&settings);
   EXPECT(v != NULL, "parser");
@@ -374,10 +366,8 @@ void test_required_check_subverb_oom(void) {
 }
 
 void test_conflicts_check_oom(void) {
-  static vl_option_t a = {
-      .name = "a", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
-  static vl_option_t b = {
-      .name = "b", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
+  static vl_option_t a = {.name = "a", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
+  static vl_option_t b = {.name = "b", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
   static const vl_option_t *const a_c[] = {&b, NULL};
   a.conflicts = a_c;
   const vl_option_t *const opts[] = {&a, &b, NULL};
@@ -398,11 +388,11 @@ void test_conflicts_check_oom(void) {
 void test_result_set_target_none_with_data(void) {
   int sink = 1;
   vl_option_t opt = {
-      .name = "n",
-      .type = VL_OPT_TYPE_LONG,
-      .value = VL_OPTION_VALUE_BOOL,
-      .target = VL_TARGET_NONE,
-      .data = &sink,
+    .name = "n",
+    .type = VL_OPT_TYPE_LONG,
+    .value = VL_OPTION_VALUE_BOOL,
+    .target = VL_TARGET_NONE,
+    .data = &sink,
   };
   const vl_option_t *const options[] = {&opt, NULL};
   valve_t *v = parser_(options, 1);
@@ -415,9 +405,8 @@ void test_result_set_target_none_with_data(void) {
 void test_annotations_no_conflict_loop_end(void) {
   /* option with required only — have_conflict loop completes without match */
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "need", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL,
-             .required = true),
-      NULL,
+    VL_OPT(.name = "need", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL, .required = true),
+    NULL,
   };
   vl_executable_t settings = {.options = options, .color = VAL_COLOR_NEVER};
   valve_t *v = vl_create(&settings);
@@ -453,8 +442,7 @@ void test_parse_bare_reserved_as_unknown_verb(void) {
 
 void test_parse_bare_reserved_as_missing_subverb(void) {
   const vl_verb_t *const subs[] = {VL_CMD(.name = "go"), NULL};
-  const vl_verb_t *const verbs[] = {
-      VL_CMD(.name = "run", .verbs = subs), NULL};
+  const vl_verb_t *const verbs[] = {VL_CMD(.name = "run", .verbs = subs), NULL};
   vl_executable_t settings = {.verbs = verbs, .color = VAL_COLOR_NEVER};
   valve_t *v = vl_create(&settings);
   /* Option-shaped reserved at sub slot */
@@ -481,21 +469,19 @@ void test_parse_help_suggest_option_match(void) {
    * not possible for n==1. Instead exercise mid-parse reserved NONE via
    * custom on_help that no-ops and a token that is not reserved. */
   const vl_option_t *const opts[] = {
-      VL_OPT(.name = "list", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_BOOL),
-      NULL,
+    VL_OPT(.name = "list", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL),
+    NULL,
   };
   /* Two verbs with option "list" — bare help=list resolves to first option.
    * For suggestion option-match (875), need resolve false with option name
    * equal target — unreachable for n==1. Cover related suggestion via
    * ambiguous subverb only (already done). Here: SEPARATE empty help target. */
   const vl_verb_t *const verbs[] = {
-      VL_CMD(.name = "a", .options = opts),
-      VL_CMD(.name = "b", .options = opts),
-      NULL,
+    VL_CMD(.name = "a", .options = opts),
+    VL_CMD(.name = "b", .options = opts),
+    NULL,
   };
-  vl_executable_t settings = {
-      .verbs = verbs, .assign = VL_ASSIGN_SEPARATE, .color = VAL_COLOR_NEVER};
+  vl_executable_t settings = {.verbs = verbs, .assign = VL_ASSIGN_SEPARATE, .color = VAL_COLOR_NEVER};
   valve_t *v = vl_create(&settings);
   char *argv[] = {(char *)"valve", (char *)"--help", (char *)""};
   /* empty next value may not be consumable */
@@ -506,19 +492,18 @@ void test_parse_help_suggest_option_match(void) {
 
 void test_forward_seen_annotation_continue(void) {
   /* Two requirements same source→same target name → forward_seen continue */
-  static vl_option_t a = {
-      .name = "a", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
-  static vl_option_t b1 = {
-      .name = "b", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
-  static vl_option_t b2 = {
-      .name = "b", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
+  static vl_option_t a = {.name = "a", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
+  static vl_option_t b1 = {.name = "b", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
+  static vl_option_t b2 = {.name = "b", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
   static const vl_option_t *const a_r[] = {&b1, &b2, NULL};
-  a.requires = a_r;
+  a.
+    requires
+  = a_r;
   /* Distinct names required by schema — use verb-local copies instead via
    * direct annotation print on a hand-built valve_t. */
   valve_requirement_t reqs[2] = {
-      {.source = &a, .target = &b1},
-      {.source = &a, .target = &b2},
+    {.source = &a, .target = &b1},
+    {.source = &a, .target = &b2},
   };
   valve_t v = {.requirements_ = reqs, .requirement_count_ = 2};
   option_annotations_print_(&v, &a);
@@ -528,43 +513,37 @@ void test_forward_seen_annotation_continue(void) {
 void test_schema_deep_verb_invalid(void) {
   /* Nested subverb with invalid option → recursive false at line 54 */
   const vl_option_t *const bad_opts[] = {
-      VL_OPT(.name = "x", .type = (vl_opt_type_t)0xFF,
-             .value = VL_OPTION_VALUE_BOOL),
-      NULL,
+    VL_OPT(.name = "x", .type = (vl_opt_type_t)0xFF, .value = VL_OPTION_VALUE_BOOL),
+    NULL,
   };
-  const vl_verb_t *const deep[] = {
-      VL_CMD(.name = "deep", .options = bad_opts), NULL};
-  const vl_verb_t *const mid[] = {
-      VL_CMD(.name = "mid", .verbs = deep), NULL};
-  const vl_verb_t *const top[] = {
-      VL_CMD(.name = "top", .verbs = mid), NULL};
+  const vl_verb_t *const deep[] = {VL_CMD(.name = "deep", .options = bad_opts), NULL};
+  const vl_verb_t *const mid[] = {VL_CMD(.name = "mid", .verbs = deep), NULL};
+  const vl_verb_t *const top[] = {VL_CMD(.name = "top", .verbs = mid), NULL};
   vl_executable_t settings = {.verbs = top, .color = VAL_COLOR_NEVER};
   EXPECT(vl_create(&settings) == NULL, "deep invalid");
 }
 
 void test_requirements_check_inactive_continue2(void) {
-  static vl_option_t a = {
-      .name = "a", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
-  static vl_option_t b = {
-      .name = "b", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
+  static vl_option_t a = {.name = "a", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
+  static vl_option_t b = {.name = "b", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
   static const vl_option_t *const a_r[] = {&b, NULL};
-  a.requires = a_r;
+  a.
+    requires
+  = a_r;
   const vl_option_t *const vopts[] = {&a, &b, NULL};
   const vl_option_t *const globals[] = {
-      VL_OPT(.name = "g", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL),
-      NULL,
+    VL_OPT(.name = "g", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL),
+    NULL,
   };
   const vl_verb_t *const verbs[] = {
-      VL_CMD(.name = "run", .options = vopts),
-      VL_CMD(.name = "other"),
-      NULL,
+    VL_CMD(.name = "run", .options = vopts),
+    VL_CMD(.name = "other"),
+    NULL,
   };
-  vl_executable_t settings = {
-      .options = globals, .verbs = verbs, .color = VAL_COLOR_NEVER};
+  vl_executable_t settings = {.options = globals, .verbs = verbs, .color = VAL_COLOR_NEVER};
   valve_t *v = vl_create(&settings);
   /* Parse other verb — run-scoped requirement inactive → continue */
   char *argv[] = {(char *)"valve", (char *)"other", (char *)"--g"};
   EXPECT(v != NULL && vl_parse(v, 3, argv) == 0, "inactive req continue");
   vl_destroy(v);
 }
-

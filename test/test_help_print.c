@@ -140,13 +140,13 @@ TEST_SOURCE_FILE("vl_results_clear_.c")
 TEST_SOURCE_FILE("vl_verb_get.c")
 /* === end ceedling valve sources === */
 
-
-
 #include <unistd.h>
 
 void setUp(void) {}
-void tearDown(void) { vl_color_support_reset(); }
 
+void tearDown(void) {
+  vl_color_support_reset();
+}
 
 static int redirect_stdout_fd_(int fd) {
   fflush(stdout);
@@ -226,62 +226,64 @@ static char *capture_parse_(valve_t *v, int argc, char **argv) {
 
 static valve_t *rich_parser_(void) {
   const vl_option_t *const agent_call_opts[] = {
-      VL_OPT(.name = "request", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_STRING, .usage = "JSON body",
-             .description = "request payload", .required = true),
-      NULL,
+    VL_OPT(.name = "request",
+           .type = VL_OPT_TYPE_LONG,
+           .value = VL_OPTION_VALUE_STRING,
+           .usage = "JSON body",
+           .description = "request payload",
+           .required = true),
+    NULL,
   };
   const vl_verb_t *const agent_subs[] = {
-      VL_CMD(.name = "list", .description = "list agents",
-             .usage = "valve agent list"),
-      VL_CMD(.name = "call", .description = "call an agent",
-             .options = agent_call_opts, .usage = "valve agent call"),
-      NULL,
+    VL_CMD(.name = "list", .description = "list agents", .usage = "valve agent list"),
+    VL_CMD(.name = "call", .description = "call an agent", .options = agent_call_opts, .usage = "valve agent call"),
+    NULL,
   };
   const vl_option_t *const net_opts[] = {
-      VL_OPT(.name = "proxy.lane", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_DOT_NOTATION, .target = VL_TARGET_STRING,
-             .description = "lane name"),
-      VL_OPT(.name = "proxy.cpus", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_DOT_NOTATION, .target = VL_TARGET_INT,
-             .description = "cpu count"),
-      VL_OPT(.name = "ratio", .short_name = 'r',
-             .type = VL_OPT_TYPE_LONG | VL_OPT_TYPE_SHORT,
-             .value = VL_OPTION_VALUE_DOUBLE),
-      VL_OPT(.name = "enable-tls", .toggle_ref = "tls",
-             .type = VL_OPT_TYPE_TOGGLE, .value = VL_OPTION_VALUE_TOGGLE),
-      VL_OPT(.name = "tags", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_KV),
-      VL_OPT(.name = "wait", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_TIME),
-      VL_OPT(.name = "items", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_ARRAY),
-      VL_OPT(.name = "score", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_NUMBER),
-      NULL,
+    VL_OPT(.name = "proxy.lane",
+           .type = VL_OPT_TYPE_LONG,
+           .value = VL_OPTION_VALUE_DOT_NOTATION,
+           .target = VL_TARGET_STRING,
+           .description = "lane name"),
+    VL_OPT(.name = "proxy.cpus",
+           .type = VL_OPT_TYPE_LONG,
+           .value = VL_OPTION_VALUE_DOT_NOTATION,
+           .target = VL_TARGET_INT,
+           .description = "cpu count"),
+    VL_OPT(.name = "ratio",
+           .short_name = 'r',
+           .type = VL_OPT_TYPE_LONG | VL_OPT_TYPE_SHORT,
+           .value = VL_OPTION_VALUE_DOUBLE),
+    VL_OPT(.name = "enable-tls", .toggle_ref = "tls", .type = VL_OPT_TYPE_TOGGLE, .value = VL_OPTION_VALUE_TOGGLE),
+    VL_OPT(.name = "tags", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_KV),
+    VL_OPT(.name = "wait", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_TIME),
+    VL_OPT(.name = "items", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_ARRAY),
+    VL_OPT(.name = "score", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_NUMBER),
+    NULL,
   };
   const vl_verb_t *const verbs[] = {
-      VL_CMD(.name = "agent", .description = "agent ops", .verbs = agent_subs,
-             .usage = "valve agent <sub>"),
-      VL_CMD(.name = "network", .description = "network", .options = net_opts),
-      NULL,
+    VL_CMD(.name = "agent", .description = "agent ops", .verbs = agent_subs, .usage = "valve agent <sub>"),
+    VL_CMD(.name = "network", .description = "network", .options = net_opts),
+    NULL,
   };
   const vl_option_t *const globals[] = {
-      VL_OPT(.name = "verbose", .short_name = 'V',
-             .type = VL_OPT_TYPE_LONG | VL_OPT_TYPE_SHORT,
-             .value = VL_OPTION_VALUE_BOOL, .required = true,
-             .description = "chatty"),
-      NULL,
+    VL_OPT(.name = "verbose",
+           .short_name = 'V',
+           .type = VL_OPT_TYPE_LONG | VL_OPT_TYPE_SHORT,
+           .value = VL_OPTION_VALUE_BOOL,
+           .required = true,
+           .description = "chatty"),
+    NULL,
   };
   vl_executable_t settings = {
-      .options = globals,
-      .verbs = verbs,
-      .program_name = "valve-help",
-      .program_version = "9.9.9",
-      .description = "help printer coverage",
-      .usage = "valve-help [options] <verb>",
-      .logo = "◆",
-      .color = VAL_COLOR_NEVER,
+    .options = globals,
+    .verbs = verbs,
+    .program_name = "valve-help",
+    .program_version = "9.9.9",
+    .description = "help printer coverage",
+    .usage = "valve-help [options] <verb>",
+    .logo = "◆",
+    .color = VAL_COLOR_NEVER,
   };
   return vl_create(&settings);
 }
@@ -381,11 +383,11 @@ void test_help_print_value_labels(void) {
 void test_default_version_and_valve_printers(void) {
   const vl_option_t *const opts[] = {NULL};
   vl_executable_t settings = {
-      .options = opts,
-      .program_name = "valve-test",
-      .program_version = "1.2.3-test",
-      .color = VAL_COLOR_NEVER,
-      /* NULL callbacks → defaults */
+    .options = opts,
+    .program_name = "valve-test",
+    .program_version = "1.2.3-test",
+    .color = VAL_COLOR_NEVER,
+    /* NULL callbacks → defaults */
   };
   valve_t *v = vl_create(&settings);
   char *ver_argv[] = {(char *)"valve", (char *)"--version"};
@@ -394,8 +396,7 @@ void test_default_version_and_valve_printers(void) {
 
   EXPECT(v != NULL, "default printer parser");
   buf = capture_parse_(v, 2, ver_argv);
-  EXPECT(buf != NULL && strstr(buf, "1.2.3-test") != NULL,
-         "default version printer");
+  EXPECT(buf != NULL && strstr(buf, "1.2.3-test") != NULL, "default version printer");
   free(buf);
 
   buf = capture_parse_(v, 2, valve_argv);
@@ -406,14 +407,13 @@ void test_default_version_and_valve_printers(void) {
 
 void test_help_assign_separate_form(void) {
   const vl_option_t *const opts[] = {
-      VL_OPT(.name = "mode", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_STRING),
-      NULL,
+    VL_OPT(.name = "mode", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_STRING),
+    NULL,
   };
   vl_executable_t settings = {
-      .options = opts,
-      .assign = VL_ASSIGN_SEPARATE,
-      .color = VAL_COLOR_NEVER,
+    .options = opts,
+    .assign = VL_ASSIGN_SEPARATE,
+    .color = VAL_COLOR_NEVER,
   };
   valve_t *v = vl_create(&settings);
   char *argv[] = {(char *)"valve", (char *)"--help"};
@@ -421,8 +421,7 @@ void test_help_assign_separate_form(void) {
 
   EXPECT(v != NULL, "separate-assign parser");
   buf = capture_parse_(v, 2, argv);
-  EXPECT(buf != NULL && strstr(buf, "--mode <string>") != NULL,
-         "separate assign uses space in usage");
+  EXPECT(buf != NULL && strstr(buf, "--mode <string>") != NULL, "separate assign uses space in usage");
   free(buf);
   vl_destroy(v);
 }

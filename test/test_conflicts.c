@@ -140,11 +140,13 @@ TEST_SOURCE_FILE("vl_results_clear_.c")
 TEST_SOURCE_FILE("vl_verb_get.c")
 /* === end ceedling valve sources === */
 
-
 #include <unistd.h>
 
 void setUp(void) {}
-void tearDown(void) { vl_color_support_reset(); }
+
+void tearDown(void) {
+  vl_color_support_reset();
+}
 
 static int redirect_stdout_fd_(int fd) {
   fflush(stdout);
@@ -199,35 +201,35 @@ static char *slurp_path_(const char *path) {
 }
 
 static const vl_option_t conflict_beta_ = {
-    .name = "beta",
-    .type = VL_OPT_TYPE_LONG,
-    .value = VL_OPTION_VALUE_BOOL,
+  .name = "beta",
+  .type = VL_OPT_TYPE_LONG,
+  .value = VL_OPTION_VALUE_BOOL,
 };
 
 static const vl_option_t *const conflict_alpha_conflicts_[] = {
-    &conflict_beta_,
-    NULL,
+  &conflict_beta_,
+  NULL,
 };
 
 static const vl_option_t conflict_alpha_ = {
-    .name = "alpha",
-    .type = VL_OPT_TYPE_LONG,
-    .value = VL_OPTION_VALUE_BOOL,
-    .conflicts = conflict_alpha_conflicts_,
+  .name = "alpha",
+  .type = VL_OPT_TYPE_LONG,
+  .value = VL_OPTION_VALUE_BOOL,
+  .conflicts = conflict_alpha_conflicts_,
 };
 
 static const vl_option_t *const conflict_globals_[] = {
-    &conflict_alpha_,
-    &conflict_beta_,
-    NULL,
+  &conflict_alpha_,
+  &conflict_beta_,
+  NULL,
 };
 
 static valve_t *conflict_parser_(void) {
   vl_executable_t settings = {
-      .options = conflict_globals_,
-      .program_name = "valve-test",
-      .description = "conflict coverage",
-      .color = VAL_COLOR_NEVER,
+    .options = conflict_globals_,
+    .program_name = "valve-test",
+    .description = "conflict coverage",
+    .color = VAL_COLOR_NEVER,
   };
   return vl_create(&settings);
 }
@@ -241,10 +243,8 @@ void test_conflict_both_present_fails(void) {
   EXPECT(vl_parse(v, 3, argv) == -1, "both conflict members fail");
   EXPECT(vl_error_count(v) >= 1, "conflict records an error");
   err = vl_error_at(v, 0);
-  EXPECT(err && err->code == VL_ERROR_CONFLICTING_OPTION,
-         "conflict error code");
-  EXPECT(err && err->message && strstr(err->message, "conflicts with") != NULL,
-         "conflict message names other option");
+  EXPECT(err && err->code == VL_ERROR_CONFLICTING_OPTION, "conflict error code");
+  EXPECT(err && err->message && strstr(err->message, "conflicts with") != NULL, "conflict message names other option");
   vl_destroy(v);
 }
 
@@ -256,10 +256,8 @@ void test_conflict_order_independent(void) {
   EXPECT(v != NULL, "conflict parser created");
   EXPECT(vl_parse(v, 3, argv) == -1, "reverse order also fails");
   err = vl_error_at(v, 0);
-  EXPECT(err && err->code == VL_ERROR_CONFLICTING_OPTION,
-         "reverse order conflict code");
-  EXPECT(err && strcmp(err->key, "alpha") == 0,
-         "later argv member is the error key");
+  EXPECT(err && err->code == VL_ERROR_CONFLICTING_OPTION, "reverse order conflict code");
+  EXPECT(err && strcmp(err->key, "alpha") == 0, "later argv member is the error key");
   vl_destroy(v);
 }
 
@@ -279,14 +277,11 @@ void test_conflict_single_member_ok(void) {
 
 void test_conflict_false_bool_still_conflicts(void) {
   valve_t *v = conflict_parser_();
-  char *argv[] = {(char *)"valve", (char *)"--alpha=false",
-                  (char *)"--beta=false"};
+  char *argv[] = {(char *)"valve", (char *)"--alpha=false", (char *)"--beta=false"};
 
   EXPECT(v != NULL, "conflict parser created");
   EXPECT(vl_parse(v, 3, argv) == -1, "explicit false still conflicts");
-  EXPECT(vl_error_at(v, 0) &&
-             vl_error_at(v, 0)->code == VL_ERROR_CONFLICTING_OPTION,
-         "false bool conflict code");
+  EXPECT(vl_error_at(v, 0) && vl_error_at(v, 0)->code == VL_ERROR_CONFLICTING_OPTION, "false bool conflict code");
   vl_destroy(v);
 }
 
@@ -306,8 +301,7 @@ void test_conflict_help_annotations(void) {
   fclose(out);
 
   buf = slurp_path_(path);
-  EXPECT(buf && strstr(buf, "conflicts:") != NULL,
-         "help shows conflicts annotation");
+  EXPECT(buf && strstr(buf, "conflicts:") != NULL, "help shows conflicts annotation");
   EXPECT(buf && strstr(buf, "--beta") != NULL, "help lists beta");
   EXPECT(buf && strstr(buf, "--alpha") != NULL, "help lists alpha");
   free(buf);
@@ -319,9 +313,9 @@ void test_conflict_invalid_self(void) {
   static const vl_option_t *self_table[2];
 
   loop_opt = (vl_option_t){
-      .name = "loop",
-      .type = VL_OPT_TYPE_LONG,
-      .value = VL_OPTION_VALUE_BOOL,
+    .name = "loop",
+    .type = VL_OPT_TYPE_LONG,
+    .value = VL_OPTION_VALUE_BOOL,
   };
   self_table[0] = &loop_opt;
   self_table[1] = NULL;
@@ -334,30 +328,29 @@ void test_conflict_invalid_self(void) {
 
 void test_conflict_invalid_null_table_with_count(void) {
   static const vl_option_t bad = {
-      .name = "bad",
-      .type = VL_OPT_TYPE_LONG,
-      .value = VL_OPTION_VALUE_BOOL,
-      .conflicts = NULL,
-      .conflict_count = 1,
+    .name = "bad",
+    .type = VL_OPT_TYPE_LONG,
+    .value = VL_OPTION_VALUE_BOOL,
+    .conflicts = NULL,
+    .conflict_count = 1,
   };
   const vl_option_t *const options[] = {&bad, NULL};
   vl_executable_t settings = {.options = options};
-  EXPECT(vl_create(&settings) == NULL,
-         "conflict_count without table rejected");
+  EXPECT(vl_create(&settings) == NULL, "conflict_count without table rejected");
 }
 
 void test_conflict_invalid_duplicate_target(void) {
   static const vl_option_t other = {
-      .name = "other",
-      .type = VL_OPT_TYPE_LONG,
-      .value = VL_OPTION_VALUE_BOOL,
+    .name = "other",
+    .type = VL_OPT_TYPE_LONG,
+    .value = VL_OPTION_VALUE_BOOL,
   };
   static const vl_option_t *const dups[] = {&other, &other, NULL};
   static const vl_option_t source = {
-      .name = "source",
-      .type = VL_OPT_TYPE_LONG,
-      .value = VL_OPTION_VALUE_BOOL,
-      .conflicts = dups,
+    .name = "source",
+    .type = VL_OPT_TYPE_LONG,
+    .value = VL_OPTION_VALUE_BOOL,
+    .conflicts = dups,
   };
   const vl_option_t *const options[] = {&source, &other, NULL};
   vl_executable_t settings = {.options = options};
@@ -371,14 +364,14 @@ void test_conflict_reciprocal_ok(void) {
   static const vl_option_t *recip_b_c[2];
 
   recip_a = (vl_option_t){
-      .name = "a",
-      .type = VL_OPT_TYPE_LONG,
-      .value = VL_OPTION_VALUE_BOOL,
+    .name = "a",
+    .type = VL_OPT_TYPE_LONG,
+    .value = VL_OPTION_VALUE_BOOL,
   };
   recip_b = (vl_option_t){
-      .name = "b",
-      .type = VL_OPT_TYPE_LONG,
-      .value = VL_OPTION_VALUE_BOOL,
+    .name = "b",
+    .type = VL_OPT_TYPE_LONG,
+    .value = VL_OPTION_VALUE_BOOL,
   };
   recip_a_c[0] = &recip_b;
   recip_a_c[1] = NULL;
@@ -389,8 +382,8 @@ void test_conflict_reciprocal_ok(void) {
 
   const vl_option_t *const options[] = {&recip_a, &recip_b, NULL};
   vl_executable_t settings = {
-      .options = options,
-      .color = VAL_COLOR_NEVER,
+    .options = options,
+    .color = VAL_COLOR_NEVER,
   };
   valve_t *v = vl_create(&settings);
   char *argv[] = {(char *)"valve", (char *)"--a", (char *)"--b"};
@@ -404,14 +397,13 @@ void test_conflict_capacity_growth(void) {
   static vl_option_t opts[10];
   static const vl_option_t *all[11];
   static const vl_option_t *c0_conflicts[10];
-  static const char *names[] = {"c0", "c1", "c2", "c3", "c4",
-                                "c5", "c6", "c7", "c8", "c9"};
+  static const char *names[] = {"c0", "c1", "c2", "c3", "c4", "c5", "c6", "c7", "c8", "c9"};
 
   for (int i = 0; i < 10; ++i) {
     opts[i] = (vl_option_t){
-        .name = names[i],
-        .type = VL_OPT_TYPE_LONG,
-        .value = VL_OPTION_VALUE_BOOL,
+      .name = names[i],
+      .type = VL_OPT_TYPE_LONG,
+      .value = VL_OPTION_VALUE_BOOL,
     };
     all[i] = &opts[i];
   }
@@ -422,8 +414,8 @@ void test_conflict_capacity_growth(void) {
   opts[0].conflicts = c0_conflicts;
 
   vl_executable_t settings = {
-      .options = all,
-      .color = VAL_COLOR_NEVER,
+    .options = all,
+    .color = VAL_COLOR_NEVER,
   };
   valve_t *v = vl_create(&settings);
   EXPECT(v != NULL, "many-conflict schema created (capacity growth)");
@@ -432,52 +424,49 @@ void test_conflict_capacity_growth(void) {
 
 void test_conflict_on_verb_options(void) {
   static const vl_option_t local_b = {
-      .name = "quiet",
-      .type = VL_OPT_TYPE_LONG,
-      .value = VL_OPTION_VALUE_BOOL,
+    .name = "quiet",
+    .type = VL_OPT_TYPE_LONG,
+    .value = VL_OPTION_VALUE_BOOL,
   };
   static const vl_option_t *const local_a_c[] = {&local_b, NULL};
   static const vl_option_t local_a = {
-      .name = "loud",
-      .type = VL_OPT_TYPE_LONG,
-      .value = VL_OPTION_VALUE_BOOL,
-      .conflicts = local_a_c,
+    .name = "loud",
+    .type = VL_OPT_TYPE_LONG,
+    .value = VL_OPTION_VALUE_BOOL,
+    .conflicts = local_a_c,
   };
   const vl_option_t *const local_opts[] = {&local_a, &local_b, NULL};
   const vl_verb_t *const verbs[] = {
-      VL_CMD(.name = "run", .options = local_opts),
-      NULL,
+    VL_CMD(.name = "run", .options = local_opts),
+    NULL,
   };
   vl_executable_t settings = {
-      .verbs = verbs,
-      .color = VAL_COLOR_NEVER,
+    .verbs = verbs,
+    .color = VAL_COLOR_NEVER,
   };
   valve_t *v = vl_create(&settings);
-  char *argv[] = {(char *)"valve", (char *)"run", (char *)"--loud",
-                  (char *)"--quiet"};
+  char *argv[] = {(char *)"valve", (char *)"run", (char *)"--loud", (char *)"--quiet"};
 
   EXPECT(v != NULL, "verb conflict parser created");
   EXPECT(vl_parse(v, 4, argv) == -1, "verb-local conflict fails");
-  EXPECT(vl_error_at(v, 0) &&
-             vl_error_at(v, 0)->code == VL_ERROR_CONFLICTING_OPTION,
-         "verb-local conflict code");
+  EXPECT(vl_error_at(v, 0) && vl_error_at(v, 0)->code == VL_ERROR_CONFLICTING_OPTION, "verb-local conflict code");
   vl_destroy(v);
 }
 
 void test_conflict_short_option_label(void) {
   static const vl_option_t short_b = {
-      .name = "brief",
-      .short_name = 'b',
-      .type = VL_OPT_TYPE_SHORT,
-      .value = VL_OPTION_VALUE_BOOL,
+    .name = "brief",
+    .short_name = 'b',
+    .type = VL_OPT_TYPE_SHORT,
+    .value = VL_OPTION_VALUE_BOOL,
   };
   static const vl_option_t *const short_a_c[] = {&short_b, NULL};
   static const vl_option_t short_a = {
-      .name = "verbose",
-      .short_name = 'V',
-      .type = VL_OPT_TYPE_SHORT,
-      .value = VL_OPTION_VALUE_BOOL,
-      .conflicts = short_a_c,
+    .name = "verbose",
+    .short_name = 'V',
+    .type = VL_OPT_TYPE_SHORT,
+    .value = VL_OPTION_VALUE_BOOL,
+    .conflicts = short_a_c,
   };
   static const vl_option_t *const opts[] = {&short_a, &short_b, NULL};
   vl_executable_t settings = {.options = opts, .color = VAL_COLOR_NEVER};
@@ -488,24 +477,23 @@ void test_conflict_short_option_label(void) {
   EXPECT(v != NULL, "short conflict parser");
   EXPECT(vl_parse(v, 3, argv) == -1, "short conflict fails");
   err = vl_error_at(v, 0);
-  EXPECT(err && err->message && strstr(err->message, "-V") != NULL,
-         "conflict label uses short form");
+  EXPECT(err && err->message && strstr(err->message, "-V") != NULL, "conflict label uses short form");
   vl_destroy(v);
 }
 
 void test_conflict_counted_table(void) {
   static const vl_option_t other = {
-      .name = "other",
-      .type = VL_OPT_TYPE_LONG,
-      .value = VL_OPTION_VALUE_BOOL,
+    .name = "other",
+    .type = VL_OPT_TYPE_LONG,
+    .value = VL_OPTION_VALUE_BOOL,
   };
   static const vl_option_t *const table[] = {&other};
   static const vl_option_t source = {
-      .name = "source",
-      .type = VL_OPT_TYPE_LONG,
-      .value = VL_OPTION_VALUE_BOOL,
-      .conflicts = table,
-      .conflict_count = 1,
+    .name = "source",
+    .type = VL_OPT_TYPE_LONG,
+    .value = VL_OPTION_VALUE_BOOL,
+    .conflicts = table,
+    .conflict_count = 1,
   };
   static const vl_option_t *const opts[] = {&source, &other, NULL};
   vl_executable_t settings = {.options = opts, .color = VAL_COLOR_NEVER};
@@ -519,30 +507,28 @@ void test_conflict_counted_table(void) {
 
 void test_conflict_toggle_label(void) {
   static const vl_option_t plain = {
-      .name = "plain",
-      .type = VL_OPT_TYPE_LONG,
-      .value = VL_OPTION_VALUE_BOOL,
+    .name = "plain",
+    .type = VL_OPT_TYPE_LONG,
+    .value = VL_OPTION_VALUE_BOOL,
   };
   static const vl_option_t *const toggle_c[] = {&plain, NULL};
   static const vl_option_t toggle = {
-      .name = "enable-feature",
-      .toggle_ref = "feature",
-      .type = VL_OPT_TYPE_TOGGLE,
-      .value = VL_OPTION_VALUE_TOGGLE,
-      .conflicts = toggle_c,
+    .name = "enable-feature",
+    .toggle_ref = "feature",
+    .type = VL_OPT_TYPE_TOGGLE,
+    .value = VL_OPTION_VALUE_TOGGLE,
+    .conflicts = toggle_c,
   };
   static const vl_option_t *const opts[] = {&toggle, &plain, NULL};
   vl_executable_t settings = {.options = opts, .color = VAL_COLOR_NEVER};
   valve_t *v = vl_create(&settings);
-  char *argv[] = {(char *)"valve", (char *)"--enable-feature",
-                  (char *)"--plain"};
+  char *argv[] = {(char *)"valve", (char *)"--enable-feature", (char *)"--plain"};
   const vl_error_t *err = NULL;
 
   EXPECT(v != NULL, "toggle conflict parser");
   EXPECT(vl_parse(v, 3, argv) == -1, "toggle conflict fails");
   err = vl_error_at(v, 0);
-  EXPECT(err && err->message &&
-             strstr(err->message, "--enable-feature") != NULL,
+  EXPECT(err && err->message && strstr(err->message, "--enable-feature") != NULL,
          "toggle conflict labels enable/disable form");
   vl_destroy(v);
 }

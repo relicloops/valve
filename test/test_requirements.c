@@ -140,13 +140,13 @@ TEST_SOURCE_FILE("vl_results_clear_.c")
 TEST_SOURCE_FILE("vl_verb_get.c")
 /* === end ceedling valve sources === */
 
-
-
 #include <unistd.h>
 
 void setUp(void) {}
-void tearDown(void) { vl_color_support_reset(); }
 
+void tearDown(void) {
+  vl_color_support_reset();
+}
 
 static int redirect_stdout_fd_(int fd) {
   fflush(stdout);
@@ -201,35 +201,35 @@ static char *slurp_path_(const char *path) {
 }
 
 static const vl_option_t req_id_ = {
-    .name = "id",
-    .type = VL_OPT_TYPE_LONG,
-    .value = VL_OPTION_VALUE_STRING,
+  .name = "id",
+  .type = VL_OPT_TYPE_LONG,
+  .value = VL_OPTION_VALUE_STRING,
 };
 
 static const vl_option_t *const req_enable_requires_[] = {
-    &req_id_,
-    NULL,
+  &req_id_,
+  NULL,
 };
 
 static const vl_option_t req_enable_ = {
-    .name = "enable-reload",
-    .type = VL_OPT_TYPE_LONG,
-    .value = VL_OPTION_VALUE_BOOL,
-    .requires = req_enable_requires_,
+  .name = "enable-reload",
+  .type = VL_OPT_TYPE_LONG,
+  .value = VL_OPTION_VALUE_BOOL,
+  .requires = req_enable_requires_,
 };
 
 static const vl_option_t *const req_globals_[] = {
-    &req_enable_,
-    &req_id_,
-    NULL,
+  &req_enable_,
+  &req_id_,
+  NULL,
 };
 
 static valve_t *req_parser_(void) {
   vl_executable_t settings = {
-      .options = req_globals_,
-      .program_name = "valve-test",
-      .description = "requirement coverage",
-      .color = VAL_COLOR_NEVER,
+    .options = req_globals_,
+    .program_name = "valve-test",
+    .description = "requirement coverage",
+    .color = VAL_COLOR_NEVER,
   };
   return vl_create(&settings);
 }
@@ -242,24 +242,19 @@ void test_requirement_missing_target_fails(void) {
   EXPECT(v != NULL, "requirement parser created");
   EXPECT(vl_parse(v, 2, argv) == -1, "source without target fails");
   err = vl_error_at(v, 0);
-  EXPECT(err && err->code == VL_ERROR_UNSATISFIED_REQUIREMENT,
-         "unsatisfied requirement code");
-  EXPECT(err && err->message && strstr(err->message, "requires") != NULL,
-         "requirement message");
-  EXPECT(err && strcmp(err->key, "enable-reload") == 0,
-         "error key is source option");
+  EXPECT(err && err->code == VL_ERROR_UNSATISFIED_REQUIREMENT, "unsatisfied requirement code");
+  EXPECT(err && err->message && strstr(err->message, "requires") != NULL, "requirement message");
+  EXPECT(err && strcmp(err->key, "enable-reload") == 0, "error key is source option");
   vl_destroy(v);
 }
 
 void test_requirement_satisfied(void) {
   valve_t *v = req_parser_();
-  char *argv[] = {(char *)"valve", (char *)"--enable-reload",
-                  (char *)"--id=42"};
+  char *argv[] = {(char *)"valve", (char *)"--enable-reload", (char *)"--id=42"};
 
   EXPECT(v != NULL, "requirement parser created");
   EXPECT(vl_parse(v, 3, argv) == 0, "source+target succeeds");
-  EXPECT(vl_has(v, "enable-reload") && vl_has(v, "id"),
-         "both options present");
+  EXPECT(vl_has(v, "enable-reload") && vl_has(v, "id"), "both options present");
   vl_destroy(v);
 }
 
@@ -278,8 +273,7 @@ void test_requirement_false_source_still_requires(void) {
 
   EXPECT(v != NULL, "requirement parser created");
   EXPECT(vl_parse(v, 2, argv) == -1, "false source still activates requires");
-  EXPECT(vl_error_at(v, 0) &&
-             vl_error_at(v, 0)->code == VL_ERROR_UNSATISFIED_REQUIREMENT,
+  EXPECT(vl_error_at(v, 0) && vl_error_at(v, 0)->code == VL_ERROR_UNSATISFIED_REQUIREMENT,
          "false source unsatisfied code");
   vl_destroy(v);
 }
@@ -312,13 +306,15 @@ void test_requirement_invalid_self(void) {
   static const vl_option_t *self_table[2];
 
   loop_opt = (vl_option_t){
-      .name = "loop",
-      .type = VL_OPT_TYPE_LONG,
-      .value = VL_OPTION_VALUE_BOOL,
+    .name = "loop",
+    .type = VL_OPT_TYPE_LONG,
+    .value = VL_OPTION_VALUE_BOOL,
   };
   self_table[0] = &loop_opt;
   self_table[1] = NULL;
-  loop_opt.requires = self_table;
+  loop_opt.
+    requires
+  = self_table;
 
   const vl_option_t *const options[] = {&loop_opt, NULL};
   vl_executable_t settings = {.options = options};
@@ -327,30 +323,29 @@ void test_requirement_invalid_self(void) {
 
 void test_requirement_invalid_null_table_with_count(void) {
   static const vl_option_t bad = {
-      .name = "bad",
-      .type = VL_OPT_TYPE_LONG,
-      .value = VL_OPTION_VALUE_BOOL,
-      .requires = NULL,
-      .require_count = 1,
+    .name = "bad",
+    .type = VL_OPT_TYPE_LONG,
+    .value = VL_OPTION_VALUE_BOOL,
+    .requires = NULL,
+    .require_count = 1,
   };
   const vl_option_t *const options[] = {&bad, NULL};
   vl_executable_t settings = {.options = options};
-  EXPECT(vl_create(&settings) == NULL,
-         "require_count without table rejected");
+  EXPECT(vl_create(&settings) == NULL, "require_count without table rejected");
 }
 
 void test_requirement_invalid_duplicate_target(void) {
   static const vl_option_t other = {
-      .name = "other",
-      .type = VL_OPT_TYPE_LONG,
-      .value = VL_OPTION_VALUE_BOOL,
+    .name = "other",
+    .type = VL_OPT_TYPE_LONG,
+    .value = VL_OPTION_VALUE_BOOL,
   };
   static const vl_option_t *const dups[] = {&other, &other, NULL};
   static const vl_option_t source = {
-      .name = "source",
-      .type = VL_OPT_TYPE_LONG,
-      .value = VL_OPTION_VALUE_BOOL,
-      .requires = dups,
+    .name = "source",
+    .type = VL_OPT_TYPE_LONG,
+    .value = VL_OPTION_VALUE_BOOL,
+    .requires = dups,
   };
   const vl_option_t *const options[] = {&source, &other, NULL};
   vl_executable_t settings = {.options = options};
@@ -361,14 +356,13 @@ void test_requirement_capacity_growth(void) {
   static vl_option_t opts[10];
   static const vl_option_t *all[11];
   static const vl_option_t *c0_requires[10];
-  static const char *names[] = {"r0", "r1", "r2", "r3", "r4",
-                                "r5", "r6", "r7", "r8", "r9"};
+  static const char *names[] = {"r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8", "r9"};
 
   for (int i = 0; i < 10; ++i) {
     opts[i] = (vl_option_t){
-        .name = names[i],
-        .type = VL_OPT_TYPE_LONG,
-        .value = VL_OPTION_VALUE_BOOL,
+      .name = names[i],
+      .type = VL_OPT_TYPE_LONG,
+      .value = VL_OPTION_VALUE_BOOL,
     };
     all[i] = &opts[i];
   }
@@ -376,11 +370,13 @@ void test_requirement_capacity_growth(void) {
   for (int i = 0; i < 9; ++i)
     c0_requires[i] = &opts[i + 1];
   c0_requires[9] = NULL;
-  opts[0].requires = c0_requires;
+  opts[0].
+    requires
+  = c0_requires;
 
   vl_executable_t settings = {
-      .options = all,
-      .color = VAL_COLOR_NEVER,
+    .options = all,
+    .color = VAL_COLOR_NEVER,
   };
   valve_t *v = vl_create(&settings);
   EXPECT(v != NULL, "many-require schema created (capacity growth)");
@@ -393,30 +389,29 @@ void test_requirement_capacity_growth(void) {
 
 void test_requirement_on_verb_options(void) {
   static const vl_option_t token = {
-      .name = "token",
-      .type = VL_OPT_TYPE_LONG,
-      .value = VL_OPTION_VALUE_STRING,
+    .name = "token",
+    .type = VL_OPT_TYPE_LONG,
+    .value = VL_OPTION_VALUE_STRING,
   };
   static const vl_option_t *const pub_req[] = {&token, NULL};
   static const vl_option_t publish = {
-      .name = "publish",
-      .type = VL_OPT_TYPE_LONG,
-      .value = VL_OPTION_VALUE_BOOL,
-      .requires = pub_req,
+    .name = "publish",
+    .type = VL_OPT_TYPE_LONG,
+    .value = VL_OPTION_VALUE_BOOL,
+    .requires = pub_req,
   };
   const vl_option_t *const local_opts[] = {&publish, &token, NULL};
   const vl_verb_t *const verbs[] = {
-      VL_CMD(.name = "ship", .options = local_opts),
-      NULL,
+    VL_CMD(.name = "ship", .options = local_opts),
+    NULL,
   };
   vl_executable_t settings = {
-      .verbs = verbs,
-      .color = VAL_COLOR_NEVER,
+    .verbs = verbs,
+    .color = VAL_COLOR_NEVER,
   };
   valve_t *v = vl_create(&settings);
   char *bad[] = {(char *)"valve", (char *)"ship", (char *)"--publish"};
-  char *ok[] = {(char *)"valve", (char *)"ship", (char *)"--publish",
-                (char *)"--token=abc"};
+  char *ok[] = {(char *)"valve", (char *)"ship", (char *)"--publish", (char *)"--token=abc"};
 
   EXPECT(v != NULL, "verb requirement parser");
   EXPECT(vl_parse(v, 3, bad) == -1, "verb-local missing require fails");
@@ -433,21 +428,25 @@ void test_requirement_cycle_a_requires_b_requires_a(void) {
   static const vl_option_t *b_req[2];
 
   a = (vl_option_t){
-      .name = "a",
-      .type = VL_OPT_TYPE_LONG,
-      .value = VL_OPTION_VALUE_BOOL,
+    .name = "a",
+    .type = VL_OPT_TYPE_LONG,
+    .value = VL_OPTION_VALUE_BOOL,
   };
   b = (vl_option_t){
-      .name = "b",
-      .type = VL_OPT_TYPE_LONG,
-      .value = VL_OPTION_VALUE_BOOL,
+    .name = "b",
+    .type = VL_OPT_TYPE_LONG,
+    .value = VL_OPTION_VALUE_BOOL,
   };
   a_req[0] = &b;
   a_req[1] = NULL;
   b_req[0] = &a;
   b_req[1] = NULL;
-  a.requires = a_req;
-  b.requires = b_req;
+  a.
+    requires
+  = a_req;
+  b.
+    requires
+  = b_req;
 
   const vl_option_t *const options[] = {&a, &b, NULL};
   vl_executable_t settings = {.options = options, .color = VAL_COLOR_NEVER};
@@ -466,17 +465,17 @@ void test_requirement_cycle_a_requires_b_requires_a(void) {
 
 void test_requirement_counted_table(void) {
   static const vl_option_t other = {
-      .name = "other",
-      .type = VL_OPT_TYPE_LONG,
-      .value = VL_OPTION_VALUE_BOOL,
+    .name = "other",
+    .type = VL_OPT_TYPE_LONG,
+    .value = VL_OPTION_VALUE_BOOL,
   };
   static const vl_option_t *const table[] = {&other};
   static const vl_option_t source = {
-      .name = "source",
-      .type = VL_OPT_TYPE_LONG,
-      .value = VL_OPTION_VALUE_BOOL,
-      .requires = table,
-      .require_count = 1,
+    .name = "source",
+    .type = VL_OPT_TYPE_LONG,
+    .value = VL_OPTION_VALUE_BOOL,
+    .requires = table,
+    .require_count = 1,
   };
   static const vl_option_t *const opts[] = {&source, &other, NULL};
   vl_executable_t settings = {.options = opts, .color = VAL_COLOR_NEVER};

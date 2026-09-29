@@ -140,10 +140,10 @@ TEST_SOURCE_FILE("vl_results_clear_.c")
 TEST_SOURCE_FILE("vl_verb_get.c")
 /* === end ceedling valve sources === */
 
-
 #include <stdio.h>
 
 void setUp(void) {}
+
 void tearDown(void) {
   vl_color_support_reset();
 }
@@ -170,14 +170,13 @@ static void visit_error_(const vl_error_t *err, void *userdata) {
 
 void test_errors_foreach_visits_each(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "known", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_STRING, ),
-      NULL,
+    VL_OPT(.name = "known", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_STRING, ),
+    NULL,
   };
   char *argv[] = {
-      (char *)"valve",
-      (char *)"--unknown=1",
-      (char *)"--also-unknown=2",
+    (char *)"valve",
+    (char *)"--unknown=1",
+    (char *)"--also-unknown=2",
   };
   valve_t *v = parser_(options, 1);
   error_visit_t visit = {0};
@@ -187,25 +186,21 @@ void test_errors_foreach_visits_each(void) {
   EXPECT(vl_error_count(v) >= 1, "parse recorded at least one error");
 
   vl_errors_foreach(v, visit_error_, &visit);
-  EXPECT(visit.count == vl_error_count(v),
-         "foreach visits every recorded error");
-  EXPECT(visit.count >= 1 && visit.key && strcmp(visit.key, "unknown") == 0,
-         "foreach sees first unknown option key");
-  EXPECT(visit.code == VL_ERROR_UNKNOWN_OPTION,
-         "foreach sees unknown-option code");
+  EXPECT(visit.count == vl_error_count(v), "foreach visits every recorded error");
+  EXPECT(visit.count >= 1 && visit.key && strcmp(visit.key, "unknown") == 0, "foreach sees first unknown option key");
+  EXPECT(visit.code == VL_ERROR_UNKNOWN_OPTION, "foreach sees unknown-option code");
 
   vl_destroy(v);
 }
 
 void test_errors_print_format(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "known", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_STRING, ),
-      NULL,
+    VL_OPT(.name = "known", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_STRING, ),
+    NULL,
   };
   char *argv[] = {
-      (char *)"valve",
-      (char *)"--unknown=1",
+    (char *)"valve",
+    (char *)"--unknown=1",
   };
   valve_t *v = parser_(options, 1);
   char *buf = NULL;
@@ -224,12 +219,9 @@ void test_errors_print_format(void) {
   fflush(mem);
   fclose(mem);
 
-  EXPECT(buf != NULL && strstr(buf, "error argv[") != NULL,
-         "print starts with error argv[");
-  EXPECT(buf && strstr(buf, "[unknown]") != NULL,
-         "print includes [key]");
-  EXPECT(buf && err && err->message && strstr(buf, err->message) != NULL,
-         "print includes message");
+  EXPECT(buf != NULL && strstr(buf, "error argv[") != NULL, "print starts with error argv[");
+  EXPECT(buf && strstr(buf, "[unknown]") != NULL, "print includes [key]");
+  EXPECT(buf && err && err->message && strstr(buf, err->message) != NULL, "print includes message");
   EXPECT(buf && strchr(buf, '\n') != NULL, "print ends lines with newline");
 
   free(buf);
@@ -246,40 +238,41 @@ typedef struct clear_cfg {
 void test_targets_clear_string_and_value(void) {
   clear_cfg_t cfg = {0};
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "lane", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_STRING, .data = &cfg,
-             .offset = offsetof(clear_cfg_t, lane),
-             .target = VL_TARGET_STRING, ),
-      VL_OPT(.name = "mode", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_STRING, .data = &cfg,
-             .offset = offsetof(clear_cfg_t, mode),
-             .target = VL_TARGET_VALUE, ),
-      NULL,
+    VL_OPT(.name = "lane",
+           .type = VL_OPT_TYPE_LONG,
+           .value = VL_OPTION_VALUE_STRING,
+           .data = &cfg,
+           .offset = offsetof(clear_cfg_t, lane),
+           .target = VL_TARGET_STRING, ),
+    VL_OPT(.name = "mode",
+           .type = VL_OPT_TYPE_LONG,
+           .value = VL_OPTION_VALUE_STRING,
+           .data = &cfg,
+           .offset = offsetof(clear_cfg_t, mode),
+           .target = VL_TARGET_VALUE, ),
+    NULL,
   };
   const vl_executable_t settings = {
-      .options = options,
-      .option_count = 2,
+    .options = options,
+    .option_count = 2,
   };
   char *argv[] = {
-      (char *)"valve",
-      (char *)"--lane=production",
-      (char *)"--mode=dual",
+    (char *)"valve",
+    (char *)"--lane=production",
+    (char *)"--mode=dual",
   };
   valve_t *v = vl_create(&settings);
 
   EXPECT(v != NULL, "parser for targets clear");
   EXPECT(vl_parse(v, 3, argv) == 0, "parse populates string and value targets");
-  EXPECT(cfg.lane != NULL && strcmp(cfg.lane, "production") == 0,
-         "string target populated");
-  EXPECT(cfg.mode.kind == VL_VALUE_STRING && cfg.mode.raw &&
-             strcmp(cfg.mode.raw, "dual") == 0,
+  EXPECT(cfg.lane != NULL && strcmp(cfg.lane, "production") == 0, "string target populated");
+  EXPECT(cfg.mode.kind == VL_VALUE_STRING && cfg.mode.raw && strcmp(cfg.mode.raw, "dual") == 0,
          "value target populated");
   vl_destroy(v);
 
   vl_targets_clear(&settings);
   EXPECT(cfg.lane == NULL, "string target cleared to NULL");
-  EXPECT(cfg.mode.raw == NULL && cfg.mode.kind == VL_VALUE_STRING,
-         "value target cleared");
+  EXPECT(cfg.mode.raw == NULL && cfg.mode.kind == VL_VALUE_STRING, "value target cleared");
 
   vl_targets_clear(&settings);
   EXPECT(cfg.lane == NULL, "second clear remains safe");
@@ -309,6 +302,5 @@ void test_color_support_force_hierarchy(void) {
   EXPECT(vl_color_supports_truecolor(), "TRUECOLOR: truecolor is true");
 
   vl_color_support_reset();
-  EXPECT(vl_color_support_detect() == vl_color_support_detect(),
-         "reset leaves detect callable");
+  EXPECT(vl_color_support_detect() == vl_color_support_detect(), "reset leaves detect callable");
 }

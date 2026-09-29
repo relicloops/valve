@@ -3,8 +3,10 @@
 #include <stdlib.h>
 
 void vl_requirements_clear_(valve_t *v) {
-  if (!v)
+
+  if (!v) {
     return;
+  }
 
   free(v->requirements_);
   v->requirements_ = nullptr;

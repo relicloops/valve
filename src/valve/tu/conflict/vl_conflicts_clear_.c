@@ -3,8 +3,10 @@
 #include <stdlib.h>
 
 void vl_conflicts_clear_(valve_t *v) {
-  if (!v)
+
+  if (!v) {
     return;
+  }
 
   free(v->conflicts_);
   v->conflicts_ = nullptr;

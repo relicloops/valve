@@ -138,12 +138,14 @@ TEST_SOURCE_FILE("vl_requirements_copy_.c")
 TEST_SOURCE_FILE("vl_requirements_copy_table_.c")
 TEST_SOURCE_FILE("vl_results_clear_.c")
 TEST_SOURCE_FILE("vl_verb_get.c")
+
 /* === end ceedling valve sources === */
 
-
-
 void setUp(void) {}
-void tearDown(void) { vl_color_support_reset(); }
+
+void tearDown(void) {
+  vl_color_support_reset();
+}
 
 void test_argv_destroy_null_and_heap(void) {
   vl_argv_destroy(0, NULL);
@@ -159,11 +161,9 @@ void test_argv_destroy_null_and_heap(void) {
 
 void test_result_count_and_at(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "mode", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_STRING),
-      VL_OPT(.name = "count", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_INT),
-      NULL,
+    VL_OPT(.name = "mode", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_STRING),
+    VL_OPT(.name = "count", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_INT),
+    NULL,
   };
   char *argv[] = {(char *)"valve", (char *)"--mode=dual", (char *)"--count=3"};
   valve_t *v = parser_(options, 2);

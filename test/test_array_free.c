@@ -143,9 +143,11 @@ TEST_SOURCE_FILE("vl_requirements_copy_.c")
 TEST_SOURCE_FILE("vl_requirements_copy_table_.c")
 TEST_SOURCE_FILE("vl_results_clear_.c")
 TEST_SOURCE_FILE("vl_verb_get.c")
+
 /* === end ceedling valve sources === */
 
 void setUp(void) {}
+
 void tearDown(void) {}
 
 /*
@@ -164,8 +166,7 @@ void test_option_array_free_full_fields(void) {
   options[1].description = strdup("desc-b");
   options[1].usage = NULL; /* free(NULL) still exercised */
 
-  EXPECT(options[0].name && options[0].description && options[0].usage,
-         "opt0 fields");
+  EXPECT(options[0].name && options[0].description && options[0].usage, "opt0 fields");
   EXPECT(options[1].name && options[1].description, "opt1 fields");
 
   option_array_free_(options, 2);
@@ -183,11 +184,9 @@ void test_option_array_free_count_zero(void) {
 void test_option_array_free_via_options_copy_oom(void) {
   /* Drive the real caller: fail mid-copy so options_copy_ rolls back. */
   const vl_option_t *const opts[] = {
-      VL_OPT(.name = "a", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL,
-             .description = "da", .usage = "ua"),
-      VL_OPT(.name = "b", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL,
-             .description = "db", .usage = "ub"),
-      NULL,
+    VL_OPT(.name = "a", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL, .description = "da", .usage = "ua"),
+    VL_OPT(.name = "b", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL, .description = "db", .usage = "ub"),
+    NULL,
   };
   vl_executable_t settings = {.options = opts, .color = VAL_COLOR_NEVER};
   int saw_null = 0;

@@ -138,10 +138,11 @@ TEST_SOURCE_FILE("vl_requirements_copy_.c")
 TEST_SOURCE_FILE("vl_requirements_copy_table_.c")
 TEST_SOURCE_FILE("vl_results_clear_.c")
 TEST_SOURCE_FILE("vl_verb_get.c")
+
 /* === end ceedling valve sources === */
 
-
 void setUp(void) {}
+
 void tearDown(void) {}
 
 static int help_calls_ = 0;
@@ -174,67 +175,69 @@ static void reset_callback_counters_(void) {
 static valve_t *reserved_parser_(void) {
   static const vl_option_t *const opts[] = {NULL};
   vl_executable_t settings = {
-      .options = opts,
-      .on_help = count_help_,
-      .on_version = count_version_,
-      .on_valve = count_valve_,
+    .options = opts,
+    .on_help = count_help_,
+    .on_version = count_version_,
+    .on_valve = count_valve_,
   };
   return vl_create(&settings);
 }
 
 static valve_t *reserved_command_parser_(void) {
   const vl_option_t *const network_opts[] = {
-      VL_OPT(.name = "proxy.lane", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_STRING),
-      NULL,
+    VL_OPT(.name = "proxy.lane", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_STRING),
+    NULL,
   };
   const vl_option_t *const config_opts[] = {
-      VL_OPT(.name = "mode", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_STRING),
-      NULL,
+    VL_OPT(.name = "mode", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_STRING),
+    NULL,
   };
   const vl_verb_t *const cmds[] = {
-      VL_CMD(.name = "network", .options = network_opts),
-      VL_CMD(.name = "config", .options = config_opts),
-      NULL,
+    VL_CMD(.name = "network", .options = network_opts),
+    VL_CMD(.name = "config", .options = config_opts),
+    NULL,
   };
   vl_executable_t settings = {
-      .verbs = cmds,
-      .on_help = count_help_,
-      .on_version = count_version_,
-      .on_valve = count_valve_,
+    .verbs = cmds,
+    .on_help = count_help_,
+    .on_version = count_version_,
+    .on_valve = count_valve_,
   };
   return vl_create(&settings);
 }
 
 static valve_t *reserved_subverb_parser_(void) {
   const vl_verb_t *const agent_subs[] = {
-      VL_CMD(.name = "list", .description = "list agents"),
-      VL_CMD(.name = "call", .description = "call an agent"),
-      NULL,
+    VL_CMD(.name = "list", .description = "list agents"),
+    VL_CMD(.name = "call", .description = "call an agent"),
+    NULL,
   };
   const vl_verb_t *const page_subs[] = {
-      VL_CMD(.name = "list", .description = "list pages"),
-      NULL,
+    VL_CMD(.name = "list", .description = "list pages"),
+    NULL,
   };
   const vl_option_t *const network_opts[] = {
-      VL_OPT(.name = "proxy.lane", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_DOT_NOTATION, .target = VL_TARGET_STRING),
-      VL_OPT(.name = "proxy.cpus", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_DOT_NOTATION, .target = VL_TARGET_INT),
-      NULL,
+    VL_OPT(.name = "proxy.lane",
+           .type = VL_OPT_TYPE_LONG,
+           .value = VL_OPTION_VALUE_DOT_NOTATION,
+           .target = VL_TARGET_STRING),
+    VL_OPT(.name = "proxy.cpus",
+           .type = VL_OPT_TYPE_LONG,
+           .value = VL_OPTION_VALUE_DOT_NOTATION,
+           .target = VL_TARGET_INT),
+    NULL,
   };
   const vl_verb_t *const cmds[] = {
-      VL_CMD(.name = "agent", .description = "agent ops", .verbs = agent_subs),
-      VL_CMD(.name = "page", .description = "page ops", .verbs = page_subs),
-      VL_CMD(.name = "network", .description = "net", .options = network_opts),
-      NULL,
+    VL_CMD(.name = "agent", .description = "agent ops", .verbs = agent_subs),
+    VL_CMD(.name = "page", .description = "page ops", .verbs = page_subs),
+    VL_CMD(.name = "network", .description = "net", .options = network_opts),
+    NULL,
   };
   vl_executable_t settings = {
-      .verbs = cmds,
-      .on_help = count_help_,
-      .on_version = count_version_,
-      .on_valve = count_valve_,
+    .verbs = cmds,
+    .on_help = count_help_,
+    .on_version = count_version_,
+    .on_valve = count_valve_,
   };
   return vl_create(&settings);
 }
@@ -248,8 +251,7 @@ void test_reserved_help_dotted_subverb(void) {
   EXPECT(v != NULL, "dotted-subverb parser created");
   EXPECT(vl_parse(v, 2, a1) == 0, "--help=agent.list parses");
   EXPECT(help_calls_ == 1, "--help=agent.list fires on_help");
-  EXPECT(vl_help_target(v) && strcmp(vl_help_target(v), "agent.list") == 0,
-         "help target stored as agent.list");
+  EXPECT(vl_help_target(v) && strcmp(vl_help_target(v), "agent.list") == 0, "help target stored as agent.list");
   EXPECT(vl_parse(v, 2, a2) == 0, "--help=page.list parses");
   EXPECT(vl_help_target(v) && strcmp(vl_help_target(v), "page.list") == 0,
          "help target stored as page.list (disambiguated)");
@@ -392,8 +394,7 @@ void test_reserved_help_context_aware(void) {
   EXPECT(v != NULL, "context-aware parser created");
   EXPECT(vl_parse(v, 3, argv) == 0, "valve network --help parses");
   EXPECT(help_calls_ == 1, "on_help fired once");
-  EXPECT(help_active_name_ && strcmp(help_active_name_, "network") == 0,
-         "on_help received active verb = network");
+  EXPECT(help_active_name_ && strcmp(help_active_name_, "network") == 0, "on_help received active verb = network");
   vl_destroy(v);
 }
 
@@ -410,13 +411,12 @@ void test_reserved_help_default_when_null(void) {
 
 void test_behavior_allow_override_reserved_option(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "help", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_STRING),
-      NULL,
+    VL_OPT(.name = "help", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_STRING),
+    NULL,
   };
   vl_executable_t settings = {
-      .options = options,
-      .behavior = VL_BEHAVIOR_ALLOW_OVERRIDE_RESERVED,
+    .options = options,
+    .behavior = VL_BEHAVIOR_ALLOW_OVERRIDE_RESERVED,
   };
   valve_t *v = vl_create(&settings);
   EXPECT(v != NULL, "option 'help' accepted with ALLOW_OVERRIDE_RESERVED");
@@ -425,12 +425,12 @@ void test_behavior_allow_override_reserved_option(void) {
 
 void test_behavior_allow_override_reserved_command(void) {
   const vl_verb_t *const verbs[] = {
-      VL_CMD(.name = "version"),
-      NULL,
+    VL_CMD(.name = "version"),
+    NULL,
   };
   vl_executable_t settings = {
-      .verbs = verbs,
-      .behavior = VL_BEHAVIOR_ALLOW_OVERRIDE_RESERVED,
+    .verbs = verbs,
+    .behavior = VL_BEHAVIOR_ALLOW_OVERRIDE_RESERVED,
   };
   valve_t *v = vl_create(&settings);
   EXPECT(v != NULL, "verb 'version' accepted with ALLOW_OVERRIDE_RESERVED");
@@ -439,14 +439,13 @@ void test_behavior_allow_override_reserved_command(void) {
 
 void test_behavior_allow_override_user_wins_at_parse(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "help", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_STRING),
-      NULL,
+    VL_OPT(.name = "help", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_STRING),
+    NULL,
   };
   vl_executable_t settings = {
-      .options = options,
-      .behavior = VL_BEHAVIOR_ALLOW_OVERRIDE_RESERVED,
-      .on_help = count_help_,
+    .options = options,
+    .behavior = VL_BEHAVIOR_ALLOW_OVERRIDE_RESERVED,
+    .on_help = count_help_,
   };
   valve_t *v = vl_create(&settings);
   char *argv[] = {(char *)"valve", (char *)"--help=foo"};
@@ -457,8 +456,7 @@ void test_behavior_allow_override_user_wins_at_parse(void) {
   EXPECT(vl_parse(v, 2, argv) == 0, "--help=foo parses as user option");
   EXPECT(help_calls_ == 0, "on_help NOT fired when user override exists");
   value = vl_get(v, "help");
-  EXPECT(value && value->kind == VL_VALUE_STRING &&
-             strcmp(value->raw, "foo") == 0,
+  EXPECT(value && value->kind == VL_VALUE_STRING && strcmp(value->raw, "foo") == 0,
          "user 'help' option captured 'foo'");
   vl_destroy(v);
 }
@@ -466,9 +464,9 @@ void test_behavior_allow_override_user_wins_at_parse(void) {
 void test_behavior_allow_override_falls_through_when_no_user_def(void) {
   static const vl_option_t *const opts[] = {NULL};
   vl_executable_t settings = {
-      .options = opts,
-      .behavior = VL_BEHAVIOR_ALLOW_OVERRIDE_RESERVED,
-      .on_version = count_version_,
+    .options = opts,
+    .behavior = VL_BEHAVIOR_ALLOW_OVERRIDE_RESERVED,
+    .on_version = count_version_,
   };
   valve_t *v = vl_create(&settings);
   char *argv[] = {(char *)"valve", (char *)"--version"};
@@ -479,4 +477,3 @@ void test_behavior_allow_override_falls_through_when_no_user_def(void) {
   EXPECT(version_calls_ == 1, "on_version fires when no user override defined");
   vl_destroy(v);
 }
-

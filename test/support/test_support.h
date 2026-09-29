@@ -18,7 +18,6 @@
 #define EXPECT(cond, name) TEST_ASSERT_TRUE_MESSAGE((cond), (name))
 
 valve_t *parser_(const vl_option_t *const *options, size_t option_count);
-valve_t *parser_with_form_(const vl_option_t *const *options,
-                           size_t option_count, vl_assign_t assign);
+valve_t *parser_with_form_(const vl_option_t *const *options, size_t option_count, vl_assign_t assign);
 
 #endif /* VALVE_TEST_SUPPORT_H */

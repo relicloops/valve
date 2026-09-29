@@ -145,7 +145,10 @@ TEST_SOURCE_FILE("vl_verb_get.c")
 
 #include <unistd.h>
 
-void setUp(void) { vl_test_alloc_reset(); }
+void setUp(void) {
+  vl_test_alloc_reset();
+}
+
 void tearDown(void) {
   vl_test_alloc_reset();
   vl_color_support_reset();
@@ -179,47 +182,47 @@ static void reset_counters_(void) {
 #define VL_ACT(...) (&(const vl_executable_action_t){__VA_ARGS__})
 
 static const vl_executable_action_t update_bool_ = {
-    .option = {.name = "update", .short_name = 'u',
-               .type = VL_OPT_TYPE_LONG | VL_OPT_TYPE_SHORT,
-               .value = VL_OPTION_VALUE_BOOL,
-               .description = "replace this binary"},
-    .run = run_update_,
+  .option = {.name = "update",
+             .short_name = 'u',
+             .type = VL_OPT_TYPE_LONG | VL_OPT_TYPE_SHORT,
+             .value = VL_OPTION_VALUE_BOOL,
+             .description = "replace this binary"},
+  .run = run_update_,
 };
 
 static const vl_executable_action_t telemetry_toggle_ = {
-    .option = {.name = "telemetry", .toggle_ref = "telemetry",
-               .type = VL_OPT_TYPE_TOGGLE, .value = VL_OPTION_VALUE_TOGGLE,
-               .description = "opt in or out of telemetry"},
-    .run = run_telemetry_,
+  .option = {.name = "telemetry",
+             .toggle_ref = "telemetry",
+             .type = VL_OPT_TYPE_TOGGLE,
+             .value = VL_OPTION_VALUE_TOGGLE,
+             .description = "opt in or out of telemetry"},
+  .run = run_telemetry_,
 };
 
 static const vl_option_t *const verb_opts_[] = {
-    VL_OPT(.name = "count", .type = VL_OPT_TYPE_LONG,
-           .value = VL_OPTION_VALUE_INT),
-    NULL,
+  VL_OPT(.name = "count", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_INT),
+  NULL,
 };
 
 static const vl_verb_t *const verbs_[] = {
-    VL_CMD(.name = "universe", .options = verb_opts_),
-    NULL,
+  VL_CMD(.name = "universe", .options = verb_opts_),
+  NULL,
 };
 
 static const vl_option_t *const globals_[] = {
-    VL_OPT(.name = "verbose", .short_name = 'V',
-           .type = VL_OPT_TYPE_LONG | VL_OPT_TYPE_SHORT,
-           .value = VL_OPTION_VALUE_BOOL),
-    NULL,
+  VL_OPT(.name = "verbose", .short_name = 'V', .type = VL_OPT_TYPE_LONG | VL_OPT_TYPE_SHORT,
+         .value = VL_OPTION_VALUE_BOOL),
+  NULL,
 };
 
-static valve_t *actions_parser_(const vl_executable_action_t *const *actions,
-                                vl_assign_t assign, bool with_verbs) {
+static valve_t *actions_parser_(const vl_executable_action_t *const *actions, vl_assign_t assign, bool with_verbs) {
   vl_executable_t settings = {
-      .assign = assign,
-      .behavior = VL_BEHAVIOR_ACCEPT_NO_VERB,
-      .options = globals_,
-      .verbs = with_verbs ? verbs_ : NULL,
-      .actions = actions,
-      .color = VAL_COLOR_NEVER,
+    .assign = assign,
+    .behavior = VL_BEHAVIOR_ACCEPT_NO_VERB,
+    .options = globals_,
+    .verbs = with_verbs ? verbs_ : NULL,
+    .actions = actions,
+    .color = VAL_COLOR_NEVER,
   };
   return vl_create(&settings);
 }
@@ -233,8 +236,7 @@ void test_actions_require_behavior_flag(void) {
 }
 
 void test_flag_without_actions_is_inert(void) {
-  vl_executable_t settings = {.behavior = VL_BEHAVIOR_ACCEPT_NO_VERB,
-                              .options = globals_};
+  vl_executable_t settings = {.behavior = VL_BEHAVIOR_ACCEPT_NO_VERB, .options = globals_};
   valve_t *v = vl_create(&settings);
   EXPECT(v != NULL, "flag alone creates");
   char *argv[] = {(char *)"prog", (char *)"--update"};
@@ -244,14 +246,12 @@ void test_flag_without_actions_is_inert(void) {
 }
 
 void test_action_count_without_table_is_refused(void) {
-  vl_executable_t settings = {.behavior = VL_BEHAVIOR_ACCEPT_NO_VERB,
-                              .action_count = 1};
+  vl_executable_t settings = {.behavior = VL_BEHAVIOR_ACCEPT_NO_VERB, .action_count = 1};
   EXPECT(vl_create(&settings) == NULL, "count without table");
 }
 
 void test_action_count_helper(void) {
-  const vl_executable_action_t *const actions[] = {&update_bool_,
-                                                   &telemetry_toggle_, NULL};
+  const vl_executable_action_t *const actions[] = {&update_bool_, &telemetry_toggle_, NULL};
   EXPECT(action_count_(NULL, 0) == 0, "null table");
   EXPECT(action_count_(actions, 0) == 2, "null-terminated");
   EXPECT(action_count_(actions, 1) == 1, "explicit count");
@@ -271,112 +271,94 @@ static bool creates_(const vl_executable_action_t *action) {
 
 void test_action_invalid_shapes_are_refused(void) {
   EXPECT(!creates_(NULL), "null slot");
-  EXPECT(!creates_(VL_ACT(.option = {.name = "x", .type = VL_OPT_TYPE_LONG,
-                                     .value = VL_OPTION_VALUE_BOOL})),
+  EXPECT(!creates_(VL_ACT(.option = {.name = "x", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL})),
          "missing run");
-  EXPECT(!creates_(VL_ACT(.option = {.name = "", .type = VL_OPT_TYPE_LONG,
-                                     .value = VL_OPTION_VALUE_BOOL},
-                          .run = run_update_)),
+  EXPECT(!creates_(
+           VL_ACT(.option = {.name = "", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL}, .run = run_update_)),
          "invalid option name");
-  EXPECT(!creates_(VL_ACT(.option = {.name = "x", .type = VL_OPT_TYPE_LONG,
-                                     .value = VL_OPTION_VALUE_BOOL,
-                                     .required = true},
-                          .run = run_update_)),
-         "required");
-  EXPECT(!creates_(VL_ACT(.option = {.name = "x", .type = VL_OPT_TYPE_LONG,
+  EXPECT(
+    !creates_(VL_ACT(.option = {.name = "x", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL, .required = true},
+                     .run = run_update_)),
+    "required");
+  EXPECT(!creates_(VL_ACT(.option = {.name = "x",
+                                     .type = VL_OPT_TYPE_LONG,
                                      .value = VL_OPTION_VALUE_STRING,
                                      .repeat = VL_OPTION_REPEAT_ARRAY},
                           .run = run_update_)),
          "repeat");
-  EXPECT(!creates_(VL_ACT(.option = {.name = "x", .type = VL_OPT_TYPE_LONG,
-                                     .value = VL_OPTION_VALUE_BOOL,
-                                     .conflicts = globals_},
-                          .run = run_update_)),
-         "conflicts");
-  EXPECT(!creates_(VL_ACT(.option = {.name = "x", .type = VL_OPT_TYPE_LONG,
-                                     .value = VL_OPTION_VALUE_BOOL,
-                                     .conflict_count = 1},
-                          .run = run_update_)),
+  EXPECT(
+    !creates_(
+      VL_ACT(.option = {.name = "x", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL, .conflicts = globals_},
+             .run = run_update_)),
+    "conflicts");
+  EXPECT(!creates_(
+           VL_ACT(.option = {.name = "x", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL, .conflict_count = 1},
+                  .run = run_update_)),
          "conflict_count");
-  EXPECT(!creates_(VL_ACT(.option = {.name = "x", .type = VL_OPT_TYPE_LONG,
-                                     .value = VL_OPTION_VALUE_BOOL,
-                                     .requires = globals_},
-                          .run = run_update_)),
-         "requires");
-  EXPECT(!creates_(VL_ACT(.option = {.name = "x", .type = VL_OPT_TYPE_LONG,
-                                     .value = VL_OPTION_VALUE_BOOL,
-                                     .require_count = 1},
-                          .run = run_update_)),
+  EXPECT(
+    !creates_(
+      VL_ACT(.option = {.name = "x", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL, .requires = globals_},
+             .run = run_update_)),
+    "requires");
+  EXPECT(!creates_(
+           VL_ACT(.option = {.name = "x", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL, .require_count = 1},
+                  .run = run_update_)),
          "require_count");
-  EXPECT(!creates_(VL_ACT(.option = {.name = "x",
-                                     .value = VL_OPTION_VALUE_COMMAND},
-                          .run = run_update_)),
+  EXPECT(!creates_(VL_ACT(.option = {.name = "x", .value = VL_OPTION_VALUE_COMMAND}, .run = run_update_)),
          "command value");
-  EXPECT(creates_(VL_ACT(.option = {.name = "x", .type = VL_OPT_TYPE_LONG,
-                                    .value = VL_OPTION_VALUE_BOOL},
+  EXPECT(creates_(VL_ACT(.option = {.name = "x", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL},
                          .run = run_update_)),
          "minimal valid action");
 }
 
 void test_action_name_collisions_are_refused(void) {
-  EXPECT(!creates_(VL_ACT(.option = {.name = "help", .type = VL_OPT_TYPE_LONG,
-                                     .value = VL_OPTION_VALUE_BOOL},
+  EXPECT(!creates_(VL_ACT(.option = {.name = "help", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL},
                           .run = run_update_)),
          "reserved long name");
-  EXPECT(!creates_(VL_ACT(.option = {.name = "x", .short_name = 'h',
-                                     .type = VL_OPT_TYPE_LONG |
-                                             VL_OPT_TYPE_SHORT,
+  EXPECT(!creates_(VL_ACT(.option = {.name = "x",
+                                     .short_name = 'h',
+                                     .type = VL_OPT_TYPE_LONG | VL_OPT_TYPE_SHORT,
                                      .value = VL_OPTION_VALUE_BOOL},
                           .run = run_update_)),
          "reserved short name");
-  EXPECT(!creates_(VL_ACT(.option = {.name = "verbose",
-                                     .type = VL_OPT_TYPE_LONG,
-                                     .value = VL_OPTION_VALUE_BOOL},
+  EXPECT(!creates_(VL_ACT(.option = {.name = "verbose", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL},
                           .run = run_update_)),
          "collides with global long");
-  EXPECT(!creates_(VL_ACT(.option = {.name = "x", .short_name = 'V',
-                                     .type = VL_OPT_TYPE_LONG |
-                                             VL_OPT_TYPE_SHORT,
+  EXPECT(!creates_(VL_ACT(.option = {.name = "x",
+                                     .short_name = 'V',
+                                     .type = VL_OPT_TYPE_LONG | VL_OPT_TYPE_SHORT,
                                      .value = VL_OPTION_VALUE_BOOL},
                           .run = run_update_)),
          "collides with global short");
 
   /* override flag does not extend to actions */
   const vl_executable_action_t *const actions[] = {
-      VL_ACT(.option = {.name = "version", .type = VL_OPT_TYPE_LONG,
-                        .value = VL_OPTION_VALUE_BOOL},
-             .run = run_update_),
-      NULL};
-  vl_executable_t settings = {
-      .behavior = VL_BEHAVIOR_ACCEPT_NO_VERB |
-                  VL_BEHAVIOR_ALLOW_OVERRIDE_RESERVED,
-      .actions = actions};
+    VL_ACT(.option = {.name = "version", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL}, .run = run_update_),
+    NULL};
+  vl_executable_t settings = {.behavior = VL_BEHAVIOR_ACCEPT_NO_VERB | VL_BEHAVIOR_ALLOW_OVERRIDE_RESERVED,
+                              .actions = actions};
   EXPECT(vl_create(&settings) == NULL, "override flag ignored for actions");
 }
 
 void test_duplicate_actions_are_refused(void) {
   const vl_executable_action_t *const by_name[] = {
-      &update_bool_,
-      VL_ACT(.option = {.name = "update", .type = VL_OPT_TYPE_LONG,
-                        .value = VL_OPTION_VALUE_BOOL},
-             .run = run_update_),
-      NULL};
-  vl_executable_t settings = {.behavior = VL_BEHAVIOR_ACCEPT_NO_VERB,
-                              .actions = by_name};
+    &update_bool_,
+    VL_ACT(.option = {.name = "update", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL}, .run = run_update_),
+    NULL};
+  vl_executable_t settings = {.behavior = VL_BEHAVIOR_ACCEPT_NO_VERB, .actions = by_name};
   EXPECT(vl_create(&settings) == NULL, "duplicate long name");
 
-  const vl_executable_action_t *const by_short[] = {
-      &update_bool_,
-      VL_ACT(.option = {.name = "other", .short_name = 'u',
-                        .type = VL_OPT_TYPE_LONG | VL_OPT_TYPE_SHORT,
-                        .value = VL_OPTION_VALUE_BOOL},
-             .run = run_update_),
-      NULL};
+  const vl_executable_action_t *const by_short[] = {&update_bool_,
+                                                    VL_ACT(.option = {.name = "other",
+                                                                      .short_name = 'u',
+                                                                      .type = VL_OPT_TYPE_LONG | VL_OPT_TYPE_SHORT,
+                                                                      .value = VL_OPTION_VALUE_BOOL},
+                                                           .run = run_update_),
+                                                    NULL};
   settings.actions = by_short;
   EXPECT(vl_create(&settings) == NULL, "duplicate short name");
 
-  const vl_executable_action_t *const distinct[] = {&update_bool_,
-                                                    &telemetry_toggle_, NULL};
+  const vl_executable_action_t *const distinct[] = {&update_bool_, &telemetry_toggle_, NULL};
   settings.actions = distinct;
   valve_t *v = vl_create(&settings);
   EXPECT(v != NULL, "distinct actions create");
@@ -393,14 +375,12 @@ void test_long_bool_action_fires_without_verb(void) {
   EXPECT(v != NULL && vl_parse(v, 2, argv) == 0, "parse ok");
   EXPECT(update_calls_ == 1, "run called once");
   EXPECT(reserved_in_run_, "reserved fired inside run");
-  EXPECT(fired_name_in_run_ && strcmp(fired_name_in_run_, "update") == 0,
-         "fired name visible inside run");
+  EXPECT(fired_name_in_run_ && strcmp(fired_name_in_run_, "update") == 0, "fired name visible inside run");
   EXPECT(vl_reserved_fired(v), "reserved fired after parse");
   EXPECT(strcmp(vl_action_fired(v), "update") == 0, "fired name after parse");
   EXPECT(vl_verb_get(v) == NULL, "no verb selected");
   const vl_value_t *val = vl_get(v, "update");
-  EXPECT(val && val->kind == VL_VALUE_BOOL && val->as.boolean,
-         "value stored under the action name");
+  EXPECT(val && val->kind == VL_VALUE_BOOL && val->as.boolean, "value stored under the action name");
   vl_destroy(v);
 }
 
@@ -432,15 +412,14 @@ void test_toggle_action_fires(void) {
 
 void test_action_with_string_value_populates_target(void) {
   char *tag = NULL;
-  const vl_executable_action_t *const actions[] = {
-      VL_ACT(.option = {.name = "update", .type = VL_OPT_TYPE_LONG,
-                        .value = VL_OPTION_VALUE_STRING,
-                        .target = VL_TARGET_STRING, .data = &tag},
-             .run = run_update_),
-      NULL};
-  vl_executable_t settings = {.behavior = VL_BEHAVIOR_ACCEPT_NO_VERB,
-                              .actions = actions,
-                              .color = VAL_COLOR_NEVER};
+  const vl_executable_action_t *const actions[] = {VL_ACT(.option = {.name = "update",
+                                                                     .type = VL_OPT_TYPE_LONG,
+                                                                     .value = VL_OPTION_VALUE_STRING,
+                                                                     .target = VL_TARGET_STRING,
+                                                                     .data = &tag},
+                                                          .run = run_update_),
+                                                   NULL};
+  vl_executable_t settings = {.behavior = VL_BEHAVIOR_ACCEPT_NO_VERB, .actions = actions, .color = VAL_COLOR_NEVER};
   valve_t *v = vl_create(&settings);
   reset_counters_();
   char *argv[] = {(char *)"prog", (char *)"--update=v7.4.0"};
@@ -459,14 +438,16 @@ void test_action_with_string_value_populates_target(void) {
 
 void test_action_separate_value(void) {
   int level = 0;
-  const vl_executable_action_t *const actions[] = {
-      VL_ACT(.option = {.name = "level", .short_name = 'l',
-                        .type = VL_OPT_TYPE_LONG | VL_OPT_TYPE_SHORT,
-                        .value = VL_OPTION_VALUE_INT,
-                        .target = VL_TARGET_INT, .data = &level,
-                        .has_int_max = true, .int_max = 5},
-             .run = run_update_),
-      NULL};
+  const vl_executable_action_t *const actions[] = {VL_ACT(.option = {.name = "level",
+                                                                     .short_name = 'l',
+                                                                     .type = VL_OPT_TYPE_LONG | VL_OPT_TYPE_SHORT,
+                                                                     .value = VL_OPTION_VALUE_INT,
+                                                                     .target = VL_TARGET_INT,
+                                                                     .data = &level,
+                                                                     .has_int_max = true,
+                                                                     .int_max = 5},
+                                                          .run = run_update_),
+                                                   NULL};
   valve_t *v = actions_parser_(actions, VL_ASSIGN_SEPARATE, true);
   reset_counters_();
   char *argv[] = {(char *)"prog", (char *)"-l", (char *)"3"};
@@ -486,9 +467,7 @@ void test_trailing_tokens_after_action_are_rejected(void) {
   char *argv[] = {(char *)"prog", (char *)"--update", (char *)"universe"};
   EXPECT(v != NULL && vl_parse(v, 3, argv) == -1, "trailing verb rejected");
   const vl_error_t *err = vl_error_at(v, 0);
-  EXPECT(err && err->code == VL_ERROR_UNEXPECTED_ARGUMENT &&
-             err->argv_index == 2,
-         "unexpected argument at index 2");
+  EXPECT(err && err->code == VL_ERROR_UNEXPECTED_ARGUMENT && err->argv_index == 2, "unexpected argument at index 2");
   EXPECT(update_calls_ == 0, "run not called");
   EXPECT(!vl_reserved_fired(v), "not fired");
   vl_destroy(v);
@@ -524,8 +503,7 @@ void test_reserved_and_verbs_still_work_with_actions(void) {
 
   char *ver[] = {(char *)"prog", (char *)"--version"};
   EXPECT(v != NULL && vl_parse(v, 2, ver) == 0, "--version still reserved");
-  EXPECT(vl_reserved_fired(v) && vl_action_fired(v) == NULL,
-         "reserved without action");
+  EXPECT(vl_reserved_fired(v) && vl_action_fired(v) == NULL, "reserved without action");
 
   char *verb[] = {(char *)"prog", (char *)"universe", (char *)"--count=2"};
   EXPECT(vl_parse(v, 3, verb) == 0, "verb parses");
@@ -539,8 +517,7 @@ void test_reserved_and_verbs_still_work_with_actions(void) {
 }
 
 void test_action_find_token_shapes(void) {
-  const vl_executable_action_t *const actions[] = {&update_bool_,
-                                                   &telemetry_toggle_, NULL};
+  const vl_executable_action_t *const actions[] = {&update_bool_, &telemetry_toggle_, NULL};
   valve_t *v = actions_parser_(actions, VL_ASSIGN_INLINE, false);
   EXPECT(v != NULL, "parser");
   EXPECT(vl_action_find_(NULL, "--update") == NULL, "null parser");
@@ -564,8 +541,7 @@ void test_action_find_token_shapes(void) {
 
   vl_executable_t plain = {.options = globals_};
   valve_t *p = vl_create(&plain);
-  EXPECT(p != NULL && vl_action_find_(p, "--update") == NULL,
-         "flag clear finds nothing");
+  EXPECT(p != NULL && vl_action_find_(p, "--update") == NULL, "flag clear finds nothing");
   vl_destroy(p);
 }
 
@@ -622,16 +598,16 @@ static char *capture_help_(valve_t *v) {
 }
 
 void test_help_overview_lists_actions(void) {
-  const vl_executable_action_t *const actions[] = {&update_bool_,
-                                                   &telemetry_toggle_, NULL};
+  const vl_executable_action_t *const actions[] = {&update_bool_, &telemetry_toggle_, NULL};
   valve_t *v = actions_parser_(actions, VL_ASSIGN_INLINE, true);
   EXPECT(v != NULL, "parser");
   char *out = capture_help_(v);
   EXPECT(out != NULL, "captured");
   EXPECT(out && strstr(out, "\nactions:\n"), "actions section");
   EXPECT(out && strstr(out, "replace this binary"), "action description");
-  EXPECT(out && strstr(out, "reserved: --help  --version  --valve  --update"
-                            "  --enable-telemetry | --disable-telemetry\n"),
+  EXPECT(out && strstr(out,
+                       "reserved: --help  --version  --valve  --update"
+                       "  --enable-telemetry | --disable-telemetry\n"),
          "reserved line lists actions");
   free(out);
   vl_destroy(v);
@@ -641,12 +617,14 @@ void test_help_overview_lists_actions(void) {
 
 void test_targets_clear_skips_actions_without_flag(void) {
   char *tag = strdup("keep");
-  const vl_executable_action_t *const actions[] = {
-      VL_ACT(.option = {.name = "update", .type = VL_OPT_TYPE_LONG,
-                        .value = VL_OPTION_VALUE_STRING,
-                        .target = VL_TARGET_STRING, .data = &tag},
-             .run = run_update_),
-      NULL, NULL};
+  const vl_executable_action_t *const actions[] = {VL_ACT(.option = {.name = "update",
+                                                                     .type = VL_OPT_TYPE_LONG,
+                                                                     .value = VL_OPTION_VALUE_STRING,
+                                                                     .target = VL_TARGET_STRING,
+                                                                     .data = &tag},
+                                                          .run = run_update_),
+                                                   NULL,
+                                                   NULL};
   vl_executable_t settings = {.actions = actions};
   vl_targets_clear(&settings);
   EXPECT(tag != NULL, "flag clear leaves action targets alone");
@@ -662,8 +640,7 @@ void test_actions_clear_null_parser(void) {
 }
 
 void test_create_action_allocation_failures(void) {
-  const vl_executable_action_t *const actions[] = {&update_bool_,
-                                                   &telemetry_toggle_, NULL};
+  const vl_executable_action_t *const actions[] = {&update_bool_, &telemetry_toggle_, NULL};
   vl_executable_t settings = {.behavior = VL_BEHAVIOR_ACCEPT_NO_VERB,
                               .options = globals_,
                               .verbs = verbs_,

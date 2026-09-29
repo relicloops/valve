@@ -6,8 +6,7 @@
  * - macOS / BSD: <util.h>
  * - Linux: <pty.h> (link with -lutil)
  */
-#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) || \
-    defined(__NetBSD__)
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
 #include <util.h>
 #elif defined(__linux__)
 #include <pty.h>

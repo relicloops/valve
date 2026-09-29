@@ -138,10 +138,11 @@ TEST_SOURCE_FILE("vl_requirements_copy_.c")
 TEST_SOURCE_FILE("vl_requirements_copy_table_.c")
 TEST_SOURCE_FILE("vl_results_clear_.c")
 TEST_SOURCE_FILE("vl_verb_get.c")
+
 /* === end ceedling valve sources === */
 
-
 void setUp(void) {}
+
 void tearDown(void) {}
 
 void test_create_destroy(void) {
@@ -162,7 +163,5 @@ void test_version_get(void) {
 
 void test_version_string(void) {
   const char *s = vl_version_string();
-  EXPECT(s != NULL && strstr(s, "valve v") != NULL,
-         "vl_version_string contains 'valve v'");
+  EXPECT(s != NULL && strstr(s, "valve v") != NULL, "vl_version_string contains 'valve v'");
 }
-

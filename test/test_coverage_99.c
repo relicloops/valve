@@ -147,7 +147,9 @@ TEST_SOURCE_FILE("vl_verb_get.c")
 #include <string.h>
 #include <unistd.h>
 
-void setUp(void) { vl_test_alloc_reset(); }
+void setUp(void) {
+  vl_test_alloc_reset();
+}
 
 void tearDown(void) {
   vl_test_alloc_reset();
@@ -172,8 +174,8 @@ void tearDown(void) {
 
 void test_parse_null_and_negative_argc(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "x", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL),
-      NULL,
+    VL_OPT(.name = "x", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL),
+    NULL,
   };
   valve_t *v = parser_(options, 1);
   char *argv[] = {(char *)"valve"};
@@ -187,12 +189,11 @@ void test_parse_null_and_negative_argc(void) {
 void test_parse_number_huge_int_as_double(void) {
   /* Exceeds int64 → parse_int fails; no .eE mark; parse_double succeeds. */
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "n", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_NUMBER),
-      NULL,
+    VL_OPT(.name = "n", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_NUMBER),
+    NULL,
   };
   valve_t *v = parser_(options, 1);
-  char *argv[] = {(char *)"valve",
-                  (char *)"--n=999999999999999999999999999999"};
+  char *argv[] = {(char *)"valve", (char *)"--n=999999999999999999999999999999"};
   const vl_value_t *val;
   EXPECT(v != NULL, "parser");
   EXPECT(vl_parse(v, 2, argv) == 0, "huge number parses as double");
@@ -203,8 +204,8 @@ void test_parse_number_huge_int_as_double(void) {
 
 void test_parse_kv_depth_and_syntax_errors(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "meta", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_KV),
-      NULL,
+    VL_OPT(.name = "meta", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_KV),
+    NULL,
   };
   char deep[512];
   size_t pos = 0;
@@ -268,9 +269,8 @@ void test_parse_kv_depth_and_syntax_errors(void) {
 
 void test_parse_array_quote_and_empty_element(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "list", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_ARRAY),
-      NULL,
+    VL_OPT(.name = "list", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_ARRAY),
+    NULL,
   };
   valve_t *v = parser_(options, 1);
   char *ok[] = {(char *)"valve", (char *)"--list=\"a\",b,\"c\""};
@@ -290,24 +290,22 @@ void test_parse_array_quote_and_empty_element(void) {
 
 void test_parse_help_suggestion_and_joined(void) {
   const vl_option_t *const sub_opts[] = {
-      VL_OPT(.name = "req", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_STRING),
-      NULL,
+    VL_OPT(.name = "req", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_STRING),
+    NULL,
   };
   const vl_verb_t *const subs[] = {
-      VL_CMD(.name = "list", .options = sub_opts),
-      NULL,
+    VL_CMD(.name = "list", .options = sub_opts),
+    NULL,
   };
   const vl_verb_t *const verbs[] = {
-      VL_CMD(.name = "agent", .verbs = subs),
-      VL_CMD(.name = "net", .verbs = subs),
-      NULL,
+    VL_CMD(.name = "agent", .verbs = subs),
+    VL_CMD(.name = "net", .verbs = subs),
+    NULL,
   };
   vl_executable_t settings = {.verbs = verbs, .color = VAL_COLOR_NEVER};
   valve_t *v = vl_create(&settings);
   char *ambig[] = {(char *)"valve", (char *)"--help=list"};
-  EXPECT(v != NULL && vl_parse(v, 2, ambig) == -1,
-         "ambiguous help suggests dotted forms");
+  EXPECT(v != NULL && vl_parse(v, 2, ambig) == -1, "ambiguous help suggests dotted forms");
   EXPECT(vl_error_count(v) > 0, "error recorded");
   vl_destroy(v);
 
@@ -324,8 +322,8 @@ void test_parse_help_suggestion_and_joined(void) {
 
 void test_parse_reserved_edge_tokens(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "x", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL),
-      NULL,
+    VL_OPT(.name = "x", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL),
+    NULL,
   };
   valve_t *v = parser_(options, 1);
   /* plen >= 64 → RESERVED_NONE path */
@@ -349,23 +347,22 @@ void test_parse_reserved_edge_tokens(void) {
 
 void test_parse_verb_reserved_and_missing_sub(void) {
   const vl_option_t *const sub_opts[] = {
-      VL_OPT(.name = "q", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL),
-      NULL,
+    VL_OPT(.name = "q", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL),
+    NULL,
   };
   const vl_verb_t *const subs[] = {
-      VL_CMD(.name = "go", .options = sub_opts),
-      NULL,
+    VL_CMD(.name = "go", .options = sub_opts),
+    NULL,
   };
   const vl_verb_t *const verbs[] = {
-      VL_CMD(.name = "run", .verbs = subs),
-      NULL,
+    VL_CMD(.name = "run", .verbs = subs),
+    NULL,
   };
   vl_executable_t settings = {.verbs = verbs, .color = VAL_COLOR_NEVER};
   valve_t *v = vl_create(&settings);
 
   char *help_at_verb[] = {(char *)"valve", (char *)"run", (char *)"--help"};
-  EXPECT(v != NULL && vl_parse(v, 3, help_at_verb) == 0,
-         "reserved help instead of subverb");
+  EXPECT(v != NULL && vl_parse(v, 3, help_at_verb) == 0, "reserved help instead of subverb");
   vl_destroy(v);
 
   v = vl_create(&settings);
@@ -382,20 +379,19 @@ void test_parse_verb_reserved_and_missing_sub(void) {
   settings.assign = VL_ASSIGN_SEPARATE;
   v = vl_create(&settings);
   char *help_inline_sep[] = {(char *)"valve", (char *)"--help=run"};
-  EXPECT(vl_parse(v, 2, help_inline_sep) == -1,
-         "inline help disabled in SEPARATE");
+  EXPECT(vl_parse(v, 2, help_inline_sep) == -1, "inline help disabled in SEPARATE");
   vl_destroy(v);
 }
 
 void test_parse_unknown_long_eq_oom_and_negative_dot(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "n", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_NUMBER),
-      NULL,
+    VL_OPT(.name = "n", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_NUMBER),
+    NULL,
   };
   vl_executable_t settings = {
-      .options = options,
-      .assign = VL_ASSIGN_SEPARATE,
-      .color = VAL_COLOR_NEVER,
+    .options = options,
+    .assign = VL_ASSIGN_SEPARATE,
+    .color = VAL_COLOR_NEVER,
   };
   valve_t *v = vl_create(&settings);
   char *argv[] = {(char *)"valve", (char *)"--n", (char *)"-.5"};
@@ -413,11 +409,16 @@ void test_int_target_overflow(void) {
   typedef struct {
     int i;
   } cfg_t;
+
   cfg_t cfg = {0};
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "i", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_INT,
-             .data = &cfg, .offset = offsetof(cfg_t, i), .target = VL_TARGET_INT),
-      NULL,
+    VL_OPT(.name = "i",
+           .type = VL_OPT_TYPE_LONG,
+           .value = VL_OPTION_VALUE_INT,
+           .data = &cfg,
+           .offset = offsetof(cfg_t, i),
+           .target = VL_TARGET_INT),
+    NULL,
   };
   valve_t *v = parser_(options, 1);
   char buf[64];
@@ -452,18 +453,17 @@ void test_color_lazy_init_paths(void) {
 
 void test_oom_vl_create_meta(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "x", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL,
-             .description = "desc", .usage = "use"),
-      NULL,
+    VL_OPT(.name = "x", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL, .description = "desc", .usage = "use"),
+    NULL,
   };
   vl_executable_t settings = {
-      .program_name = "prog",
-      .program_version = "1.0",
-      .description = "d",
-      .usage = "u",
-      .logo = "L",
-      .options = options,
-      .color = VAL_COLOR_NEVER,
+    .program_name = "prog",
+    .program_version = "1.0",
+    .description = "d",
+    .usage = "u",
+    .logo = "L",
+    .options = options,
+    .color = VAL_COLOR_NEVER,
   };
 
   /* Fail early strdup in settings_meta_copy_ */
@@ -481,21 +481,19 @@ void test_oom_vl_create_meta(void) {
 
 void test_oom_vl_create_options_and_verbs(void) {
   const vl_option_t *const opts[] = {
-      VL_OPT(.name = "a", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL,
-             .description = "da", .usage = "ua"),
-      VL_OPT(.name = "b", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL,
-             .description = "db", .usage = "ub"),
-      NULL,
+    VL_OPT(.name = "a", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL, .description = "da", .usage = "ua"),
+    VL_OPT(.name = "b", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL, .description = "db", .usage = "ub"),
+    NULL,
   };
   const vl_verb_t *const verbs[] = {
-      VL_CMD(.name = "run", .description = "rd", .usage = "ru", .options = opts),
-      NULL,
+    VL_CMD(.name = "run", .description = "rd", .usage = "ru", .options = opts),
+    NULL,
   };
   vl_executable_t settings = {
-      .options = opts,
-      .verbs = verbs,
-      .program_name = "p",
-      .color = VAL_COLOR_NEVER,
+    .options = opts,
+    .verbs = verbs,
+    .program_name = "p",
+    .color = VAL_COLOR_NEVER,
   };
 
   for (int n = 1; n <= 40; ++n) {
@@ -511,10 +509,9 @@ void test_oom_vl_create_options_and_verbs(void) {
 
 void test_oom_parse_scalar_and_bool(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "s", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_STRING),
-      VL_OPT(.name = "enable-x", .toggle_ref = "x", .type = VL_OPT_TYPE_TOGGLE,
-             .value = VL_OPTION_VALUE_TOGGLE),
-      NULL,
+    VL_OPT(.name = "s", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_STRING),
+    VL_OPT(.name = "enable-x", .toggle_ref = "x", .type = VL_OPT_TYPE_TOGGLE, .value = VL_OPTION_VALUE_TOGGLE),
+    NULL,
   };
   valve_t *v = parser_(options, 2);
   EXPECT(v != NULL, "parser");
@@ -536,10 +533,9 @@ void test_oom_parse_scalar_and_bool(void) {
 
 void test_oom_parse_kv_array_unknown(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "meta", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_KV),
-      VL_OPT(.name = "list", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_ARRAY),
-      NULL,
+    VL_OPT(.name = "meta", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_KV),
+    VL_OPT(.name = "list", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_ARRAY),
+    NULL,
   };
   valve_t *v = parser_(options, 2);
 
@@ -576,25 +572,30 @@ void test_oom_error_add_and_result_set(void) {
     char *s;
     vl_value_t val;
   } cfg_t;
+
   cfg_t cfg = {0};
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "s", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_STRING,
-             .data = &cfg, .offset = offsetof(cfg_t, s),
-             .target = VL_TARGET_STRING),
-      VL_OPT(.name = "mode", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_STRING, .repeat = VL_OPTION_REPEAT_ARRAY),
-      VL_OPT(.name = "box", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_KV,
-             .data = &cfg, .offset = offsetof(cfg_t, val),
-             .target = VL_TARGET_VALUE),
-      NULL,
+    VL_OPT(.name = "s",
+           .type = VL_OPT_TYPE_LONG,
+           .value = VL_OPTION_VALUE_STRING,
+           .data = &cfg,
+           .offset = offsetof(cfg_t, s),
+           .target = VL_TARGET_STRING),
+    VL_OPT(.name = "mode", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_STRING, .repeat = VL_OPTION_REPEAT_ARRAY),
+    VL_OPT(.name = "box",
+           .type = VL_OPT_TYPE_LONG,
+           .value = VL_OPTION_VALUE_KV,
+           .data = &cfg,
+           .offset = offsetof(cfg_t, val),
+           .target = VL_TARGET_VALUE),
+    NULL,
   };
 
   for (int n = 1; n <= 20; ++n) {
     valve_t *v = parser_(options, 3);
     vl_test_alloc_reset();
     vl_test_alloc_fail_after(n);
-    char *a[] = {(char *)"valve", (char *)"--s=hello", (char *)"--mode=a",
-                 (char *)"--mode=b", (char *)"--box=k:1"};
+    char *a[] = {(char *)"valve", (char *)"--s=hello", (char *)"--mode=a", (char *)"--mode=b", (char *)"--box=k:1"};
     (void)vl_parse(v, 5, a);
     vl_test_alloc_reset();
     vl_destroy(v);
@@ -606,14 +607,14 @@ void test_oom_error_add_and_result_set(void) {
 }
 
 void test_oom_conflict_and_requirement_errors(void) {
-  static vl_option_t a = {
-      .name = "a", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
-  static vl_option_t b = {
-      .name = "b", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
+  static vl_option_t a = {.name = "a", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
+  static vl_option_t b = {.name = "b", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
   static const vl_option_t *const a_c[] = {&b, NULL};
   static const vl_option_t *const b_r[] = {&a, NULL};
   a.conflicts = a_c;
-  b.requires = b_r;
+  b.
+    requires
+  = b_r;
   static const vl_option_t *const opts[] = {&a, &b, NULL};
   vl_executable_t settings = {.options = opts, .color = VAL_COLOR_NEVER};
 
@@ -645,33 +646,32 @@ void test_oom_conflict_and_requirement_errors(void) {
 
 void test_find_option_via_active_scopes(void) {
   const vl_option_t *const sub_opts[] = {
-      VL_OPT(.name = "inner", .short_name = 'i',
-             .type = VL_OPT_TYPE_LONG | VL_OPT_TYPE_SHORT,
-             .value = VL_OPTION_VALUE_INT),
-      NULL,
+    VL_OPT(.name = "inner",
+           .short_name = 'i',
+           .type = VL_OPT_TYPE_LONG | VL_OPT_TYPE_SHORT,
+           .value = VL_OPTION_VALUE_INT),
+    NULL,
   };
   const vl_option_t *const verb_opts[] = {
-      VL_OPT(.name = "mid", .short_name = 'm',
-             .type = VL_OPT_TYPE_LONG | VL_OPT_TYPE_SHORT,
-             .value = VL_OPTION_VALUE_INT),
-      NULL,
+    VL_OPT(.name = "mid",
+           .short_name = 'm',
+           .type = VL_OPT_TYPE_LONG | VL_OPT_TYPE_SHORT,
+           .value = VL_OPTION_VALUE_INT),
+    NULL,
   };
   const vl_verb_t *const subs[] = {
-      VL_CMD(.name = "go", .options = sub_opts),
-      NULL,
+    VL_CMD(.name = "go", .options = sub_opts),
+    NULL,
   };
   const vl_verb_t *const verbs[] = {
-      VL_CMD(.name = "run", .options = verb_opts, .verbs = subs),
-      NULL,
+    VL_CMD(.name = "run", .options = verb_opts, .verbs = subs),
+    NULL,
   };
   const vl_option_t *const globals[] = {
-      VL_OPT(.name = "g", .short_name = 'g',
-             .type = VL_OPT_TYPE_LONG | VL_OPT_TYPE_SHORT,
-             .value = VL_OPTION_VALUE_INT),
-      NULL,
+    VL_OPT(.name = "g", .short_name = 'g', .type = VL_OPT_TYPE_LONG | VL_OPT_TYPE_SHORT, .value = VL_OPTION_VALUE_INT),
+    NULL,
   };
-  vl_executable_t settings = {
-      .options = globals, .verbs = verbs, .color = VAL_COLOR_NEVER};
+  vl_executable_t settings = {.options = globals, .verbs = verbs, .color = VAL_COLOR_NEVER};
   valve_t *v = vl_create(&settings);
   char *a1[] = {(char *)"valve", (char *)"run", (char *)"go", (char *)"--inner=1"};
   char *a2[] = {(char *)"valve", (char *)"run", (char *)"go", (char *)"-i=2"};
@@ -686,23 +686,26 @@ void test_find_option_via_active_scopes(void) {
 
 void test_help_with_usage_description_logo(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "port", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_INT,
-             .description = "listen port", .usage = "--port N"),
-      NULL,
+    VL_OPT(.name = "port",
+           .type = VL_OPT_TYPE_LONG,
+           .value = VL_OPTION_VALUE_INT,
+           .description = "listen port",
+           .usage = "--port N"),
+    NULL,
   };
   const vl_verb_t *const verbs[] = {
-      VL_CMD(.name = "serve", .description = "run server", .usage = "serve [opts]"),
-      NULL,
+    VL_CMD(.name = "serve", .description = "run server", .usage = "serve [opts]"),
+    NULL,
   };
   vl_executable_t settings = {
-      .program_name = "demo",
-      .program_version = "9.9",
-      .description = "demo tool",
-      .usage = "demo [opts]",
-      .logo = "◆",
-      .options = options,
-      .verbs = verbs,
-      .color = VAL_COLOR_NEVER,
+    .program_name = "demo",
+    .program_version = "9.9",
+    .description = "demo tool",
+    .usage = "demo [opts]",
+    .logo = "◆",
+    .options = options,
+    .verbs = verbs,
+    .color = VAL_COLOR_NEVER,
   };
   valve_t *v = vl_create(&settings);
   char *argv[] = {(char *)"valve", (char *)"--help"};
@@ -712,9 +715,8 @@ void test_help_with_usage_description_logo(void) {
 
 void test_duplicate_repeat_error(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "once", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_STRING, .repeat = VL_OPTION_REPEAT_ERROR),
-      NULL,
+    VL_OPT(.name = "once", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_STRING, .repeat = VL_OPTION_REPEAT_ERROR),
+    NULL,
   };
   valve_t *v = parser_(options, 1);
   char *argv[] = {(char *)"valve", (char *)"--once=a", (char *)"--once=b"};
@@ -724,9 +726,8 @@ void test_duplicate_repeat_error(void) {
 
 void test_required_missing_path(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "need", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL,
-             .required = true),
-      NULL,
+    VL_OPT(.name = "need", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL, .required = true),
+    NULL,
   };
   valve_t *v = parser_(options, 1);
   EXPECT(v != NULL, "parser");
@@ -745,10 +746,9 @@ void test_required_missing_path(void) {
 
   /* Force required check: parse with a throwaway bool that isn't need */
   const vl_option_t *const options2[] = {
-      VL_OPT(.name = "need", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL,
-             .required = true),
-      VL_OPT(.name = "extra", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL),
-      NULL,
+    VL_OPT(.name = "need", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL, .required = true),
+    VL_OPT(.name = "extra", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL),
+    NULL,
   };
   v = parser_(options2, 2);
   char *miss[] = {(char *)"valve", (char *)"--extra"};

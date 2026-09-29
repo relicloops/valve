@@ -168,8 +168,8 @@ typedef struct vl_verb {
  *        prefix stripping).
  */
 typedef enum vl_opt_type {
-  VL_OPT_TYPE_LONG   = 1u << 0, /**< --flag */
-  VL_OPT_TYPE_SHORT  = 1u << 1, /**< -f */
+  VL_OPT_TYPE_LONG = 1u << 0,   /**< --flag */
+  VL_OPT_TYPE_SHORT = 1u << 1,  /**< -f */
   VL_OPT_TYPE_TOGGLE = 1u << 2, /**< --enable-flag / --disable-flag */
 } vl_opt_type_t;
 
@@ -270,9 +270,9 @@ typedef struct vl_option {
   const char *description; /**< one-line summary shown in help */
   /** Optional usage guidance printed below Valve's inferred option syntax. */
   const char *usage;
-  vl_opt_type_t type;         /**< accepted syntactic forms */
-  vl_option_value_t value;    /**< option-argument parsing rule */
-  vl_option_repeat_t repeat;  /**< policy for repeated occurrences */
+  vl_opt_type_t type;        /**< accepted syntactic forms */
+  vl_option_value_t value;   /**< option-argument parsing rule */
+  vl_option_repeat_t repeat; /**< policy for repeated occurrences */
   /** When true, vl_parse() fails with VL_ERROR_MISSING_REQUIRED if the
    *  option was never provided. Checked for globals and the active verb
    *  chain; skipped when a reserved token (--help/--version/--valve) or an
@@ -285,7 +285,8 @@ typedef struct vl_option {
   size_t conflict_count; /**< entries in `conflicts` */
   /** Options that must also appear when this option appears. The relationship
    *  is directed. A count of 0 means the table is NULL-terminated. */
-  const vl_option_t *const *requires;
+  const vl_option_t *const *
+    requires;
   size_t require_count; /**< entries in `requires` */
   /** Base address of caller-owned target storage (e.g. a config struct).
    *  NULL disables target population; the value is still stored in the
@@ -371,6 +372,7 @@ struct vl_value {
   /** Original option-argument text (owned copy). NULL for a COMMAND value
    *  and for an array built from repeated options. */
   const char *raw;
+
   union {
     int64_t integer;      /**< VL_VALUE_INT */
     double number;        /**< VL_VALUE_DOUBLE */
@@ -398,12 +400,12 @@ typedef struct vl_result {
 
 /** Reason a vl_error_t was recorded. */
 typedef enum vl_error_code {
-  VL_ERROR_UNKNOWN_OPTION = 1,      /**< no option matches the token */
+  VL_ERROR_UNKNOWN_OPTION = 1, /**< no option matches the token */
   /** The option exists but not in that form: wrong long/short/toggle type,
    *  inline vs separate mismatch with the executable's assign mode, KV via
    *  short form, or a command option given outside `--`. */
   VL_ERROR_DISABLED_FORM,
-  VL_ERROR_MISSING_VALUE,           /**< option-argument or `--` tail absent */
+  VL_ERROR_MISSING_VALUE, /**< option-argument or `--` tail absent */
   /** Option-argument failed parsing, bounds, target-type checks, or an
    *  unknown `--help=<target>`. */
   VL_ERROR_INVALID_VALUE,
@@ -450,8 +452,7 @@ typedef struct vl_path {
  *  @return The segment count, or 0 on empty input, an empty segment
  *          (leading/trailing/double dot), more than VL_PATH_MAX_SEGMENTS
  *          segments, or scratch too small to hold `dotted`. */
-size_t vl_path_split(const char *dotted, char *scratch, size_t scratch_len,
-                     vl_path_t *out);
+size_t vl_path_split(const char *dotted, char *scratch, size_t scratch_len, vl_path_t *out);
 
 /** Kind of node a `--help=<target>` resolved to. */
 typedef enum vl_help_kind {
@@ -499,9 +500,8 @@ typedef struct vl_help_resolution {
  *  @param target       Help target text without the `--help=` prefix.
  *  @param out          Filled on success; untouched otherwise.
  *  @return true and fills *out on a match, false otherwise. */
-bool vl_help_resolve(const vl_verb_t *const *verbs, size_t verb_count,
-                     const vl_option_t *const *globals, size_t global_count,
-                     const char *target, vl_help_resolution_t *out);
+bool vl_help_resolve(const vl_verb_t *const *verbs, size_t verb_count, const vl_option_t *const *globals,
+                     size_t global_count, const char *target, vl_help_resolution_t *out);
 
 /** Validate and copy a schema into a new parser. NULL creates an empty parser.
  *  Also applies `settings->color` via vl_color_init().

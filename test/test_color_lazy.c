@@ -43,8 +43,7 @@ void test_color_lazy_init_before_any_init(void) {
   (void)vl_color_supports_hyperlinks();
   vl_term_caps_t caps;
   vl_term_caps(&caps);
-  EXPECT(vl_color_enabled(stdout) || !isatty(STDOUT_FILENO) ||
-             caps.color >= VL_COLOR_SUPPORT_NONE,
+  EXPECT(vl_color_enabled(stdout) || !isatty(STDOUT_FILENO) || caps.color >= VL_COLOR_SUPPORT_NONE,
          "lazy init via enabled/detect/caps");
   EXPECT(vl_color_for(stdout, VAL_FG_RED) != NULL, "color_for after lazy");
 }

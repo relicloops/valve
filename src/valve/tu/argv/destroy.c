@@ -4,7 +4,7 @@
 
 void vl_argv_destroy(int argc, char **argv) {
 
-  if (!argv){
+  if (!argv) {
     return;
   }
 

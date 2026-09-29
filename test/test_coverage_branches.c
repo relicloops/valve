@@ -148,9 +148,12 @@ TEST_SOURCE_FILE("vl_requirements_copy_.c")
 TEST_SOURCE_FILE("vl_requirements_copy_table_.c")
 TEST_SOURCE_FILE("vl_results_clear_.c")
 TEST_SOURCE_FILE("vl_verb_get.c")
+
 /* === end ceedling valve sources === */
 
-void setUp(void) { vl_test_alloc_reset(); }
+void setUp(void) {
+  vl_test_alloc_reset();
+}
 
 void tearDown(void) {
   vl_test_alloc_reset();
@@ -212,8 +215,7 @@ void test_color_env_branch_arms(void) {
   (void)vl_color_support_detect();
 
   /* TERM with 24bit / truecolor / direct / bare 256 */
-  const char *terms[] = {"xterm-truecolor", "xterm-24bit", "xterm-direct",
-                         "xterm-256", "foo256bar"};
+  const char *terms[] = {"xterm-truecolor", "xterm-24bit", "xterm-direct", "xterm-256", "foo256bar"};
   for (size_t i = 0; i < sizeof terms / sizeof terms[0]; ++i) {
     setenv("TERM", terms[i], 1);
     unsetenv("COLORTERM");
@@ -284,20 +286,17 @@ void test_color_env_branch_arms(void) {
   setenv("FORCE_COLOR", "3", 1);
   vl_color_support_reset();
   vl_color_init(VAL_COLOR_ALWAYS);
-  EXPECT(!vl_color_supports() || vl_color_support_detect() == VL_COLOR_SUPPORT_NONE,
-         "NO_COLOR beats FORCE");
+  EXPECT(!vl_color_supports() || vl_color_support_detect() == VL_COLOR_SUPPORT_NONE, "NO_COLOR beats FORCE");
 }
 
 /* ---- parse edges ----------------------------------------------------- */
 
 void test_parse_negative_number_branch_arms(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "n", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_NUMBER),
-      NULL,
+    VL_OPT(.name = "n", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_NUMBER),
+    NULL,
   };
-  vl_executable_t settings = {
-      .options = options, .assign = VL_ASSIGN_SEPARATE, .color = VAL_COLOR_NEVER};
+  vl_executable_t settings = {.options = options, .assign = VL_ASSIGN_SEPARATE, .color = VAL_COLOR_NEVER};
 
   /* '-' then digit-range miss: ':' is >= '0' but > '9' */
   valve_t *v = vl_create(&settings);
@@ -332,9 +331,8 @@ void test_parse_negative_number_branch_arms(void) {
 
 void test_parse_enable_disable_empty_suffix(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "feature", .type = VL_OPT_TYPE_TOGGLE,
-             .value = VL_OPTION_VALUE_TOGGLE, .toggle_ref = "feature"),
-      NULL,
+    VL_OPT(.name = "feature", .type = VL_OPT_TYPE_TOGGLE, .value = VL_OPTION_VALUE_TOGGLE, .toggle_ref = "feature"),
+    NULL,
   };
   valve_t *v = parser_(options, 1);
   char *en[] = {(char *)"valve", (char *)"--enable-"};
@@ -348,12 +346,10 @@ void test_parse_enable_disable_empty_suffix(void) {
 
 void test_parse_int_double_edge_values(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "i", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_INT),
-      VL_OPT(.name = "d", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_DOUBLE),
-      VL_OPT(.name = "a", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_AUTO),
-      NULL,
+    VL_OPT(.name = "i", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_INT),
+    VL_OPT(.name = "d", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_DOUBLE),
+    VL_OPT(.name = "a", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_AUTO),
+    NULL,
   };
   valve_t *v = parser_(options, 3);
 
@@ -367,8 +363,7 @@ void test_parse_int_double_edge_values(void) {
   vl_destroy(v);
 
   v = parser_(options, 3);
-  char *erange[] = {(char *)"valve",
-                    (char *)"--i=99999999999999999999999999999"};
+  char *erange[] = {(char *)"valve", (char *)"--i=99999999999999999999999999999"};
   EXPECT(vl_parse(v, 2, erange) == -1, "int ERANGE");
   vl_destroy(v);
 
@@ -407,8 +402,8 @@ void test_parse_int_double_edge_values(void) {
 
 void test_parse_kv_pipe_and_trailing(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "meta", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_KV),
-      NULL,
+    VL_OPT(.name = "meta", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_KV),
+    NULL,
   };
   valve_t *v = parser_(options, 1);
   char *pipe_end[] = {(char *)"valve", (char *)"--meta=a:1|"};
@@ -428,9 +423,11 @@ void test_parse_kv_pipe_and_trailing(void) {
 
 void test_parse_dot_notation_toggle_target(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "cfg.flag", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_DOT_NOTATION, .target = VL_TARGET_TOGGLE),
-      NULL,
+    VL_OPT(.name = "cfg.flag",
+           .type = VL_OPT_TYPE_LONG,
+           .value = VL_OPTION_VALUE_DOT_NOTATION,
+           .target = VL_TARGET_TOGGLE),
+    NULL,
   };
   valve_t *v = parser_(options, 1);
   char *argv[] = {(char *)"valve", (char *)"--cfg.flag=true"};
@@ -443,33 +440,24 @@ void test_parse_dot_notation_toggle_target(void) {
 
 void test_parse_toggle_ref_on_verb_levels(void) {
   const vl_option_t *const sub_opts[] = {
-      VL_OPT(.name = "fast", .type = VL_OPT_TYPE_TOGGLE,
-             .value = VL_OPTION_VALUE_TOGGLE, .toggle_ref = "fast"),
-      VL_OPT(.name = "other", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_BOOL), /* null toggle_ref skip */
-      NULL,
+    VL_OPT(.name = "fast", .type = VL_OPT_TYPE_TOGGLE, .value = VL_OPTION_VALUE_TOGGLE, .toggle_ref = "fast"),
+    VL_OPT(.name = "other", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL), /* null toggle_ref skip */
+    NULL,
   };
   const vl_option_t *const verb_opts[] = {
-      VL_OPT(.name = "debug", .type = VL_OPT_TYPE_TOGGLE,
-             .value = VL_OPTION_VALUE_TOGGLE, .toggle_ref = "debug"),
-      VL_OPT(.name = "plain", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_BOOL),
-      NULL,
+    VL_OPT(.name = "debug", .type = VL_OPT_TYPE_TOGGLE, .value = VL_OPTION_VALUE_TOGGLE, .toggle_ref = "debug"),
+    VL_OPT(.name = "plain", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL),
+    NULL,
   };
   const vl_option_t *const global_opts[] = {
-      VL_OPT(.name = "verbose", .type = VL_OPT_TYPE_TOGGLE,
-             .value = VL_OPTION_VALUE_TOGGLE, .toggle_ref = "verbose"),
-      NULL,
+    VL_OPT(.name = "verbose", .type = VL_OPT_TYPE_TOGGLE, .value = VL_OPTION_VALUE_TOGGLE, .toggle_ref = "verbose"),
+    NULL,
   };
-  const vl_verb_t *const subs[] = {
-      VL_CMD(.name = "go", .options = sub_opts), NULL};
-  const vl_verb_t *const verbs[] = {
-      VL_CMD(.name = "run", .options = verb_opts, .verbs = subs), NULL};
-  vl_executable_t settings = {
-      .options = global_opts, .verbs = verbs, .color = VAL_COLOR_NEVER};
+  const vl_verb_t *const subs[] = {VL_CMD(.name = "go", .options = sub_opts), NULL};
+  const vl_verb_t *const verbs[] = {VL_CMD(.name = "run", .options = verb_opts, .verbs = subs), NULL};
+  vl_executable_t settings = {.options = global_opts, .verbs = verbs, .color = VAL_COLOR_NEVER};
   valve_t *v = vl_create(&settings);
-  char *a1[] = {(char *)"valve", (char *)"run", (char *)"go",
-                (char *)"--enable-fast"};
+  char *a1[] = {(char *)"valve", (char *)"run", (char *)"go", (char *)"--enable-fast"};
   EXPECT(v != NULL && vl_parse(v, 4, a1) == 0, "sub toggle");
   vl_destroy(v);
 
@@ -484,8 +472,7 @@ void test_parse_toggle_ref_on_verb_levels(void) {
   vl_destroy(v);
 
   /* flat schema without required sub */
-  const vl_verb_t *const verbs2[] = {
-      VL_CMD(.name = "run", .options = verb_opts), NULL};
+  const vl_verb_t *const verbs2[] = {VL_CMD(.name = "run", .options = verb_opts), NULL};
   settings.verbs = verbs2;
   v = vl_create(&settings);
   char *a4[] = {(char *)"valve", (char *)"run", (char *)"--enable-debug"};
@@ -512,11 +499,12 @@ void test_parse_toggle_ref_on_verb_levels(void) {
 
 void test_parse_assign_mode_disabled_forms(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "x", .short_name = 'x',
-             .type = VL_OPT_TYPE_LONG | VL_OPT_TYPE_SHORT,
-             .value = VL_OPTION_VALUE_STRING),
-      VL_OPT(.name = "b", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL),
-      NULL,
+    VL_OPT(.name = "x",
+           .short_name = 'x',
+           .type = VL_OPT_TYPE_LONG | VL_OPT_TYPE_SHORT,
+           .value = VL_OPTION_VALUE_STRING),
+    VL_OPT(.name = "b", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL),
+    NULL,
   };
   /* SEPARATE: inline form disabled */
   valve_t *v = parser_with_form_(options, 2, VL_ASSIGN_SEPARATE);
@@ -539,15 +527,12 @@ void test_parse_assign_mode_disabled_forms(void) {
 
 void test_parse_reserved_eq_edge_and_empty_cmd(void) {
   const vl_option_t *const sub_opts[] = {
-      VL_OPT(.name = "q", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL),
-      NULL,
+    VL_OPT(.name = "q", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL),
+    NULL,
   };
-  const vl_verb_t *const subs[] = {VL_CMD(.name = "go", .options = sub_opts),
-                                   NULL};
-  const vl_verb_t *const verbs[] = {
-      VL_CMD(.name = "run", .verbs = subs), NULL};
-  vl_executable_t settings = {
-      .verbs = verbs, .assign = VL_ASSIGN_INLINE, .color = VAL_COLOR_NEVER};
+  const vl_verb_t *const subs[] = {VL_CMD(.name = "go", .options = sub_opts), NULL};
+  const vl_verb_t *const verbs[] = {VL_CMD(.name = "run", .verbs = subs), NULL};
+  vl_executable_t settings = {.verbs = verbs, .assign = VL_ASSIGN_INLINE, .color = VAL_COLOR_NEVER};
 
   valve_t *v = vl_create(&settings);
   char *empty_cmd[] = {(char *)"valve", (char *)""};
@@ -611,14 +596,17 @@ void test_parse_reserved_eq_edge_and_empty_cmd(void) {
 }
 
 static int g_cb_hits;
+
 static void cb_help_(const valve_t *v) {
   (void)v;
   g_cb_hits |= 1;
 }
+
 static void cb_version_(const valve_t *v) {
   (void)v;
   g_cb_hits |= 2;
 }
+
 static void cb_valve_(const valve_t *v) {
   (void)v;
   g_cb_hits |= 4;
@@ -626,10 +614,10 @@ static void cb_valve_(const valve_t *v) {
 
 void test_parse_reserved_callbacks_hit(void) {
   vl_executable_t settings = {
-      .color = VAL_COLOR_NEVER,
-      .on_help = cb_help_,
-      .on_version = cb_version_,
-      .on_valve = cb_valve_,
+    .color = VAL_COLOR_NEVER,
+    .on_help = cb_help_,
+    .on_version = cb_version_,
+    .on_valve = cb_valve_,
   };
   g_cb_hits = 0;
   valve_t *v = vl_create(&settings);
@@ -654,20 +642,17 @@ void test_parse_reserved_callbacks_hit(void) {
 void test_parse_help_suggest_null_names(void) {
   /* Ambiguous sub-verb name across verbs → suggestion builder */
   const vl_option_t *const sub_opts[] = {
-      VL_OPT(.name = "x", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL),
-      NULL,
+    VL_OPT(.name = "x", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL),
+    NULL,
   };
-  const vl_verb_t *const subs_a[] = {VL_CMD(.name = "list", .options = sub_opts),
-                                     NULL};
-  const vl_verb_t *const subs_b[] = {VL_CMD(.name = "list", .options = sub_opts),
-                                     NULL};
+  const vl_verb_t *const subs_a[] = {VL_CMD(.name = "list", .options = sub_opts), NULL};
+  const vl_verb_t *const subs_b[] = {VL_CMD(.name = "list", .options = sub_opts), NULL};
   const vl_verb_t *const verbs[] = {
-      VL_CMD(.name = "a", .verbs = subs_a),
-      VL_CMD(.name = "b", .verbs = subs_b),
-      NULL,
+    VL_CMD(.name = "a", .verbs = subs_a),
+    VL_CMD(.name = "b", .verbs = subs_b),
+    NULL,
   };
-  vl_executable_t settings = {
-      .verbs = verbs, .assign = VL_ASSIGN_INLINE, .color = VAL_COLOR_NEVER};
+  vl_executable_t settings = {.verbs = verbs, .assign = VL_ASSIGN_INLINE, .color = VAL_COLOR_NEVER};
   valve_t *v = vl_create(&settings);
   char *argv[] = {(char *)"valve", (char *)"--help=list"};
   EXPECT(v != NULL && vl_parse(v, 2, argv) == -1, "ambiguous help");
@@ -677,8 +662,7 @@ void test_parse_help_suggest_null_names(void) {
 /* ---- help resolve / print -------------------------------------------- */
 
 void test_help_resolve_null_slots_and_three_seg(void) {
-  static const vl_option_t leaf = {
-      .name = "leaf", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
+  static const vl_option_t leaf = {.name = "leaf", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
   static const vl_option_t *const sub_opts[] = {&leaf, NULL};
   static const vl_verb_t sub = {.name = "sub", .options = sub_opts};
   static const vl_verb_t *const subs[] = {&sub, NULL};
@@ -687,42 +671,31 @@ void test_help_resolve_null_slots_and_three_seg(void) {
   static const vl_option_t nameless = {.name = NULL};
 
   vl_help_resolution_t out = {0};
-  EXPECT(vl_help_resolve(verbs, 0, NULL, 0, "verb.sub.leaf", &out),
-         "three-segment resolve");
+  EXPECT(vl_help_resolve(verbs, 0, NULL, 0, "verb.sub.leaf", &out), "three-segment resolve");
   EXPECT(out.kind == VL_HELP_OPTION && out.option == &leaf, "kind option");
 
   /* n==3 with unknown verb → false arm of if (verb) */
-  EXPECT(!vl_help_resolve(verbs, 0, NULL, 0, "zzz.sub.leaf", &out),
-         "unknown verb three-seg");
-  EXPECT(!vl_help_resolve(verbs, 0, NULL, 0, "verb.nope.leaf", &out),
-         "bad sub");
+  EXPECT(!vl_help_resolve(verbs, 0, NULL, 0, "zzz.sub.leaf", &out), "unknown verb three-seg");
+  EXPECT(!vl_help_resolve(verbs, 0, NULL, 0, "verb.nope.leaf", &out), "bad sub");
   /* miss: verb+sub found, option missing */
-  EXPECT(!vl_help_resolve(verbs, 0, NULL, 0, "verb.sub.nope", &out),
-         "bad leaf");
+  EXPECT(!vl_help_resolve(verbs, 0, NULL, 0, "verb.sub.nope", &out), "bad leaf");
 
   /* explicit count keeps leading NULL slots visible to scanners */
   static const vl_verb_t *const verbs_holes[] = {NULL, &verb, NULL};
-  EXPECT(vl_help_resolve(verbs_holes, 2, NULL, 0, "verb.sub.leaf", &out),
-         "three-seg with null verb slot");
+  EXPECT(vl_help_resolve(verbs_holes, 2, NULL, 0, "verb.sub.leaf", &out), "three-seg with null verb slot");
 
-  static const vl_option_t grp = {
-      .name = "proxy.lane", .type = VL_OPT_TYPE_LONG,
-      .value = VL_OPTION_VALUE_STRING};
+  static const vl_option_t grp = {.name = "proxy.lane", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_STRING};
   static const vl_option_t *const g2[] = {NULL, &nameless, &grp, NULL};
   EXPECT(vl_help_resolve(NULL, 0, g2, 3, "proxy", &out), "group with holes");
 
   /* via parse → internal three-segment */
   const vl_option_t *const sub_opts2[] = {
-      VL_OPT(.name = "leaf", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_BOOL),
-      NULL,
+    VL_OPT(.name = "leaf", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL),
+    NULL,
   };
-  const vl_verb_t *const subs2[] = {
-      VL_CMD(.name = "sub", .options = sub_opts2), NULL};
-  const vl_verb_t *const verbs2[] = {
-      VL_CMD(.name = "verb", .verbs = subs2), NULL};
-  vl_executable_t settings = {
-      .verbs = verbs2, .assign = VL_ASSIGN_INLINE, .color = VAL_COLOR_NEVER};
+  const vl_verb_t *const subs2[] = {VL_CMD(.name = "sub", .options = sub_opts2), NULL};
+  const vl_verb_t *const verbs2[] = {VL_CMD(.name = "verb", .verbs = subs2), NULL};
+  vl_executable_t settings = {.verbs = verbs2, .assign = VL_ASSIGN_INLINE, .color = VAL_COLOR_NEVER};
   valve_t *v = vl_create(&settings);
   char *argv[] = {(char *)"valve", (char *)"--help=verb.sub.leaf"};
   EXPECT(v != NULL && vl_parse(v, 2, argv) == 0, "parse three-seg help");
@@ -741,24 +714,29 @@ void test_help_resolve_null_slots_and_three_seg(void) {
 
 void test_help_print_null_name_cards(void) {
   vl_option_t opt = {.name = NULL, .usage = "u", .description = "d"};
-  vl_option_t named = {
-      .name = "ok", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL,
-      .usage = "u", .description = "d"};
-  valve_verb_t sub = {.name = NULL, .description = "sd", .usage = "su",
-                      .options = &named, .option_count = 1};
-  valve_verb_t verb = {.name = NULL, .description = "vd", .usage = "vu",
-                       .verbs = &sub, .verb_count = 1,
-                       .options = &named, .option_count = 1};
+  vl_option_t named = {.name = "ok",
+                       .type = VL_OPT_TYPE_LONG,
+                       .value = VL_OPTION_VALUE_BOOL,
+                       .usage = "u",
+                       .description = "d"};
+  valve_verb_t sub = {.name = NULL, .description = "sd", .usage = "su", .options = &named, .option_count = 1};
+  valve_verb_t verb = {.name = NULL,
+                       .description = "vd",
+                       .usage = "vu",
+                       .verbs = &sub,
+                       .verb_count = 1,
+                       .options = &named,
+                       .option_count = 1};
   valve_t v = {
-      .program_name_ = "prog",
-      .program_version_ = NULL,
-      .description_ = "desc",
-      .usage_ = "usage",
-      .logo_ = NULL,
-      .options_ = &opt,
-      .option_count_ = 1,
-      .verbs_ = &verb,
-      .verb_count_ = 1,
+    .program_name_ = "prog",
+    .program_version_ = NULL,
+    .description_ = "desc",
+    .usage_ = "usage",
+    .logo_ = NULL,
+    .options_ = &opt,
+    .option_count_ = 1,
+    .verbs_ = &verb,
+    .verb_count_ = 1,
   };
 
   /* overview with null verb name */
@@ -774,8 +752,7 @@ void test_help_print_null_name_cards(void) {
 
   /* targeted group with null-name option in table */
   vl_option_t g1 = {.name = NULL};
-  vl_option_t g2 = {
-      .name = "cfg.x", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_INT};
+  vl_option_t g2 = {.name = "cfg.x", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_INT};
   vl_option_t opts[2] = {g1, g2};
   v.options_ = opts;
   v.option_count_ = 2;
@@ -808,12 +785,10 @@ void test_version_print_null_and_fallback(void) {
 
 void test_duration_null_and_message_default(void) {
   int64_t out = 0;
-  EXPECT(option_duration_parse_(NULL, &out) == OPTION_DURATION_EMPTY,
-         "null raw");
+  EXPECT(option_duration_parse_(NULL, &out) == OPTION_DURATION_EMPTY, "null raw");
   EXPECT(option_duration_parse_(":", &out) == OPTION_DURATION_SYNTAX,
          "non-digit >9 path via : after empty? — leading non-digit");
-  EXPECT(option_duration_parse_("1x", &out) == OPTION_DURATION_SUFFIX,
-         "bad suffix");
+  EXPECT(option_duration_parse_("1x", &out) == OPTION_DURATION_SUFFIX, "bad suffix");
   /* char < '0' mid-parse after digits handled by unit; leading '!' */
   EXPECT(option_duration_parse_("!", &out) == OPTION_DURATION_SYNTAX, "bang");
   (void)option_duration_message_(OPTION_DURATION_OK);
@@ -822,8 +797,7 @@ void test_duration_null_and_message_default(void) {
 }
 
 void test_value_label_dot_toggle_and_default(void) {
-  vl_option_t o = {.value = VL_OPTION_VALUE_DOT_NOTATION,
-                   .target = VL_TARGET_TOGGLE};
+  vl_option_t o = {.value = VL_OPTION_VALUE_DOT_NOTATION, .target = VL_TARGET_TOGGLE};
   EXPECT(strcmp(option_value_label_(&o), "value") == 0, "dot toggle");
   o.target = VL_TARGET_VALUE;
   EXPECT(strcmp(option_value_label_(&o), "value") == 0, "dot value");
@@ -832,14 +806,12 @@ void test_value_label_dot_toggle_and_default(void) {
 }
 
 void test_label_short_and_toggle_null_ref(void) {
-  vl_option_t sh = {.short_name = 'q', .type = VL_OPT_TYPE_SHORT,
-                    .value = VL_OPTION_VALUE_BOOL};
+  vl_option_t sh = {.short_name = 'q', .type = VL_OPT_TYPE_SHORT, .value = VL_OPTION_VALUE_BOOL};
   char *l = option_label_(&sh);
   EXPECT(l && strcmp(l, "-q") == 0, "short label");
   free(l);
 
-  vl_option_t tog = {.type = VL_OPT_TYPE_TOGGLE, .toggle_ref = NULL,
-                     .name = "x", .value = VL_OPTION_VALUE_TOGGLE};
+  vl_option_t tog = {.type = VL_OPT_TYPE_TOGGLE, .toggle_ref = NULL, .name = "x", .value = VL_OPTION_VALUE_TOGGLE};
   /* falls through — may return null without LONG/SHORT */
   l = option_label_(&tog);
   free(l);
@@ -856,14 +828,12 @@ void test_more_null_api_arms(void) {
 
   valve_t v = {0};
   EXPECT(vl_error_at(&v, 0) == NULL, "error_at OOB");
-  EXPECT(vl_error_add_(&v, VL_ERROR_UNKNOWN_OPTION, 0, "k", NULL) == 0,
-         "add null message");
+  EXPECT(vl_error_add_(&v, VL_ERROR_UNKNOWN_OPTION, 0, "k", NULL) == 0, "add null message");
   EXPECT(vl_error_count(&v) == 1, "count 1");
   /* print error with null message */
   vl_errors_print(&v, stdout);
   /* error with key */
-  EXPECT(vl_error_add_(&v, VL_ERROR_UNKNOWN_OPTION, 1, NULL, "msg") == 0,
-         "add null key");
+  EXPECT(vl_error_add_(&v, VL_ERROR_UNKNOWN_OPTION, 1, NULL, "msg") == 0, "add null key");
   vl_errors_print(&v, stdout);
   free((void *)v.errors_[0].key);
   free((void *)v.errors_[1].message);
@@ -875,8 +845,7 @@ void test_more_null_api_arms(void) {
 void test_schema_option_count_without_table(void) {
   vl_verb_t verb = {.name = "run", .option_count = 2, .options = NULL};
   const vl_verb_t *const verbs[] = {&verb, NULL};
-  vl_executable_t settings = {.verbs = verbs, .verb_count = 1,
-                              .color = VAL_COLOR_NEVER};
+  vl_executable_t settings = {.verbs = verbs, .verb_count = 1, .color = VAL_COLOR_NEVER};
   EXPECT(vl_create(&settings) == NULL, "option_count without options");
 
   settings.verbs = NULL;
@@ -890,21 +859,22 @@ void test_schema_option_count_without_table(void) {
 
 void test_collides_null_slots(void) {
   const vl_option_t *const globals[] = {
-      NULL,
-      VL_OPT(.name = NULL, .short_name = 'p', .type = VL_OPT_TYPE_SHORT,
-             .value = VL_OPTION_VALUE_BOOL),
-      VL_OPT(.name = "port", .short_name = 'x',
-             .type = VL_OPT_TYPE_LONG | VL_OPT_TYPE_SHORT,
-             .value = VL_OPTION_VALUE_INT),
-      NULL,
+    NULL,
+    VL_OPT(.name = NULL, .short_name = 'p', .type = VL_OPT_TYPE_SHORT, .value = VL_OPTION_VALUE_BOOL),
+    VL_OPT(.name = "port",
+           .short_name = 'x',
+           .type = VL_OPT_TYPE_LONG | VL_OPT_TYPE_SHORT,
+           .value = VL_OPTION_VALUE_INT),
+    NULL,
   };
   const vl_option_t *const locals[] = {
-      NULL,
-      VL_OPT(.name = "port", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_INT),
-      VL_OPT(.name = "quiet", .short_name = 'p',
-             .type = VL_OPT_TYPE_LONG | VL_OPT_TYPE_SHORT,
-             .value = VL_OPTION_VALUE_BOOL),
-      NULL,
+    NULL,
+    VL_OPT(.name = "port", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_INT),
+    VL_OPT(.name = "quiet",
+           .short_name = 'p',
+           .type = VL_OPT_TYPE_LONG | VL_OPT_TYPE_SHORT,
+           .value = VL_OPTION_VALUE_BOOL),
+    NULL,
   };
   EXPECT(option_collides_with_globals_(globals, 3, locals, 3), "collide holes");
 }
@@ -913,12 +883,12 @@ void test_find_option_null_tables(void) {
   valve_verb_t sub = {.name = "go", .options = NULL, .option_count = 0};
   valve_verb_t verb = {.name = "run", .options = NULL, .option_count = 0};
   valve_t v = {
-      .active_subverb_ = &sub,
-      .active_verb_ = &verb,
-      .options_ = NULL,
-      .option_count_ = 0,
-      .verbs_ = NULL,
-      .verb_count_ = 0,
+    .active_subverb_ = &sub,
+    .active_verb_ = &verb,
+    .options_ = NULL,
+    .option_count_ = 0,
+    .verbs_ = NULL,
+    .verb_count_ = 0,
   };
   EXPECT(vl_option_find_(&v, "x") == NULL, "find null tables");
   EXPECT(vl_option_find_n_(&v, "x", 1) == NULL, "find_n null");
@@ -942,9 +912,10 @@ void test_name_valid_edge_chars(void) {
 }
 
 void test_options_invalid_null_toggle_ref(void) {
-  static const vl_option_t tog = {
-      .name = "t", .type = VL_OPT_TYPE_TOGGLE, .value = VL_OPTION_VALUE_TOGGLE,
-      .toggle_ref = NULL};
+  static const vl_option_t tog = {.name = "t",
+                                  .type = VL_OPT_TYPE_TOGGLE,
+                                  .value = VL_OPTION_VALUE_TOGGLE,
+                                  .toggle_ref = NULL};
   static const vl_option_t *const opts[] = {&tog};
   EXPECT(options_have_invalid_(opts, 1), "null toggle_ref");
 }
@@ -970,8 +941,7 @@ void test_requirement_exists_partial_match(void) {
   vl_option_t a = {.name = "a"};
   vl_option_t b = {.name = "b"};
   valve_verb_t verb = {.name = "run"};
-  valve_requirement_t reqs[1] = {
-      {.source = &a, .target = &b, .verb = &verb, .subverb = NULL}};
+  valve_requirement_t reqs[1] = {{.source = &a, .target = &b, .verb = &verb, .subverb = NULL}};
   valve_t v = {.requirements_ = reqs, .requirement_count_ = 1};
   EXPECT(!vl_requirement_exists_(&v, &a, &b, NULL, NULL), "verb mismatch");
   EXPECT(vl_requirement_exists_(&v, &a, &b, &verb, NULL), "full match");
@@ -979,39 +949,41 @@ void test_requirement_exists_partial_match(void) {
 }
 
 void test_duplicate_long_null_name_continue(void) {
-  static const vl_option_t a = {
-      .name = "a", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
-  static const vl_option_t anon = {
-      .name = NULL, .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
+  static const vl_option_t a = {.name = "a", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
+  static const vl_option_t anon = {.name = NULL, .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
   static const vl_option_t *const opts[] = {&a, &anon, &a};
   /* may return true for dup or invalid — exercise name-null continue */
   (void)options_have_duplicate_long_(opts, 3);
-  static const vl_option_t s1 = {
-      .name = "s1", .short_name = 's', .type = VL_OPT_TYPE_SHORT,
-      .value = VL_OPTION_VALUE_BOOL};
-  static const vl_option_t s2 = {
-      .name = "s2", .short_name = '\0', .type = VL_OPT_TYPE_LONG,
-      .value = VL_OPTION_VALUE_BOOL};
-  static const vl_option_t s3 = {
-      .name = "s3", .short_name = 's', .type = VL_OPT_TYPE_SHORT,
-      .value = VL_OPTION_VALUE_BOOL};
+  static const vl_option_t s1 = {.name = "s1",
+                                 .short_name = 's',
+                                 .type = VL_OPT_TYPE_SHORT,
+                                 .value = VL_OPTION_VALUE_BOOL};
+  static const vl_option_t s2 = {.name = "s2",
+                                 .short_name = '\0',
+                                 .type = VL_OPT_TYPE_LONG,
+                                 .value = VL_OPTION_VALUE_BOOL};
+  static const vl_option_t s3 = {.name = "s3",
+                                 .short_name = 's',
+                                 .type = VL_OPT_TYPE_SHORT,
+                                 .value = VL_OPTION_VALUE_BOOL};
   static const vl_option_t *const shorts[] = {&s1, &s2, &s3};
   EXPECT(options_have_duplicate_short_(shorts, 3), "dup short");
 }
 
 void test_annotations_seen_duplicates(void) {
   /* Two identical requires/conflicts so seen_* returns true on 2nd */
-  static vl_option_t a = {
-      .name = "a", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL,
-      .required = true};
-  static vl_option_t b = {
-      .name = "b", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
+  static vl_option_t a = {.name = "a", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL, .required = true};
+  static vl_option_t b = {.name = "b", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
   static const vl_option_t *const reqs[] = {&b, &b, NULL};
-  a.requires = reqs;
+  a.
+    requires
+  = reqs;
   static const vl_option_t *const confs[] = {&b, &b, NULL};
   a.conflicts = confs;
   static const vl_option_t *const breqs[] = {&a, &a, NULL};
-  b.requires = breqs; /* so a is required_by from b... actually required_by
+  b.
+    requires
+  = breqs; /* so a is required_by from b... actually required_by
                        * scans requirements where target==option */
 
   const vl_option_t *const options[] = {&a, &b, NULL};
@@ -1019,17 +991,15 @@ void test_annotations_seen_duplicates(void) {
   valve_t *v = vl_create(&settings);
   if (!v) {
     /* schema may reject duplicate conflict entries — build valve manually */
-    valve_requirement_t r[2] = {{.source = &a, .target = &b},
-                                {.source = &a, .target = &b}};
-    valve_conflict_t c[2] = {{.first = &a, .second = &b},
-                             {.first = &a, .second = &b}};
+    valve_requirement_t r[2] = {{.source = &a, .target = &b}, {.source = &a, .target = &b}};
+    valve_conflict_t c[2] = {{.first = &a, .second = &b}, {.first = &a, .second = &b}};
     valve_t manual = {
-        .requirements_ = r,
-        .requirement_count_ = 2,
-        .conflicts_ = c,
-        .conflict_count_ = 2,
-        .options_ = (vl_option_t[]){a, b},
-        .option_count_ = 2,
+      .requirements_ = r,
+      .requirement_count_ = 2,
+      .conflicts_ = c,
+      .conflict_count_ = 2,
+      .options_ = (vl_option_t[]){a, b},
+      .option_count_ = 2,
     };
     option_annotations_print_(&manual, &a);
     option_annotations_print_(&manual, &b);
@@ -1052,37 +1022,65 @@ void test_targets_clear_null_opt_and_kinds(void) {
     vl_value_t val;
     vl_value_t tog;
   } cfg_t;
+
   cfg_t cfg = {.s = strdup("hi"), .i = 1, .i64 = 2, .d = 3.0, .b = true};
   cfg.val = (vl_value_t){.kind = VL_VALUE_STRING, .raw = strdup("v")};
   cfg.tog = (vl_value_t){.kind = VL_VALUE_BOOL, .as.boolean = true};
 
   const vl_option_t *const options[] = {
-      NULL,
-      VL_OPT(.name = "s", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_STRING,
-             .data = &cfg, .offset = offsetof(cfg_t, s), .target = VL_TARGET_STRING),
-      VL_OPT(.name = "i", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_INT,
-             .data = &cfg, .offset = offsetof(cfg_t, i), .target = VL_TARGET_INT),
-      VL_OPT(.name = "i64", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_INT,
-             .data = &cfg, .offset = offsetof(cfg_t, i64),
-             .target = VL_TARGET_INT64),
-      VL_OPT(.name = "d", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_DOUBLE,
-             .data = &cfg, .offset = offsetof(cfg_t, d),
-             .target = VL_TARGET_DOUBLE),
-      VL_OPT(.name = "b", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL,
-             .data = &cfg, .offset = offsetof(cfg_t, b), .target = VL_TARGET_BOOL),
-      VL_OPT(.name = "val", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_STRING,
-             .data = &cfg, .offset = offsetof(cfg_t, val),
-             .target = VL_TARGET_VALUE),
-      VL_OPT(.name = "tog", .type = VL_OPT_TYPE_TOGGLE,
-             .value = VL_OPTION_VALUE_TOGGLE, .toggle_ref = "tog", .data = &cfg,
-             .offset = offsetof(cfg_t, tog), .target = VL_TARGET_TOGGLE),
-      VL_OPT(.name = "none", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL,
-             .data = &cfg, .target = VL_TARGET_NONE),
-      NULL,
+    NULL,
+    VL_OPT(.name = "s",
+           .type = VL_OPT_TYPE_LONG,
+           .value = VL_OPTION_VALUE_STRING,
+           .data = &cfg,
+           .offset = offsetof(cfg_t, s),
+           .target = VL_TARGET_STRING),
+    VL_OPT(.name = "i",
+           .type = VL_OPT_TYPE_LONG,
+           .value = VL_OPTION_VALUE_INT,
+           .data = &cfg,
+           .offset = offsetof(cfg_t, i),
+           .target = VL_TARGET_INT),
+    VL_OPT(.name = "i64",
+           .type = VL_OPT_TYPE_LONG,
+           .value = VL_OPTION_VALUE_INT,
+           .data = &cfg,
+           .offset = offsetof(cfg_t, i64),
+           .target = VL_TARGET_INT64),
+    VL_OPT(.name = "d",
+           .type = VL_OPT_TYPE_LONG,
+           .value = VL_OPTION_VALUE_DOUBLE,
+           .data = &cfg,
+           .offset = offsetof(cfg_t, d),
+           .target = VL_TARGET_DOUBLE),
+    VL_OPT(.name = "b",
+           .type = VL_OPT_TYPE_LONG,
+           .value = VL_OPTION_VALUE_BOOL,
+           .data = &cfg,
+           .offset = offsetof(cfg_t, b),
+           .target = VL_TARGET_BOOL),
+    VL_OPT(.name = "val",
+           .type = VL_OPT_TYPE_LONG,
+           .value = VL_OPTION_VALUE_STRING,
+           .data = &cfg,
+           .offset = offsetof(cfg_t, val),
+           .target = VL_TARGET_VALUE),
+    VL_OPT(.name = "tog",
+           .type = VL_OPT_TYPE_TOGGLE,
+           .value = VL_OPTION_VALUE_TOGGLE,
+           .toggle_ref = "tog",
+           .data = &cfg,
+           .offset = offsetof(cfg_t, tog),
+           .target = VL_TARGET_TOGGLE),
+    VL_OPT(.name = "none",
+           .type = VL_OPT_TYPE_LONG,
+           .value = VL_OPTION_VALUE_BOOL,
+           .data = &cfg,
+           .target = VL_TARGET_NONE),
+    NULL,
   };
   /* explicit count includes NULL hole */
-  vl_executable_t settings = {
-      .options = options, .option_count = 9, .color = VAL_COLOR_NEVER};
+  vl_executable_t settings = {.options = options, .option_count = 9, .color = VAL_COLOR_NEVER};
   /* create may fail on null slot — call clear directly */
   vl_targets_clear(&settings);
   free(cfg.s);
@@ -1095,14 +1093,15 @@ void test_set_empty_kv_array_clone(void) {
   typedef struct {
     vl_value_t v;
   } cfg_t;
+
   cfg_t cfg = {0};
   vl_option_t opt = {
-      .name = "meta",
-      .type = VL_OPT_TYPE_LONG,
-      .value = VL_OPTION_VALUE_KV,
-      .data = &cfg,
-      .offset = offsetof(cfg_t, v),
-      .target = VL_TARGET_VALUE,
+    .name = "meta",
+    .type = VL_OPT_TYPE_LONG,
+    .value = VL_OPTION_VALUE_KV,
+    .data = &cfg,
+    .offset = offsetof(cfg_t, v),
+    .target = VL_TARGET_VALUE,
   };
   valve_t v = {0};
   vl_value_t empty_kv = {.kind = VL_VALUE_KV};
@@ -1116,39 +1115,38 @@ void test_set_empty_kv_array_clone(void) {
 }
 
 void test_conflicts_valid_null_continue(void) {
-  static vl_option_t a = {
-      .name = "a", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
-  static vl_option_t b = {
-      .name = "b", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
+  static vl_option_t a = {.name = "a", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
+  static vl_option_t b = {.name = "b", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
   static const vl_option_t *const conf_null[] = {NULL};
   a.conflicts = conf_null;
   a.conflict_count = 1;
   const vl_option_t *const opts[] = {&a, &b, NULL};
-  EXPECT(!options_conflicts_valid_(NULL, 0, NULL, 0, opts, 2),
-         "null conflict rejected");
+  EXPECT(!options_conflicts_valid_(NULL, 0, NULL, 0, opts, 2), "null conflict rejected");
 
   static const vl_option_t *const conf_self[] = {&a};
   a.conflicts = conf_self;
   a.conflict_count = 1;
-  EXPECT(!options_conflicts_valid_(NULL, 0, NULL, 0, opts, 2),
-         "self conflict rejected");
+  EXPECT(!options_conflicts_valid_(NULL, 0, NULL, 0, opts, 2), "self conflict rejected");
 
-  a.requires = NULL;
+  a.
+    requires
+  = NULL;
   a.require_count = 1;
-  EXPECT(!options_requirements_valid_(NULL, 0, NULL, 0, opts, 2),
-         "require_count without table");
+  EXPECT(!options_requirements_valid_(NULL, 0, NULL, 0, opts, 2), "require_count without table");
 
   static const vl_option_t *const req_null[] = {NULL};
-  a.requires = req_null;
+  a.
+    requires
+  = req_null;
   a.require_count = 1;
-  EXPECT(!options_requirements_valid_(NULL, 0, NULL, 0, opts, 2),
-         "null require rejected");
+  EXPECT(!options_requirements_valid_(NULL, 0, NULL, 0, opts, 2), "null require rejected");
 
   static const vl_option_t *const req_self[] = {&a};
-  a.requires = req_self;
+  a.
+    requires
+  = req_self;
   a.require_count = 1;
-  EXPECT(!options_requirements_valid_(NULL, 0, NULL, 0, opts, 2),
-         "self require rejected");
+  EXPECT(!options_requirements_valid_(NULL, 0, NULL, 0, opts, 2), "self require rejected");
 }
 
 void test_seen_with_null_other(void) {
@@ -1156,15 +1154,15 @@ void test_seen_with_null_other(void) {
   vl_option_t b = {.name = "b"};
   vl_option_t c = {.name = "c"};
   valve_conflict_t conflicts[2] = {
-      {.first = &c, .second = &b}, /* other(a) → NULL */
-      {.first = &a, .second = &b},
+    {.first = &c, .second = &b}, /* other(a) → NULL */
+    {.first = &a, .second = &b},
   };
   valve_t v = {.conflicts_ = conflicts, .conflict_count_ = 2};
   EXPECT(!vl_conflict_seen_(&v, 1, &a, &b), "null other before match");
   EXPECT(vl_conflict_seen_(&v, 2, &a, &b), "then seen");
   valve_requirement_t reqs[2] = {
-      {.source = &c, .target = &b},
-      {.source = &a, .target = &b},
+    {.source = &c, .target = &b},
+    {.source = &a, .target = &b},
   };
   v.requirements_ = reqs;
   v.requirement_count_ = 2;
@@ -1176,14 +1174,14 @@ void test_seen_with_null_other(void) {
 
 void test_copy_table_null_slot(void) {
   /* Exercise conflicts/requirements copy with sparse tables via create */
-  static vl_option_t a = {
-      .name = "a", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
-  static vl_option_t b = {
-      .name = "b", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
+  static vl_option_t a = {.name = "a", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
+  static vl_option_t b = {.name = "b", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
   static const vl_option_t *const conf[] = {&b, NULL};
   a.conflicts = conf;
   static const vl_option_t *const req[] = {&b, NULL};
-  a.requires = req;
+  a.
+    requires
+  = req;
   const vl_option_t *const options[] = {&a, &b, NULL};
   vl_executable_t settings = {.options = options, .color = VAL_COLOR_NEVER};
   valve_t *v = vl_create(&settings);
@@ -1195,40 +1193,36 @@ void test_active_conflict_requirement_null_v(void) {
   valve_conflict_t c = {0};
   EXPECT(!vl_conflict_active_(NULL, &c), "active null v");
   EXPECT(!vl_conflict_active_(&(valve_t){0}, NULL), "active null conflict");
-  EXPECT(!vl_requirement_active_(NULL, &(valve_requirement_t){0}),
-         "req active null");
+  EXPECT(!vl_requirement_active_(NULL, &(valve_requirement_t){0}), "req active null");
   EXPECT(!vl_requirement_active_(&(valve_t){0}, NULL), "req null requirement");
 }
 
 void test_duplicate_name_null_second_slot(void) {
-  static const vl_option_t a = {
-      .name = "a", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
+  static const vl_option_t a = {.name = "a", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_BOOL};
   static const vl_option_t *const opts[] = {&a, NULL, &a};
   EXPECT(options_have_duplicate_long_(opts, 3), "dup across null");
 
-  static const vl_option_t s1 = {
-      .name = "s1", .short_name = 'q', .type = VL_OPT_TYPE_SHORT,
-      .value = VL_OPTION_VALUE_BOOL};
-  static const vl_option_t s2 = {
-      .name = "s2", .short_name = 'q', .type = VL_OPT_TYPE_SHORT,
-      .value = VL_OPTION_VALUE_BOOL};
+  static const vl_option_t s1 = {.name = "s1",
+                                 .short_name = 'q',
+                                 .type = VL_OPT_TYPE_SHORT,
+                                 .value = VL_OPTION_VALUE_BOOL};
+  static const vl_option_t s2 = {.name = "s2",
+                                 .short_name = 'q',
+                                 .type = VL_OPT_TYPE_SHORT,
+                                 .value = VL_OPTION_VALUE_BOOL};
   static const vl_option_t *const shorts[] = {&s1, NULL, &s2};
   EXPECT(options_have_duplicate_short_(shorts, 3), "dup short across null");
 }
 
 void test_collides_null_global_short(void) {
   const vl_option_t *const globals[] = {
-      NULL,
-      VL_OPT(.name = "g", .short_name = 'p', .type = VL_OPT_TYPE_SHORT,
-             .value = VL_OPTION_VALUE_BOOL),
+    NULL,
+    VL_OPT(.name = "g", .short_name = 'p', .type = VL_OPT_TYPE_SHORT, .value = VL_OPTION_VALUE_BOOL),
   };
   const vl_option_t *const locals[] = {
-      VL_OPT(.name = "l", .short_name = 'p',
-             .type = VL_OPT_TYPE_LONG | VL_OPT_TYPE_SHORT,
-             .value = VL_OPTION_VALUE_BOOL),
+    VL_OPT(.name = "l", .short_name = 'p', .type = VL_OPT_TYPE_LONG | VL_OPT_TYPE_SHORT, .value = VL_OPTION_VALUE_BOOL),
   };
-  EXPECT(option_collides_with_globals_(globals, 2, locals, 1),
-         "short collide skips null global");
+  EXPECT(option_collides_with_globals_(globals, 2, locals, 1), "short collide skips null global");
 }
 
 void test_subverb_get_active_null(void) {
@@ -1243,11 +1237,16 @@ void test_set_int_target_bounds_and_empty_kv(void) {
   typedef struct {
     int i;
   } cfg_t;
+
   cfg_t cfg = {0};
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "i", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_INT,
-             .data = &cfg, .offset = offsetof(cfg_t, i), .target = VL_TARGET_INT),
-      NULL,
+    VL_OPT(.name = "i",
+           .type = VL_OPT_TYPE_LONG,
+           .value = VL_OPTION_VALUE_INT,
+           .data = &cfg,
+           .offset = offsetof(cfg_t, i),
+           .target = VL_TARGET_INT),
+    NULL,
   };
   valve_t *v = parser_(options, 1);
   char *lo[] = {(char *)"valve", (char *)"--i=-2147483649"};
@@ -1260,17 +1259,16 @@ void test_requirement_count_null_option(void) {
 }
 
 void test_value_label_dot_none(void) {
-  vl_option_t o = {.value = VL_OPTION_VALUE_DOT_NOTATION,
-                   .target = VL_TARGET_NONE};
+  vl_option_t o = {.value = VL_OPTION_VALUE_DOT_NOTATION, .target = VL_TARGET_NONE};
   EXPECT(strcmp(option_value_label_(&o), "value") == 0, "dot none");
 }
 
 void test_schema_allow_override_reserved_verbs(void) {
   const vl_verb_t *const verbs[] = {VL_CMD(.name = "help"), NULL};
   vl_executable_t settings = {
-      .verbs = verbs,
-      .behavior = VL_BEHAVIOR_ALLOW_OVERRIDE_RESERVED,
-      .color = VAL_COLOR_NEVER,
+    .verbs = verbs,
+    .behavior = VL_BEHAVIOR_ALLOW_OVERRIDE_RESERVED,
+    .color = VAL_COLOR_NEVER,
   };
   valve_t *v = vl_create(&settings);
   EXPECT(v != NULL, "allow override reserved verb");
@@ -1291,4 +1289,3 @@ void test_have_duplicate_verb_null_name(void) {
   (void)verbs_have_duplicate_(verbs, 3);
   EXPECT(1, "verb dup null name");
 }
-

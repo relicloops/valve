@@ -138,10 +138,11 @@ TEST_SOURCE_FILE("vl_requirements_copy_.c")
 TEST_SOURCE_FILE("vl_requirements_copy_table_.c")
 TEST_SOURCE_FILE("vl_results_clear_.c")
 TEST_SOURCE_FILE("vl_verb_get.c")
+
 /* === end ceedling valve sources === */
 
-
 void setUp(void) {}
+
 void tearDown(void) {}
 
 /* ---- vl_path_split --------------------------------------------------- */
@@ -152,8 +153,7 @@ void test_path_single_segment(void) {
   size_t n = vl_path_split("list", scratch, sizeof(scratch), &path);
   EXPECT(n == 1, "single segment returns count 1");
   EXPECT(path.count == 1, "single segment path.count is 1");
-  EXPECT(path.segments[0] && strcmp(path.segments[0], "list") == 0,
-         "single segment value is 'list'");
+  EXPECT(path.segments[0] && strcmp(path.segments[0], "list") == 0, "single segment value is 'list'");
 }
 
 void test_path_two_segments(void) {
@@ -161,20 +161,16 @@ void test_path_two_segments(void) {
   vl_path_t path = {0};
   size_t n = vl_path_split("proxy.lane", scratch, sizeof(scratch), &path);
   EXPECT(n == 2, "two segments returns count 2");
-  EXPECT(path.segments[0] && strcmp(path.segments[0], "proxy") == 0,
-         "segment 0 is 'proxy'");
-  EXPECT(path.segments[1] && strcmp(path.segments[1], "lane") == 0,
-         "segment 1 is 'lane'");
+  EXPECT(path.segments[0] && strcmp(path.segments[0], "proxy") == 0, "segment 0 is 'proxy'");
+  EXPECT(path.segments[1] && strcmp(path.segments[1], "lane") == 0, "segment 1 is 'lane'");
 }
 
 void test_path_three_segments(void) {
   char scratch[64];
   vl_path_t path = {0};
-  size_t n =
-      vl_path_split("agent.call.request", scratch, sizeof(scratch), &path);
+  size_t n = vl_path_split("agent.call.request", scratch, sizeof(scratch), &path);
   EXPECT(n == 3, "three segments returns count 3");
-  EXPECT(path.segments[2] && strcmp(path.segments[2], "request") == 0,
-         "segment 2 is 'request'");
+  EXPECT(path.segments[2] && strcmp(path.segments[2], "request") == 0, "segment 2 is 'request'");
 }
 
 void test_path_max_segments(void) {
@@ -182,8 +178,7 @@ void test_path_max_segments(void) {
   vl_path_t path = {0};
   size_t n = vl_path_split("a.b.c.d", scratch, sizeof(scratch), &path);
   EXPECT(n == 4, "four segments (max) returns count 4");
-  EXPECT(path.segments[3] && strcmp(path.segments[3], "d") == 0,
-         "segment 3 is 'd'");
+  EXPECT(path.segments[3] && strcmp(path.segments[3], "d") == 0, "segment 3 is 'd'");
 }
 
 void test_path_overflow(void) {
@@ -197,40 +192,31 @@ void test_path_overflow(void) {
 void test_path_empty(void) {
   char scratch[8];
   vl_path_t path = {0};
-  EXPECT(vl_path_split("", scratch, sizeof(scratch), &path) == 0,
-         "empty input returns 0");
+  EXPECT(vl_path_split("", scratch, sizeof(scratch), &path) == 0, "empty input returns 0");
 }
 
 void test_path_empty_segments(void) {
   char scratch[16];
   vl_path_t path = {0};
-  EXPECT(vl_path_split(".a", scratch, sizeof(scratch), &path) == 0,
-         "leading dot returns 0");
-  EXPECT(vl_path_split("a.", scratch, sizeof(scratch), &path) == 0,
-         "trailing dot returns 0");
-  EXPECT(vl_path_split("a..b", scratch, sizeof(scratch), &path) == 0,
-         "double dot returns 0");
+  EXPECT(vl_path_split(".a", scratch, sizeof(scratch), &path) == 0, "leading dot returns 0");
+  EXPECT(vl_path_split("a.", scratch, sizeof(scratch), &path) == 0, "trailing dot returns 0");
+  EXPECT(vl_path_split("a..b", scratch, sizeof(scratch), &path) == 0, "double dot returns 0");
 }
 
 void test_path_scratch_too_small(void) {
   char scratch[4];
   vl_path_t path = {0};
   /* "proxy.lane" needs 11 bytes incl. NUL; scratch holds 4. */
-  EXPECT(vl_path_split("proxy.lane", scratch, sizeof(scratch), &path) == 0,
-         "scratch too small returns 0");
+  EXPECT(vl_path_split("proxy.lane", scratch, sizeof(scratch), &path) == 0, "scratch too small returns 0");
 }
 
 void test_path_null_args(void) {
   char scratch[8];
   vl_path_t path = {0};
-  EXPECT(vl_path_split(NULL, scratch, sizeof(scratch), &path) == 0,
-         "NULL dotted returns 0");
-  EXPECT(vl_path_split("a", NULL, sizeof(scratch), &path) == 0,
-         "NULL scratch returns 0");
-  EXPECT(vl_path_split("a", scratch, sizeof(scratch), NULL) == 0,
-         "NULL out returns 0");
-  EXPECT(vl_path_split("a", scratch, 0, &path) == 0,
-         "zero scratch_len returns 0");
+  EXPECT(vl_path_split(NULL, scratch, sizeof(scratch), &path) == 0, "NULL dotted returns 0");
+  EXPECT(vl_path_split("a", NULL, sizeof(scratch), &path) == 0, "NULL scratch returns 0");
+  EXPECT(vl_path_split("a", scratch, sizeof(scratch), NULL) == 0, "NULL out returns 0");
+  EXPECT(vl_path_split("a", scratch, 0, &path) == 0, "zero scratch_len returns 0");
 }
 
 /* ---- VL_OPTION_VALUE_DOT_NOTATION scalar coexistence ----------------- */
@@ -243,20 +229,28 @@ typedef struct dot_proxy {
 void test_dot_notation_string_and_int(void) {
   dot_proxy_t proxy = {0};
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "proxy.lane", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_DOT_NOTATION, .data = &proxy,
-             .offset = offsetof(dot_proxy_t, lane), .target = VL_TARGET_STRING),
-      VL_OPT(.name = "proxy.cpus", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_DOT_NOTATION, .data = &proxy,
-             .offset = offsetof(dot_proxy_t, cpus), .target = VL_TARGET_INT,
-             .has_int_min = true, .has_int_max = true, .int_min = 1,
-             .int_max = 8),
-      NULL,
+    VL_OPT(.name = "proxy.lane",
+           .type = VL_OPT_TYPE_LONG,
+           .value = VL_OPTION_VALUE_DOT_NOTATION,
+           .data = &proxy,
+           .offset = offsetof(dot_proxy_t, lane),
+           .target = VL_TARGET_STRING),
+    VL_OPT(.name = "proxy.cpus",
+           .type = VL_OPT_TYPE_LONG,
+           .value = VL_OPTION_VALUE_DOT_NOTATION,
+           .data = &proxy,
+           .offset = offsetof(dot_proxy_t, cpus),
+           .target = VL_TARGET_INT,
+           .has_int_min = true,
+           .has_int_max = true,
+           .int_min = 1,
+           .int_max = 8),
+    NULL,
   };
   char *argv[] = {
-      (char *)"valve",
-      (char *)"--proxy.lane=api.loop",
-      (char *)"--proxy.cpus=4",
+    (char *)"valve",
+    (char *)"--proxy.lane=api.loop",
+    (char *)"--proxy.cpus=4",
   };
   valve_t *v = parser_(options, 2);
   const vl_value_t *lane = NULL;
@@ -266,8 +260,7 @@ void test_dot_notation_string_and_int(void) {
   EXPECT(vl_parse(v, 3, argv) == 0, "dot-notation options parse without error");
 
   lane = vl_get(v, "proxy.lane");
-  EXPECT(lane && lane->kind == VL_VALUE_STRING &&
-             strcmp(lane->raw, "api.loop") == 0,
+  EXPECT(lane && lane->kind == VL_VALUE_STRING && strcmp(lane->raw, "api.loop") == 0,
          "dot-notation string leaf stored as string");
 
   cpus = vl_get(v, "proxy.cpus");
@@ -275,8 +268,7 @@ void test_dot_notation_string_and_int(void) {
          "dot-notation int leaf stored as int (target-driven)");
 
   vl_destroy(v);
-  EXPECT(proxy.lane && strcmp(proxy.lane, "api.loop") == 0,
-         "dot-notation string bound to caller target");
+  EXPECT(proxy.lane && strcmp(proxy.lane, "api.loop") == 0, "dot-notation string bound to caller target");
   EXPECT(proxy.cpus == 4, "dot-notation int bound to caller target");
   free(proxy.lane);
 }
@@ -284,11 +276,15 @@ void test_dot_notation_string_and_int(void) {
 void test_dot_notation_int_bounds(void) {
   dot_proxy_t proxy = {0};
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "proxy.cpus", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_DOT_NOTATION, .data = &proxy,
-             .offset = offsetof(dot_proxy_t, cpus), .target = VL_TARGET_INT,
-             .has_int_max = true, .int_max = 4),
-      NULL,
+    VL_OPT(.name = "proxy.cpus",
+           .type = VL_OPT_TYPE_LONG,
+           .value = VL_OPTION_VALUE_DOT_NOTATION,
+           .data = &proxy,
+           .offset = offsetof(dot_proxy_t, cpus),
+           .target = VL_TARGET_INT,
+           .has_int_max = true,
+           .int_max = 4),
+    NULL,
   };
   char *argv[] = {(char *)"valve", (char *)"--proxy.cpus=99"};
   valve_t *v = parser_(options, 1);
@@ -301,10 +297,13 @@ void test_dot_notation_int_bounds(void) {
 void test_dot_notation_int_rejects_nonint(void) {
   dot_proxy_t proxy = {0};
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "proxy.cpus", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_DOT_NOTATION, .data = &proxy,
-             .offset = offsetof(dot_proxy_t, cpus), .target = VL_TARGET_INT),
-      NULL,
+    VL_OPT(.name = "proxy.cpus",
+           .type = VL_OPT_TYPE_LONG,
+           .value = VL_OPTION_VALUE_DOT_NOTATION,
+           .data = &proxy,
+           .offset = offsetof(dot_proxy_t, cpus),
+           .target = VL_TARGET_INT),
+    NULL,
   };
   char *argv[] = {(char *)"valve", (char *)"--proxy.cpus=abc"};
   valve_t *v = parser_(options, 1);
@@ -313,4 +312,3 @@ void test_dot_notation_int_rejects_nonint(void) {
   EXPECT(vl_parse(v, 2, argv) == -1, "dot-notation int rejects non-integer");
   vl_destroy(v);
 }
-

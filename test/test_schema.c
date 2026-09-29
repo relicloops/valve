@@ -138,16 +138,17 @@ TEST_SOURCE_FILE("vl_requirements_copy_.c")
 TEST_SOURCE_FILE("vl_requirements_copy_table_.c")
 TEST_SOURCE_FILE("vl_results_clear_.c")
 TEST_SOURCE_FILE("vl_verb_get.c")
+
 /* === end ceedling valve sources === */
 
-
 void setUp(void) {}
+
 void tearDown(void) {}
 
 void test_schema_null_options_with_count_rejected(void) {
   const vl_executable_t settings = {
-      .options = NULL,
-      .option_count = 1,
+    .options = NULL,
+    .option_count = 1,
   };
   valve_t *v = vl_create(&settings);
   EXPECT(v == NULL, "NULL options with nonzero count rejected");
@@ -156,8 +157,8 @@ void test_schema_null_options_with_count_rejected(void) {
 
 void test_schema_null_commands_with_count_rejected(void) {
   const vl_executable_t settings = {
-      .verbs = NULL,
-      .verb_count = 1,
+    .verbs = NULL,
+    .verb_count = 1,
   };
   valve_t *v = vl_create(&settings);
   EXPECT(v == NULL, "NULL verbs with nonzero count rejected");
@@ -166,12 +167,12 @@ void test_schema_null_commands_with_count_rejected(void) {
 
 void test_schema_null_command_options_with_count_rejected(void) {
   const vl_verb_t *const verbs[] = {
-      VL_CMD(.name = "run", .options = NULL, .option_count = 1),
-      NULL,
+    VL_CMD(.name = "run", .options = NULL, .option_count = 1),
+    NULL,
   };
   const vl_executable_t settings = {
-      .verbs = verbs,
-      .verb_count = 1,
+    .verbs = verbs,
+    .verb_count = 1,
   };
   valve_t *v = vl_create(&settings);
   EXPECT(v == NULL, "NULL verb options with nonzero count rejected");
@@ -180,7 +181,7 @@ void test_schema_null_command_options_with_count_rejected(void) {
 
 void test_schema_invalid_assign_rejected(void) {
   const vl_executable_t settings = {
-      .assign = (vl_assign_t)99,
+    .assign = (vl_assign_t)99,
   };
   valve_t *v = vl_create(&settings);
   EXPECT(v == NULL, "invalid assignment form rejected");
@@ -189,9 +190,8 @@ void test_schema_invalid_assign_rejected(void) {
 
 void test_schema_empty_option_name_rejected(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_STRING),
-      NULL,
+    VL_OPT(.name = "", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_STRING),
+    NULL,
   };
   const vl_executable_t settings = {.options = options, .option_count = 1};
   valve_t *v = vl_create(&settings);
@@ -201,9 +201,8 @@ void test_schema_empty_option_name_rejected(void) {
 
 void test_schema_option_name_with_equals_rejected(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "bad=name", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_STRING),
-      NULL,
+    VL_OPT(.name = "bad=name", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_STRING),
+    NULL,
   };
   const vl_executable_t settings = {.options = options, .option_count = 1};
   valve_t *v = vl_create(&settings);
@@ -213,9 +212,8 @@ void test_schema_option_name_with_equals_rejected(void) {
 
 void test_schema_dash_option_name_rejected(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "-bad", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_STRING),
-      NULL,
+    VL_OPT(.name = "-bad", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_STRING),
+    NULL,
   };
   const vl_executable_t settings = {.options = options, .option_count = 1};
   valve_t *v = vl_create(&settings);
@@ -225,9 +223,8 @@ void test_schema_dash_option_name_rejected(void) {
 
 void test_schema_invalid_short_name_rejected(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "bad", .short_name = '-', .type = VL_OPT_TYPE_SHORT,
-             .value = VL_OPTION_VALUE_STRING),
-      NULL,
+    VL_OPT(.name = "bad", .short_name = '-', .type = VL_OPT_TYPE_SHORT, .value = VL_OPTION_VALUE_STRING),
+    NULL,
   };
   const vl_executable_t settings = {.options = options, .option_count = 1};
   valve_t *v = vl_create(&settings);
@@ -237,9 +234,8 @@ void test_schema_invalid_short_name_rejected(void) {
 
 void test_schema_invalid_option_enum_rejected(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "bad", .type = VL_OPT_TYPE_LONG,
-             .value = (vl_option_value_t)99),
-      NULL,
+    VL_OPT(.name = "bad", .type = VL_OPT_TYPE_LONG, .value = (vl_option_value_t)99),
+    NULL,
   };
   const vl_executable_t settings = {.options = options, .option_count = 1};
   valve_t *v = vl_create(&settings);
@@ -249,9 +245,8 @@ void test_schema_invalid_option_enum_rejected(void) {
 
 void test_schema_invalid_repeat_enum_rejected(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "bad", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_STRING, .repeat = (vl_option_repeat_t)99),
-      NULL,
+    VL_OPT(.name = "bad", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_STRING, .repeat = (vl_option_repeat_t)99),
+    NULL,
   };
   const vl_executable_t settings = {.options = options, .option_count = 1};
   valve_t *v = vl_create(&settings);
@@ -261,9 +256,8 @@ void test_schema_invalid_repeat_enum_rejected(void) {
 
 void test_schema_invalid_target_enum_rejected(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "bad", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_STRING, .target = (vl_target_t)99),
-      NULL,
+    VL_OPT(.name = "bad", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_STRING, .target = (vl_target_t)99),
+    NULL,
   };
   const vl_executable_t settings = {.options = options, .option_count = 1};
   valve_t *v = vl_create(&settings);
@@ -273,9 +267,8 @@ void test_schema_invalid_target_enum_rejected(void) {
 
 void test_schema_unknown_form_bits_rejected(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "bad", .type = (vl_opt_type_t)(1u << 20),
-             .value = VL_OPTION_VALUE_STRING),
-      NULL,
+    VL_OPT(.name = "bad", .type = (vl_opt_type_t)(1u << 20), .value = VL_OPTION_VALUE_STRING),
+    NULL,
   };
   const vl_executable_t settings = {.options = options, .option_count = 1};
   valve_t *v = vl_create(&settings);
@@ -285,8 +278,8 @@ void test_schema_unknown_form_bits_rejected(void) {
 
 void test_schema_empty_command_name_rejected(void) {
   const vl_verb_t *const verbs[] = {
-      VL_CMD(.name = ""),
-      NULL,
+    VL_CMD(.name = ""),
+    NULL,
   };
   const vl_executable_t settings = {.verbs = verbs};
   valve_t *v = vl_create(&settings);
@@ -296,8 +289,8 @@ void test_schema_empty_command_name_rejected(void) {
 
 void test_schema_dash_command_name_rejected(void) {
   const vl_verb_t *const verbs[] = {
-      VL_CMD(.name = "-run"),
-      NULL,
+    VL_CMD(.name = "-run"),
+    NULL,
   };
   const vl_executable_t settings = {.verbs = verbs};
   valve_t *v = vl_create(&settings);
@@ -307,11 +300,9 @@ void test_schema_dash_command_name_rejected(void) {
 
 void test_schema_duplicate_long_rejected(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "mode", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_STRING),
-      VL_OPT(.name = "mode", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_INT),
-      NULL,
+    VL_OPT(.name = "mode", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_STRING),
+    VL_OPT(.name = "mode", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_INT),
+    NULL,
   };
   const vl_executable_t settings = {.options = options, .option_count = 2};
   valve_t *v = vl_create(&settings);
@@ -321,11 +312,9 @@ void test_schema_duplicate_long_rejected(void) {
 
 void test_schema_duplicate_short_rejected(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "alpha", .short_name = 'x', .type = VL_OPT_TYPE_SHORT,
-             .value = VL_OPTION_VALUE_STRING),
-      VL_OPT(.name = "beta", .short_name = 'x', .type = VL_OPT_TYPE_SHORT,
-             .value = VL_OPTION_VALUE_STRING),
-      NULL,
+    VL_OPT(.name = "alpha", .short_name = 'x', .type = VL_OPT_TYPE_SHORT, .value = VL_OPTION_VALUE_STRING),
+    VL_OPT(.name = "beta", .short_name = 'x', .type = VL_OPT_TYPE_SHORT, .value = VL_OPTION_VALUE_STRING),
+    NULL,
   };
   const vl_executable_t settings = {.options = options, .option_count = 2};
   valve_t *v = vl_create(&settings);
@@ -335,9 +324,9 @@ void test_schema_duplicate_short_rejected(void) {
 
 void test_schema_duplicate_command_rejected(void) {
   const vl_verb_t *const verbs[] = {
-      VL_CMD(.name = "run"),
-      VL_CMD(.name = "run"),
-      NULL,
+    VL_CMD(.name = "run"),
+    VL_CMD(.name = "run"),
+    NULL,
   };
   const vl_executable_t settings = {.verbs = verbs};
   valve_t *v = vl_create(&settings);
@@ -347,22 +336,20 @@ void test_schema_duplicate_command_rejected(void) {
 
 void test_schema_command_collides_with_global_rejected(void) {
   const vl_option_t *const global_options[] = {
-      VL_OPT(.name = "tags", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_STRING),
-      NULL,
+    VL_OPT(.name = "tags", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_STRING),
+    NULL,
   };
   const vl_option_t *const local_options[] = {
-      VL_OPT(.name = "tags", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_STRING),
-      NULL,
+    VL_OPT(.name = "tags", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_STRING),
+    NULL,
   };
   const vl_verb_t *const verbs[] = {
-      VL_CMD(.name = "build", .options = local_options),
-      NULL,
+    VL_CMD(.name = "build", .options = local_options),
+    NULL,
   };
   const vl_executable_t settings = {
-      .options = global_options,
-      .verbs = verbs,
+    .options = global_options,
+    .verbs = verbs,
   };
   valve_t *v = vl_create(&settings);
   EXPECT(v == NULL, "verb-local long name colliding with global rejected");
@@ -371,22 +358,20 @@ void test_schema_command_collides_with_global_rejected(void) {
 
 void test_schema_command_short_collides_with_global_rejected(void) {
   const vl_option_t *const global_options[] = {
-      VL_OPT(.name = "verbose", .short_name = 'v',
-             .type = VL_OPT_TYPE_SHORT, .value = VL_OPTION_VALUE_STRING),
-      NULL,
+    VL_OPT(.name = "verbose", .short_name = 'v', .type = VL_OPT_TYPE_SHORT, .value = VL_OPTION_VALUE_STRING),
+    NULL,
   };
   const vl_option_t *const local_options[] = {
-      VL_OPT(.name = "version", .short_name = 'v',
-             .type = VL_OPT_TYPE_SHORT, .value = VL_OPTION_VALUE_STRING),
-      NULL,
+    VL_OPT(.name = "version", .short_name = 'v', .type = VL_OPT_TYPE_SHORT, .value = VL_OPTION_VALUE_STRING),
+    NULL,
   };
   const vl_verb_t *const verbs[] = {
-      VL_CMD(.name = "build", .options = local_options),
-      NULL,
+    VL_CMD(.name = "build", .options = local_options),
+    NULL,
   };
   const vl_executable_t settings = {
-      .options = global_options,
-      .verbs = verbs,
+    .options = global_options,
+    .verbs = verbs,
   };
   valve_t *v = vl_create(&settings);
   EXPECT(v == NULL, "verb-local short name colliding with global rejected");
@@ -395,9 +380,8 @@ void test_schema_command_short_collides_with_global_rejected(void) {
 
 void test_schema_reserved_option_name_rejected(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "help", .type = VL_OPT_TYPE_LONG,
-             .value = VL_OPTION_VALUE_STRING),
-      NULL,
+    VL_OPT(.name = "help", .type = VL_OPT_TYPE_LONG, .value = VL_OPTION_VALUE_STRING),
+    NULL,
   };
   vl_executable_t settings = {.options = options};
   valve_t *v = vl_create(&settings);
@@ -407,8 +391,8 @@ void test_schema_reserved_option_name_rejected(void) {
 
 void test_schema_reserved_command_name_rejected(void) {
   const vl_verb_t *const verbs[] = {
-      VL_CMD(.name = "version"),
-      NULL,
+    VL_CMD(.name = "version"),
+    NULL,
   };
   vl_executable_t settings = {.verbs = verbs};
   valve_t *v = vl_create(&settings);
@@ -418,13 +402,11 @@ void test_schema_reserved_command_name_rejected(void) {
 
 void test_schema_reserved_short_name_rejected(void) {
   const vl_option_t *const options[] = {
-      VL_OPT(.name = "host", .short_name = 'h', .type = VL_OPT_TYPE_SHORT,
-             .value = VL_OPTION_VALUE_STRING),
-      NULL,
+    VL_OPT(.name = "host", .short_name = 'h', .type = VL_OPT_TYPE_SHORT, .value = VL_OPTION_VALUE_STRING),
+    NULL,
   };
   vl_executable_t settings = {.options = options};
   valve_t *v = vl_create(&settings);
   EXPECT(v == NULL, "option with short_name 'h' rejected in strict mode");
   vl_destroy(v);
 }
-

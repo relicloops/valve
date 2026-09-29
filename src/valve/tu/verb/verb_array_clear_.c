@@ -3,8 +3,10 @@
 #include <stdlib.h>
 
 void verb_array_clear_(valve_verb_t *verbs, size_t count) {
-  if (!verbs)
+
+  if (!verbs) {
     return;
+  }
 
   for (size_t i = 0; i < count; ++i) {
     vl_option_t *options = verbs[i].options;
@@ -12,11 +14,13 @@ void verb_array_clear_(valve_verb_t *verbs, size_t count) {
     free(verbs[i].name);
     free(verbs[i].description);
     free(verbs[i].usage);
+
     for (size_t j = 0; j < verbs[i].option_count; ++j) {
       free((char *)options[j].name);
       free((char *)options[j].description);
       free((char *)options[j].usage);
     }
+
     free(options);
 
     verb_array_clear_(verbs[i].verbs, verbs[i].verb_count);
@@ -25,8 +29,10 @@ void verb_array_clear_(valve_verb_t *verbs, size_t count) {
 }
 
 void vl_verbs_clear_(valve_t *v) {
-  if (!v)
+
+  if (!v) {
     return;
+  }
 
   verb_array_clear_(v->verbs_, v->verb_count_);
   free(v->verbs_);
