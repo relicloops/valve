@@ -143,3 +143,17 @@ For a module distributed as headers only:
 - A lower-level module calling back into a higher-level/host module.
 - Silently ignoring a function's return value when failure is possible.
 - Unbounded dynamic allocation or recursion with no documented bound.
+
+## Formatting and vertical spacing
+
+Two layers, kept apart. clang-format owns the mechanical layout: indentation (two spaces), wrapping at 120 columns, brace placement (attached), argument layout. It keeps existing blank lines but never invents meaningful ones, so vertical spacing is a house style with its own rules:
+
+- One blank line after the initial declaration/setup block of a function, before the first statement that acts on it.
+- One blank line before a top-level `if`, `switch`, `for`, `while`, or `return` that begins a new logical phase.
+- Keep phases visibly separate: validate, build, serialize, return.
+- No blank line between tightly related statements, and none inside a run of short guard clauses.
+- Group declarations by purpose, not only by type.
+- Never more than one consecutive blank line.
+- Prefer named intermediate booleans over a condition chain of ten or more terms. That is a semantic refactor for the agent, not something a formatter does.
+
+The blank-line rules are applied deterministically by `scripts/c-blank-lines.py`, followed by clang-format, through `scripts/c-format.sh --codemod`, both in `core.os-arm-v1`. Agents spend judgment only on what a tool cannot decide: splitting conditions, extracting helpers, naming phases.
