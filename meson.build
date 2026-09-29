@@ -1,7 +1,7 @@
 project(
   'valve',
   'c',
-  version: '2.0.1-014',
+  version: '2.0.2-015',
   license: 'Apache-2.0',
   meson_version: '>=1.4',
   default_options: [

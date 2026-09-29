@@ -4,6 +4,26 @@ All notable changes to this project are documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project uses [Conventional Commits](https://www.conventionalcommits.org/).
 
+## [2.0.2-015] - 2026-09-29
+
+### Fixed
+
+- **tu**: Include the declaring header in two prototype-less units
+
+### Refactored
+
+- **parse**: Split the parser into per-function units
+- **c23**: Use nullptr and drop stdbool.h
+
+### Documentation
+
+- **rules**: Add C formatting and vertical spacing
+- **include**: Add Doxygen comments to color.h and valve.h
+
+### Build
+
+- **meson**: Version the shared library as libvalve.so.2
+- **meson**: Drop _GNU_SOURCE from the library c_args
 ## [2.0.0-011] - 2026-09-11
 
 ### Fixed
