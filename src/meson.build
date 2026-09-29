@@ -115,7 +115,7 @@ valve_lib = library(
   c_args: valve_c_args,
   install: true,
   version: valve_version.split('-')[0],
-  soversion: '0',
+  soversion: '2',
 )
 
 valve_dep = declare_dependency(
